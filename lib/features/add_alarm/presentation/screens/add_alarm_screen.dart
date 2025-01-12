@@ -43,78 +43,90 @@ class AddAlarmScreen extends StatelessWidget {
                     children: [
                       // Hour Dropdown
                       Obx(() => DropdownButton<int>(
-                            value: controller.selectedHour.value,
-                            items: List.generate(12, (index) {
-                              return DropdownMenuItem(
-                                value: index + 1,
-                                child: Text(
-                                  (index + 1).toString(),
-                                  style: GoogleFonts.poppins(
-                                      fontSize: getWidth(30),
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              );
-                            }),
-                            onChanged: (value) {
-                              if (value != null) {
-                                controller.selectedHour.value = value;
-                              }
-                            },
-                          )),
+                        value: controller.selectedHour.value,
+                        items: List.generate(12, (index) {
+                          return DropdownMenuItem(
+                            value: index + 1,
+                            child: Text(
+                              (index + 1).toString(),
+                              style: GoogleFonts.poppins(
+                                fontSize: getWidth(30),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }),
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.selectedHour.value = value;
+                          }
+                        },
+                        dropdownColor: AppColors.yellowContainer,
+
+                        menuMaxHeight: 200,
+                      )),
 
                       // Minute Dropdown
                       Obx(() => DropdownButton<int>(
-                            value: controller.selectedMinute.value,
-                            items: List.generate(60, (index) {
-                              return DropdownMenuItem(
-                                value: index,
-                                child: Text(
-                                  index.toString().padLeft(2, '0'),
-                                  style: GoogleFonts.poppins(
-                                      fontSize: getWidth(30),
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              );
-                            }),
-                            onChanged: (value) {
-                              if (value != null) {
-                                controller.selectedMinute.value = value;
-                              }
-                            },
-                          )),
+                        value: controller.selectedMinute.value,
+                        items: List.generate(60, (index) {
+                          return DropdownMenuItem(
+                            value: index,
+                            child: Text(
+                              index.toString().padLeft(2, '0'),
+                              style: GoogleFonts.poppins(
+                                fontSize: getWidth(30),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }),
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.selectedMinute.value = value;
+                          }
+                        },
+                        dropdownColor: AppColors.yellowContainer,
+                        menuMaxHeight: 200,
+                      )),
 
                       // AM/PM Dropdown
                       Obx(() => DropdownButton<bool>(
-                            value: controller.isAm.value,
-                            items: [
-                              DropdownMenuItem(
-                                value: true,
-                                child: Text(
-                                  "am",
-                                  style: GoogleFonts.poppins(
-                                      fontSize: getWidth(30),
-                                      fontWeight: FontWeight.w500),
-                                ),
+                        value: controller.isAm.value,
+                        items: [
+                          DropdownMenuItem(
+                            value: true,
+                            child: Text(
+                              "am",
+                              style: GoogleFonts.poppins(
+                                fontSize: getWidth(30),
+                                fontWeight: FontWeight.w500,
                               ),
-                              DropdownMenuItem(
-                                value: false,
-                                child: Text(
-                                  "pm",
-                                  style: GoogleFonts.poppins(
-                                      fontSize: getWidth(30),
-                                      fontWeight: FontWeight.w500),
-                                ),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: false,
+                            child: Text(
+                              "pm",
+                              style: GoogleFonts.poppins(
+                                fontSize: getWidth(30),
+                                fontWeight: FontWeight.w500,
                               ),
-                            ],
-                            onChanged: (value) {
-                              if (value != null) {
-                                controller.isAm.value = value;
-                              }
-                            },
-                          )),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.isAm.value = value;
+                          }
+                        },
+                        dropdownColor: AppColors.yellowContainer,
+                        menuMaxHeight: 150,
+                      )),
                     ],
                   ),
                 ),
+
 
                 // Background Section
                 Container(

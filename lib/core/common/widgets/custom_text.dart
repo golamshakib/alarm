@@ -1,3 +1,4 @@
+import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -26,9 +27,9 @@ class CustomText extends StatelessWidget {
     return Text(
       text,
       style: GoogleFonts.poppins(
-          fontSize: fontSize ?? getWidth(14),
-          color: color ?? Colors.black,
-          fontWeight: fontWeight ?? FontWeight.w400),
+          fontSize: fontSize ?? getWidth(16),
+          color: color ?? AppColors.textPrimary,
+          fontWeight: fontWeight ?? FontWeight.w600),
       overflow: textOverflow,
       maxLines: maxLines,
     );

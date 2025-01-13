@@ -43,7 +43,8 @@ class AppColors {
 
   // Container Colors
   static const Color greyContainer = Color(0xFFF7F7F7);
-  static const Color yellowContainer = Color(0xFFFFF5E1);
+  static const Color lightYellowContainer = Color(0xFFFFF5E1);
+  static const Color yellowContainer = Color(0xFFFFA845);
 
   // Utility Colors
   static const Color success = Color(0xFF4CAF50);

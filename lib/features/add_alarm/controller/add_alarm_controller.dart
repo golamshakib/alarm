@@ -2,10 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AddAlarmController extends GetxController {
+
+  final labelController = TextEditingController();
   // Time management
   var selectedHour = 7.obs;
   var selectedMinute = 15.obs;
   var isAm = true.obs;
+  var label = 'Morning Alarm'.obs;
+  var selectedSnoozeDuration = 10.obs;
+  final List<int> snoozeOptions = [5, 10, 15, 20, 25, 30];
+  RxBool isSwitched = false.obs;
+
+  // Vibration
+  var isToggled = false.obs;
+  // Method to toggle the state
+  void vibrationToggle() {
+    isToggled.value = !isToggled.value;
+  }
 
   // Background
   var selectedBackground = "Cute Dog in bed".obs;
@@ -16,20 +29,35 @@ class AddAlarmController extends GetxController {
     "Su": false,
     "Mo": true,
     "Tu": true,
-    "We": true,
-    "Th": true,
+    "We": false,
+    "Th": false,
     "Fr": true,
     "Sa": false,
   }.obs;
 
-  // Snooze duration
-  var snoozeDuration = 10.obs; // In minutes
+  // Label
+  // Set initial label text
+  void setInitialLabel(String text) {
+    label.value = text;
+    labelController.text = text;
+  }
+
+  // Update label value
+  void updateLabel(String text) {
+    label.value = text;
+    labelController.text = text;
+  }
+
+  void updateSnoozeDuration(int duration) {
+    selectedSnoozeDuration.value = duration;
+  }
+
 
   // Vibration toggle
   var vibrationEnabled = true.obs;
 
   // Volume
-  var volume = 5.0.obs;
+  var volume = 100.0.obs;
 
   // Update time
   void setTime(int hour, int minute, bool am) {
@@ -44,10 +72,6 @@ class AddAlarmController extends GetxController {
     repeatDays.refresh(); // Refresh to update UI
   }
 
-  // Set snooze duration
-  void setSnooze(int duration) {
-    snoozeDuration.value = duration;
-  }
 
   // Toggle vibration
   void toggleVibration(bool value) {
@@ -57,5 +81,10 @@ class AddAlarmController extends GetxController {
   // Set volume
   void setVolume(double value) {
     volume.value = value;
+  }
+  @override
+  void dispose() {
+    labelController.dispose();
+    super.dispose();
   }
 }

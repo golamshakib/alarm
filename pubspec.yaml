@@ -42,10 +42,14 @@ dependencies:
   url_launcher: ^6.1.12
   google_fonts: ^6.2.1
   shared_preferences: ^2.3.2
+  widgets_easier: ^0.0.10
+
   # Icons
   cupertino_icons: ^1.0.8
   # State Management
-  get: ^4.6.6
+  image_picker: ^0.8.7
+  file_picker: ^5.2.3
+  get: ^4.6.5
 
 dev_dependencies:
   flutter_test:

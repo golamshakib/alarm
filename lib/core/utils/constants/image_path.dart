@@ -11,6 +11,8 @@ class ImagePath{
   static const  String alarmImage='$_basePath/alarm_image.png';
   static const  String dog='$_basePath/dog.png';
   static const  String extraImage ='$_basePath/extra_image.png';
+  static const  String lineImage ='$_basePath/line_image.png';
+  static const  String lineImage2 ='$_basePath/line_image.png';
 
 
 }

@@ -1,13 +1,12 @@
-// import 'package:get/get.dart';
-//
-// class PreviewScreenController extends GetxController {
-//
-//   var isPlaying = <bool>[].obs;
-//
-//   void togglePlay(int index) {
-//     for (int i = 0; i < isPlaying.length; i++) {
-//       isPlaying[i] = (i == index) ? !isPlaying[i] : false;
-//     }
-//     isPlaying.refresh();
-//   }
-// }
+import 'package:get/get.dart';
+
+class PreviewScreenController extends GetxController {
+
+  RxBool isPlaying = false.obs;
+  RxBool showExtraImage = false.obs; // Observable for extra image visibility
+
+  void togglePlay() {
+    isPlaying.value = !isPlaying.value;
+    showExtraImage.value = isPlaying.value; // Show extra image when playing
+  }
+}

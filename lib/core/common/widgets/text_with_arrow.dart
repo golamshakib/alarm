@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'custom_text.dart'; // Import your CustomText widget
 
 class TextWithArrow extends StatelessWidget {
-  final String text;
+  final String? text;
   final double? fontSize;
   final TextOverflow? textOverflow;
   final Color? color;
@@ -13,7 +13,7 @@ class TextWithArrow extends StatelessWidget {
 
   const TextWithArrow({
     super.key,
-    required this.text,
+    this.text,
     this.fontSize,
     this.textOverflow = TextOverflow.ellipsis,
     this.color,
@@ -29,7 +29,7 @@ class TextWithArrow extends StatelessWidget {
         children: [
           // CustomText Widget
           CustomText(
-            text: text,
+            text: text ?? '',
             fontSize: fontSize ?? getWidth(14),
             maxLines: 1,
             textOverflow: TextOverflow.ellipsis,

@@ -1,10 +1,10 @@
 import 'package:alarm/core/utils/constants/icon_path.dart';
 import 'package:alarm/features/alarm/alarm_screen.dart';
-import 'package:alarm/features/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../add_alarm/presentation/screens/add_alarm_screen.dart';
+import '../../settings/presentation/screens/settings_screen.dart';
 
 class CreatorNavBarController extends GetxController {
 

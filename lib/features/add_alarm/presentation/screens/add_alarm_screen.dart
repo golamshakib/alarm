@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/constants/image_path.dart';
+import '../../../../routes/app_routes.dart';
 import '../../controller/add_alarm_controller.dart';
 
 class AddAlarmScreen extends StatelessWidget {
@@ -137,11 +138,16 @@ class AddAlarmScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Background Info
-                      const Row(
+                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText(text: 'Background:'),
-                          TextWithArrow(text: 'Cute Dog in bed'),
+                          const CustomText(text: 'Background:'),
+                          InkWell(
+                            onTap: (){
+                              Get.toNamed(AppRoute.changeBackgroundScreen);
+
+                            },
+                              child: const TextWithArrow(text: 'Cute Dog in bed')),
                         ],
                       ),
                       SizedBox(height: getHeight(16)),

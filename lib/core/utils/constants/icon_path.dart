@@ -15,5 +15,6 @@ class IconPath{
   static const  String settingsInactive='$_basePath/settings_inactive.png';
   static const  String addIconActive ='$_basePath/add_icon_active.png';
   static const  String imageUploadIcon ='$_basePath/camera_icon.png';
+  static const  String editSquare ='$_basePath/edit_square.png';
 
 }

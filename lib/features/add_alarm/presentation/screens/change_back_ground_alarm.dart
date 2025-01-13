@@ -96,8 +96,9 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                               top: 0,
                               right: 0,
                               child: Container(
-                                width: getWidth(100),
-                                height: getHeight(100),
+                                // width: getWidth(100),
+                                // height: getHeight(100),
+                                padding: const EdgeInsets.all(50),
                                 decoration: BoxDecoration(
                                   borderRadius: const BorderRadius.only(
                                     bottomRight: Radius.circular(10),

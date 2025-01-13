@@ -23,6 +23,8 @@ class PreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(PreviewScreenController()); // Initialize controller
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -42,46 +44,43 @@ class PreviewScreen extends StatelessWidget {
                     CustomText(text: title),
                     const CustomText(text: ':'),
                     SizedBox(width: getWidth(8)),
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     // controller.togglePlay(index);
-                    //   },
-                    //   child: Obx(() {
-                    //     return Row(
-                    //       children: [
-                    //         Icon(
-                    //           controller.isPlaying[index]
-                    //               ? Icons.play_circle_fill_rounded
-                    //               : Icons.play_circle_outline_rounded,
-                    //           color: Colors.orange,
-                    //           size: 25,
-                    //         ),
-                    //         if (controller.isPlaying[index]) ...[
-                    //           SizedBox(width: getWidth(8)),
-                    //           Image.asset(item['extraImage'] ?? '', height: getHeight(25), width: getWidth(75),),
-                    //         ],
-                    //       ],
-                    //     );
-                    //   }),
-                    // ),
+                    Obx(() {
+                      return GestureDetector(
+                        onTap: controller.togglePlay,
+                        child: Icon(
+                          controller.isPlaying.value
+                              ? Icons.play_circle_fill_rounded
+                              : Icons.play_circle_outline_rounded,
+                          color: Colors.orange,
+                          size: 25,
+                        ),
+                      );
+                    }),
                     SizedBox(width: getWidth(10)),
-                    Image.asset(musicUrl,  height: getHeight(25), width: getWidth(75),)
+                    Obx(() {
+                      return controller.showExtraImage.value
+                          ? Image.asset(
+                        musicUrl,
+                        height: getHeight(25),
+                        width: getWidth(75),
+                      )
+                          : const SizedBox();
+                    }),
                   ],
                 ),
                 SizedBox(height: getHeight(16)),
-            
+
                 // Image Preview
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
                     image,
                     width: double.infinity,
-                    // height: 300,
                     fit: BoxFit.contain,
                   ),
                 ),
                 SizedBox(height: getHeight(20)),
-            
+
                 GestureDetector(
                   onTap: () {},
                   child: Container(

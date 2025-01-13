@@ -14,7 +14,7 @@ class AddAlarmController extends GetxController {
   RxBool isSwitched = false.obs;
 
   // Vibration
-  var isToggled = false.obs;
+  var isToggled = true.obs;
   // Method to toggle the state
   void vibrationToggle() {
     isToggled.value = !isToggled.value;
@@ -53,8 +53,7 @@ class AddAlarmController extends GetxController {
   }
 
 
-  // Vibration toggle
-  var vibrationEnabled = true.obs;
+
 
   // Volume
   var volume = 100.0.obs;
@@ -70,12 +69,6 @@ class AddAlarmController extends GetxController {
   void toggleDay(String day) {
     repeatDays[day] = !repeatDays[day]!;
     repeatDays.refresh(); // Refresh to update UI
-  }
-
-
-  // Toggle vibration
-  void toggleVibration(bool value) {
-    vibrationEnabled.value = value;
   }
 
   // Set volume

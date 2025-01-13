@@ -6,6 +6,7 @@ import 'custom_text.dart'; // Import your CustomText widget
 class TextWithArrow extends StatelessWidget {
   final String text;
   final double? fontSize;
+  final TextOverflow? textOverflow;
   final Color? color;
   final FontWeight? fontWeight;
   final VoidCallback? onTap;
@@ -14,6 +15,7 @@ class TextWithArrow extends StatelessWidget {
     super.key,
     required this.text,
     this.fontSize,
+    this.textOverflow = TextOverflow.ellipsis,
     this.color,
     this.fontWeight,
     this.onTap,
@@ -29,6 +31,8 @@ class TextWithArrow extends StatelessWidget {
           CustomText(
             text: text,
             fontSize: fontSize ?? getWidth(14),
+            maxLines: 1,
+            textOverflow: TextOverflow.ellipsis,
             color: AppColors.textGrey,
             fontWeight: fontWeight ?? FontWeight.w400
           ),

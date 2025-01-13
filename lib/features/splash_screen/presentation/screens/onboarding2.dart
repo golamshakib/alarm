@@ -90,7 +90,10 @@ class OnBoarding2Screen extends StatelessWidget {
                           Get.toNamed(AppRoute.onboarding3);
                         },
                         child: Padding(
-                          padding: EdgeInsets.only(right: getWidth(8)),
+                          padding: EdgeInsets.only(
+                            // right: getWidth(16),
+                            bottom: getHeight(16),
+                          ),
                           child: Image.asset(
                             IconPath.onboardingNext2,
                             height: getHeight(65),

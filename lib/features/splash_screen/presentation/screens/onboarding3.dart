@@ -74,7 +74,6 @@ class OnBoarding3Screen extends StatelessWidget {
                     ),
                     SizedBox(height: getHeight(48)),
 
-                    // Next Button
                     Align(
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
@@ -82,7 +81,9 @@ class OnBoarding3Screen extends StatelessWidget {
                           Get.toNamed(AppRoute.navBarScreen);
                         },
                         child: Padding(
-                          padding: EdgeInsets.only(right: getWidth(8)),
+                          padding: EdgeInsets.only(
+                            // right: getWidth(16),
+                            bottom: getHeight(16),),
                           child: Image.asset(
                             IconPath.onboardingNext3,
                             height: getHeight(65),

@@ -3,6 +3,8 @@ import 'package:alarm/features/splash_screen/presentation/screens/onboarding1.da
 import 'package:alarm/features/splash_screen/presentation/screens/onboarding2.dart';
 import 'package:get/get.dart';
 
+import '../features/add_alarm/presentation/screens/change_back_ground_alarm.dart';
+import '../features/add_alarm/presentation/screens/create_new_backgroud_alarm.dart';
 import '../features/authentication/presentation/screens/login_screen.dart';
 import '../features/splash_screen/presentation/screens/onboarding3.dart';
 import '../features/splash_screen/presentation/screens/splash_screen.dart';
@@ -13,6 +15,8 @@ class AppRoute {
   static String onboarding2 = "/onboarding2";
   static String onboarding3 = "/onboarding3";
   static String navBarScreen = "/navBarScreen";
+  static String changeBackgroundScreen = "/changeBackgroundScreen";
+  static String createNewAlarmScreen = "/createNewAlarmScreen";
 
   static String loginScreen = "/loginScreen";
 
@@ -25,5 +29,7 @@ class AppRoute {
     GetPage(name: navBarScreen, page: () => const CreatorNavBar()),
 
     GetPage(name: loginScreen, page: () => const LoginScreen()),
+    GetPage(name: changeBackgroundScreen, page: () => const ChangeBackGroundAlarm()),
+    GetPage(name: createNewAlarmScreen, page: () => const CreateNewAlarmScreen ()),
   ];
 }

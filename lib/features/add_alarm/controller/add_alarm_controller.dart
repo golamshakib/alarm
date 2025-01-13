@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AddAlarmController extends GetxController {
+import '../data/add_alarm_model.dart';
 
+
+class AddAlarmController extends GetxController {
   final labelController = TextEditingController();
+
   // Time management
   var selectedHour = 7.obs;
   var selectedMinute = 15.obs;
@@ -11,14 +14,6 @@ class AddAlarmController extends GetxController {
   var label = 'Morning Alarm'.obs;
   var selectedSnoozeDuration = 10.obs;
   final List<int> snoozeOptions = [5, 10, 15, 20, 25, 30];
-  RxBool isSwitched = false.obs;
-
-  // Vibration
-  var isToggled = false.obs;
-  // Method to toggle the state
-  void vibrationToggle() {
-    isToggled.value = !isToggled.value;
-  }
 
   // Background
   var selectedBackground = "Cute Dog in bed".obs;
@@ -35,53 +30,77 @@ class AddAlarmController extends GetxController {
     "Sa": false,
   }.obs;
 
-  // Label
-  // Set initial label text
-  void setInitialLabel(String text) {
-    label.value = text;
-    labelController.text = text;
+  // Vibration
+  var isToggled = false.obs;
+  void toggle() {
+    isToggled.value = !isToggled.value;
   }
-
-  // Update label value
-  void updateLabel(String text) {
-    label.value = text;
-    labelController.text = text;
-  }
-
-  void updateSnoozeDuration(int duration) {
-    selectedSnoozeDuration.value = duration;
-  }
-
-
-  // Vibration toggle
-  var vibrationEnabled = true.obs;
 
   // Volume
   var volume = 100.0.obs;
 
-  // Update time
-  void setTime(int hour, int minute, bool am) {
-    selectedHour.value = hour;
-    selectedMinute.value = minute;
-    isAm.value = am;
-  }
+  // Alarm List
+  var alarms = <AlarmModel>[].obs;
+
+  // Methods
 
   // Toggle repeat days
   void toggleDay(String day) {
-    repeatDays[day] = !repeatDays[day]!;
-    repeatDays.refresh(); // Refresh to update UI
-  }
-
-
-  // Toggle vibration
-  void toggleVibration(bool value) {
-    vibrationEnabled.value = value;
+    if (repeatDays.containsKey(day)) {
+      repeatDays[day] = !repeatDays[day]!;
+      repeatDays.refresh(); // Refresh to update the UI
+    }
   }
 
   // Set volume
   void setVolume(double value) {
     volume.value = value;
   }
+
+  // Vibration toggle
+  void vibrationToggle() {
+    isToggled.value = !isToggled.value; // Toggle the vibration state
+  }
+
+  // Save alarm to the list
+  void saveAlarm() {
+    final List<String> activeDays = repeatDays.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
+
+    final newAlarm = AlarmModel(
+      hour: selectedHour.value,
+      minute: selectedMinute.value,
+      isAm: isAm.value,
+      label: label.value,
+      backgroundName: selectedBackground.value,
+      backgroundImage: selectedBackgroundImage.value,
+      repeatDays: activeDays,
+      vibrationEnabled: isToggled.value,
+      snoozeDuration: selectedSnoozeDuration.value,
+      volume: volume.value,
+    );
+
+    alarms.add(newAlarm);
+    Get.snackbar("Success", "Alarm added successfully!",
+        snackPosition: SnackPosition.BOTTOM);
+  }
+
+  // Reset all fields after saving an alarm
+  void resetFields() {
+    selectedHour.value = 7;
+    selectedMinute.value = 15;
+    isAm.value = true;
+    label.value = 'Morning Alarm';
+    selectedBackground.value = "Cute Dog in bed";
+    selectedBackgroundImage.value = "assets/images/dog.jpg";
+    repeatDays.updateAll((key, value) => false);
+    isToggled.value = false;
+    selectedSnoozeDuration.value = 10;
+    volume.value = 100.0;
+  }
+
   @override
   void dispose() {
     labelController.dispose();

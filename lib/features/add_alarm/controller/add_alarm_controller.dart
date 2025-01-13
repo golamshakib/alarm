@@ -57,7 +57,7 @@ class AddAlarmController extends GetxController {
   var vibrationEnabled = true.obs;
 
   // Volume
-  var volume = 5.0.obs;
+  var volume = 100.0.obs;
 
   // Update time
   void setTime(int hour, int minute, bool am) {

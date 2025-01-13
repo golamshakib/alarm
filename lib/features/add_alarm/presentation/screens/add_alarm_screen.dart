@@ -270,7 +270,7 @@ class AddAlarmScreen extends StatelessWidget {
                           const CustomText(text: 'Volume:'), // Label
                           const Spacer(),
                           Expanded(
-                            flex: 2, // Adjust the space the slider occupies if needed
+                            flex: 2,
                             child: Obx(() {
                               return Slider(
                                 value: controller.volume.value,

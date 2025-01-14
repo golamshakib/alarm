@@ -73,7 +73,7 @@ class PreviewScreen extends StatelessWidget {
                 // Image Preview
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
+                  child: Image.asset(
                     image,
                     width: double.infinity,
                     fit: BoxFit.contain,

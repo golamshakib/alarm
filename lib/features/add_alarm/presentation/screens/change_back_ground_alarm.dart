@@ -105,7 +105,7 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                     topRight: Radius.circular(10),
                                   ),
                                   image: DecorationImage(
-                                    image: NetworkImage(item['image']!),
+                                    image:AssetImage(item['image']!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),

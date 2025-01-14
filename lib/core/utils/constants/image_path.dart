@@ -13,6 +13,7 @@ class ImagePath{
   static const  String extraImage ='$_basePath/extra_image.png';
   static const  String lineImage ='$_basePath/line_image.png';
   static const  String lineImage2 ='$_basePath/line_image.png';
+  static const  String dog2 ='$_basePath/dog2.png';
 
 
 }

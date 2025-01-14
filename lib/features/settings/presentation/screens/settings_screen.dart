@@ -20,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const CustomAppbarWithLogo(text: 'Settings', showBackIcon: true,),
+            const CustomAppbarWithLogo(text: 'Settings'),
             SizedBox(height: getHeight(24)),
             Container(
               padding: const EdgeInsets.all(16),

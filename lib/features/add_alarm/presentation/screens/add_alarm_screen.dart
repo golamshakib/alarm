@@ -42,6 +42,7 @@ class AddAlarmScreen extends StatelessWidget {
                 ),
 
                 // Time Picker
+                // Time Picker
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
@@ -49,93 +50,102 @@ class AddAlarmScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Hour Dropdown
-                      Obx(() => DropdownButton<int>(
-                        value: controller.selectedHour.value,
-                        items: List.generate(12, (index) {
-                          return DropdownMenuItem(
-                            value: index + 1,
-                            child: Text(
-                              (index + 1).toString(),
-                              style: GoogleFonts.poppins(
-                                fontSize: getWidth(30),
-                                fontWeight: FontWeight.w500,
+                  child: SizedBox(
+                    height: 60, // Set a fixed height to ensure visibility
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Hour Dropdown
+                        Flexible(
+                          child: Obx(() => DropdownButton<int>(
+                            value: controller.selectedHour.value,
+                            items: List.generate(12, (index) {
+                              return DropdownMenuItem(
+                                value: index + 1,
+                                child: Text(
+                                  (index + 1).toString(),
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 24, // Adjust as needed
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            }),
+                            onChanged: (value) {
+                              if (value != null) {
+                                controller.selectedHour.value = value;
+                              }
+                            },
+                            dropdownColor: AppColors.lightYellowContainer,
+                            menuMaxHeight: 200,
+                          )),
+                        ),
+                        // Minute Dropdown
+                        Flexible(
+                          child: Obx(() => DropdownButton<int>(
+                            value: controller.selectedMinute.value,
+                            items: List.generate(60, (index) {
+                              return DropdownMenuItem(
+                                value: index,
+                                child: Text(
+                                  index.toString().padLeft(2, '0'),
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 24, // Adjust as needed
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            }),
+                            onChanged: (value) {
+                              if (value != null) {
+                                controller.selectedMinute.value = value;
+                              }
+                            },
+                            dropdownColor: AppColors.lightYellowContainer,
+                            menuMaxHeight: 200,
+                          )),
+                        ),
+                        // AM/PM Dropdown
+                        Flexible(
+                          child: Obx(() => DropdownButton<bool>(
+                            value: controller.isAm.value,
+                            items: [
+                              DropdownMenuItem(
+                                value: true,
+                                child: Text(
+                                  "AM",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 24, // Adjust as needed
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
-                            ),
-                          );
-                        }),
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.selectedHour.value = value;
-                          }
-                        },
-                        dropdownColor: AppColors.lightYellowContainer,
-                        menuMaxHeight: 200,
-                      )),
-
-                      // Minute Dropdown
-                      Obx(() => DropdownButton<int>(
-                        value: controller.selectedMinute.value,
-                        items: List.generate(60, (index) {
-                          return DropdownMenuItem(
-                            value: index,
-                            child: Text(
-                              index.toString().padLeft(2, '0'),
-                              style: GoogleFonts.poppins(
-                                fontSize: getWidth(30),
-                                fontWeight: FontWeight.w500,
+                              DropdownMenuItem(
+                                value: false,
+                                child: Text(
+                                  "PM",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 24, // Adjust as needed
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
-                            ),
-                          );
-                        }),
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.selectedMinute.value = value;
-                          }
-                        },
-                        dropdownColor: AppColors.lightYellowContainer,
-                        menuMaxHeight: 200,
-                      )),
-
-                      // AM/PM Dropdown
-                      Obx(() => DropdownButton<bool>(
-                        value: controller.isAm.value,
-                        items: [
-                          DropdownMenuItem(
-                            value: true,
-                            child: Text(
-                              "am",
-                              style: GoogleFonts.poppins(
-                                fontSize: getWidth(30),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: false,
-                            child: Text(
-                              "pm",
-                              style: GoogleFonts.poppins(
-                                fontSize: getWidth(30),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.isAm.value = value;
-                          }
-                        },
-                        dropdownColor: AppColors.lightYellowContainer,
-                        menuMaxHeight: 150,
-                      )),
-                    ],
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                controller.isAm.value = value;
+                              }
+                            },
+                            dropdownColor: AppColors.lightYellowContainer,
+                            menuMaxHeight: 150,
+                          )),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+
 
                 // Background Section
                 Container(

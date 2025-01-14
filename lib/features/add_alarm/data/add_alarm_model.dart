@@ -9,6 +9,7 @@ class AlarmModel {
   final bool vibrationEnabled;
   final int snoozeDuration;
   final double volume;
+  bool isToggled;
 
   AlarmModel({
     required this.hour,
@@ -21,5 +22,6 @@ class AlarmModel {
     required this.vibrationEnabled,
     required this.snoozeDuration,
     required this.volume,
+    this.isToggled = false,
   });
 }

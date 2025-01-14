@@ -4,6 +4,7 @@ import 'package:alarm/core/common/widgets/text_with_arrow.dart';
 import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/icon_path.dart';
+import 'package:alarm/features/alarm/alarm_screen.dart';
 import 'package:alarm/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,12 +28,16 @@ class AddAlarmScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // App Bar
-                 CustomAppbarWithLogo(
+                CustomAppbarWithLogo(
                   text: 'Add Alarm',
                   iconPath: IconPath.check,
-                  onIconTap: (){
+
+                  onIconTap: () {
+
                     controller.saveAlarm();
                     // controller.resetFields();
+                    Get.snackbar("Success", "Successfully Alarm Added");
+
                   },
                 ),
 
@@ -151,8 +156,7 @@ class AddAlarmScreen extends StatelessWidget {
                             onTap: () {
                               Get.toNamed(AppRoute.changeBackgroundScreen);
                             },
-                            child:
-                            const TextWithArrow(text: 'Cute Dog in bed'),
+                            child: const TextWithArrow(text: 'Cute Dog in bed'),
                           ),
                         ],
                       ),
@@ -235,44 +239,39 @@ class AddAlarmScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const CustomText(text: 'Vibration:'),
-                          Obx(
-                                () {
-                              return GestureDetector(
-                                onTap: () {
-                                  controller.vibrationToggle();
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 300),
-                                  width: getWidth(36),
-                                  height: getHeight(28),
-                                  decoration: BoxDecoration(
-                                    color: controller.isToggled.value
-                                        ? const Color(0xffFFAB4C)
-                                        : const Color(0xffA3B2C7)
-                                        .withOpacity(0.3),
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  child: AnimatedAlign(
-                                    duration: const Duration(milliseconds: 300),
-                                    alignment: controller.isToggled.value
-                                        ? Alignment.centerRight
-                                        : Alignment.centerLeft,
-                                    child: Container(
-                                      width: getWidth(18),
-                                      height: getHeight(18),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
+                          Obx(() => GestureDetector(
+                            onTap: controller.toggleVibration,
+                            child: AnimatedContainer(
+                              duration:
+                              const Duration(milliseconds: 300),
+                              width: getWidth(37),
+                              height: getHeight(21),
+                              decoration: BoxDecoration(
+                                color: controller.isVibrationEnabled.value
+                                    ? const Color(0xffFFAB4C)
+                                    : const Color(0xffA3B2C7)
+                                    .withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: AnimatedAlign(
+                                duration: const Duration(milliseconds: 300),
+                                alignment:
+                                controller.isVibrationEnabled.value
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: Container(
+                                  width: getWidth(18),
+                                  height: getHeight(18),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
                                   ),
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            ),
+                          )),
                         ],
                       ),
-                      SizedBox(height: getHeight(8)),
 
                       // Volume Section
                       Row(
@@ -299,10 +298,6 @@ class AddAlarmScreen extends StatelessWidget {
                 ),
 
                 SizedBox(height: getHeight(24)),
-
-                // Save Button
-
-
               ],
             ),
           ),

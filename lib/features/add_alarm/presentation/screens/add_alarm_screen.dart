@@ -51,7 +51,7 @@ class AddAlarmScreen extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.all(16),
                   child: SizedBox(
-                    height: 60, // Set a fixed height to ensure visibility
+                    height: getHeight(60),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -283,6 +283,7 @@ class AddAlarmScreen extends StatelessWidget {
                         ],
                       ),
 
+                      SizedBox(height: getHeight(6)),
                       // Volume Section
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

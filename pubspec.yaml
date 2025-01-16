@@ -48,7 +48,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   # State Management
   image_picker: ^0.8.7
-  file_picker: ^5.2.3
+  file_picker: ^8.1.7
   get: ^4.6.5
 
 dev_dependencies:

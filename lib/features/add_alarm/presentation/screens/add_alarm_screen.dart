@@ -42,7 +42,6 @@ class AddAlarmScreen extends StatelessWidget {
                 ),
 
                 // Time Picker
-                // Time Picker
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
@@ -166,12 +165,20 @@ class AddAlarmScreen extends StatelessWidget {
                             onTap: () {
                               Get.toNamed(AppRoute.changeBackgroundScreen);
                             },
-                            child: const TextWithArrow(text: 'Cute Dog in bed'),
+                            child: Obx(() {
+                              return TextWithArrow(
+                                text: controller.selectedBackground.value,
+                              );
+                            }),
                           ),
                         ],
                       ),
                       SizedBox(height: getHeight(16)),
-                      Image.asset(ImagePath.dog),
+                      Obx(() {
+                        return Image.asset(
+                          controller.selectedBackgroundImage.value,
+                        );
+                      }),
                       SizedBox(height: getHeight(24)),
 
                       // Repeat Section

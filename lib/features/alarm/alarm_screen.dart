@@ -128,21 +128,16 @@ class AlarmScreen extends StatelessWidget {
                           }
                         },
                         child: Container(
-
                           decoration: BoxDecoration(
                             image: const DecorationImage(
                               image: AssetImage(ImagePath.dog),
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(10),
-
                           ),
-                          
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-
-
                               gradient: LinearGradient(
                                 colors: [
                                   const Color(0xffFFF5E1),
@@ -162,12 +157,13 @@ class AlarmScreen extends StatelessWidget {
                                     Row(
                                       children: [
                                         GestureDetector(
-                                            onTap: () {},
-                                            child: const Icon(
-                                              Icons.play_circle_outline,
-                                              color: Colors.orange,
-                                              size: 28,
-                                            )),
+                                          onTap: () {},
+                                          child: const Icon(
+                                            Icons.play_circle_outline,
+                                            color: Colors.orange,
+                                            size: 28,
+                                          ),
+                                        ),
                                         SizedBox(width: getWidth(12)),
                                         GestureDetector(
                                           onTap: () {
@@ -190,8 +186,7 @@ class AlarmScreen extends StatelessWidget {
                                               child: AnimatedAlign(
                                                 duration: const Duration(
                                                     milliseconds: 300),
-                                                alignment: alarm
-                                                    .isToggled.value
+                                                alignment: alarm.isToggled.value
                                                     ? Alignment.centerRight
                                                     : Alignment.centerLeft,
                                                 child: Container(
@@ -235,7 +230,7 @@ class AlarmScreen extends StatelessWidget {
                                   children: [
                                     CustomText(
                                       text: alarm.repeatDays.isNotEmpty
-                                          ? "${alarm.repeatDays.first} to ${alarm.repeatDays.last}"
+                                          ? controller.formatRepeatDays() // This will use the updated format
                                           : "No Repeat Days",
                                       fontSize: getWidth(14),
                                       fontWeight: FontWeight.w400,

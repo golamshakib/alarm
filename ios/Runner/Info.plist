@@ -2,8 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Some message to describe why you need this permission</string>
+
 	<key>CFBundleDisplayName</key>
 	<string>Alarm</string>
 	<key>CFBundleExecutable</key>

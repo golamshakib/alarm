@@ -1,4 +1,5 @@
 import 'package:alarm/core/common/widgets/custom_text.dart';
+import 'package:alarm/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -6,8 +7,10 @@ import '../../../../core/common/widgets/custom_appbar_with_logo.dart';
 import '../../../../core/utils/constants/app_colors.dart';
 import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
+import '../../controller/add_alarm_controller.dart';
 import '../../controller/change_back_ground_controller.dart';
 import '../../controller/preview_screen_controller.dart';
+import 'add_alarm_screen.dart';
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({
@@ -82,7 +85,14 @@ class PreviewScreen extends StatelessWidget {
                 SizedBox(height: getHeight(20)),
 
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    // Set the background image and title in AddAlarmController
+                    final addAlarmController = Get.find<AddAlarmController>();
+                    addAlarmController.selectedBackground.value = title;
+                    addAlarmController.selectedBackgroundImage.value = image;
+                    Get.snackbar("Success", "Successfully Change the background");
+                    Get.back();
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: getHeight(12)),
                     decoration: BoxDecoration(

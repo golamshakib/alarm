@@ -230,7 +230,7 @@ class AlarmScreen extends StatelessWidget {
                                   children: [
                                     CustomText(
                                       text: alarm.repeatDays.isNotEmpty
-                                          ? controller.formatRepeatDays() // This will use the updated format
+                                          ? "${alarm.repeatDays.first} to ${alarm.repeatDays.last}"
                                           : "No Repeat Days",
                                       fontSize: getWidth(14),
                                       fontWeight: FontWeight.w400,

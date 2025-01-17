@@ -45,6 +45,7 @@ dependencies:
   widgets_easier: ^0.0.10
   permission_handler: ^11.3.1
   record: ^5.2.0
+  audio_waveforms: ^1.2.0
   just_audio: ^0.9.43
   path_provider: ^2.1.5
   path: ^1.9.0

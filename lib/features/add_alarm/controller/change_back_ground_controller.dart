@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get.dart';
 
 class ChangeBackgroundController extends GetxController {
+  // Database Data List
   var items = [
     {'title': 'Cute Dog in bed', 'image': ImagePath.dog3,'extraImage': ImagePath.extraImage,},
     {'title': 'Cute Cat under blanket', 'image': ImagePath.dog2,'extraImage': ImagePath.extraImage,},
@@ -13,6 +14,8 @@ class ChangeBackgroundController extends GetxController {
     {'title': 'Cute Dog in bed', 'image': ImagePath.dog3,'extraImage': ImagePath.extraImage,},
     {'title': 'Cute Cat under blanket', 'image': ImagePath.dog3,'extraImage': ImagePath.extraImage,},
   ].obs;
+
+
 
   var isPlaying = <bool>[].obs;
 

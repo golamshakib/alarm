@@ -3,16 +3,20 @@ import 'package:alarm/core/common/widgets/custom_appbar_with_logo.dart';
 import 'package:alarm/core/common/widgets/custom_text.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/icon_path.dart';
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:widgets_easier/widgets_easier.dart';
 import 'dart:io';
 
-import '../../../../core/utils/constants/app_colors.dart';
 import '../../controller/create_new_back_ground_alarm_controller.dart';
+import '../../widgets/record_tune_section.dart';
+import '../../widgets/save_background_button_section.dart';
+import '../../widgets/upload_background_image_section.dart';
+import '../../widgets/upload_tone_section.dart';
+import '../../widgets/wave_form_section.dart';
 
 class CreateNewAlarmScreen extends StatelessWidget {
   const CreateNewAlarmScreen({super.key});
@@ -66,7 +70,9 @@ class CreateNewAlarmScreen extends StatelessWidget {
                         ),
                         child: TextFormField(
                           controller: controller.titleController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            hintText: 'Background title',
+                            hintStyle: GoogleFonts.poppins(color: const Color(0xffA59F92), fontSize: getWidth(14)),
                             border: InputBorder.none,
                             focusedBorder: InputBorder.none,
                             enabledBorder: InputBorder.none,
@@ -283,290 +289,3 @@ class CreateNewAlarmScreen extends StatelessWidget {
   }
 }
 
-class WaveFormSection extends StatelessWidget {
-  const WaveFormSection({
-    super.key,
-    required this.controller,
-  });
-
-  final CreateAlarmController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(
-      () => Column(
-        children: [
-          if (controller.recordingPath.value != null)
-            Column(
-              children: [
-                AudioFileWaveforms(
-                  playerController:
-                      controller.playerController,
-                  size: Size(getWidth(300), getHeight(100)),
-                  playerWaveStyle: const PlayerWaveStyle(
-                    fixedWaveColor: Colors.grey,
-                    liveWaveColor: Color(0xffFFA845),
-                    waveThickness: 2.0,
-                  ),
-                ),
-              ],
-            ),
-          if (controller.recordingPath.value != null)
-            IconButton(
-              onPressed: () {
-                controller.togglePlayback();
-              },
-              icon: Icon(
-                controller.isPlaying.value
-                    ? Icons.pause
-                    : Icons.play_arrow,
-                color: const Color(0xffFFA845),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class UploadToneSection extends StatelessWidget {
-  const UploadToneSection({
-    super.key,
-    required this.controller,
-  });
-
-  final CreateAlarmController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() => controller.selectedAudio.value == null
-        ? CustomText(
-            text: "Upload your tone:",
-            fontSize: getWidth(16),
-            fontWeight: FontWeight.w600,
-            color: const Color(0xff333333),
-          )
-        : Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CustomText(
-                text: "Upload Background Image:",
-                fontSize: getWidth(16),
-                fontWeight: FontWeight.w600,
-                color: const Color(0xff333333),
-              ),
-              GestureDetector(
-                  onTap: () async {
-                    try {
-                      FilePickerResult? result =
-                          await FilePicker.platform.pickFiles(
-                        type: FileType.audio,
-                      );
-                      if (result != null &&
-                          result.files.single.path != null) {
-                        controller.pickAudio(
-                            File(result.files.single.path!));
-                      }
-                    } catch (e) {
-                      Get.snackbar(
-                          "Error", "Failed to pick audio: $e",
-                          snackPosition:
-                              SnackPosition.BOTTOM);
-                    }
-                  },
-                  child: CustomText(
-                    text: "Change",
-                    color: const Color(0xffFFA845),
-                    fontWeight: FontWeight.w600,
-                    fontSize: getWidth(16),
-                    decoration: TextDecoration.underline,
-                    decorationColor: const Color(0xffFFA845),
-                  ))
-            ],
-          ));
-  }
-}
-
-class UploadBackgroundImageSection extends StatelessWidget {
-  const UploadBackgroundImageSection({
-    super.key,
-    required this.controller,
-    required this.picker,
-  });
-
-  final CreateAlarmController controller;
-  final ImagePicker picker;
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() => controller.selectedImage.value == null
-        ? CustomText(
-            text: "Upload Background Image:",
-            fontSize: getWidth(16),
-            fontWeight: FontWeight.w600,
-            color: const Color(0xff333333),
-          )
-        : Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CustomText(
-                text: "Upload Background Image:",
-                fontSize: getWidth(16),
-                fontWeight: FontWeight.w600,
-                color: const Color(0xff333333),
-              ),
-              GestureDetector(
-                  onTap: () async {
-                    try {
-                      final XFile? image =
-                          await picker.pickImage(
-                        source: ImageSource.gallery,
-                      );
-                      if (image != null) {
-                        controller
-                            .pickImage(File(image.path));
-                      }
-                    } catch (e) {
-                      Get.snackbar(
-                          "Error", "Failed to pick image: $e",
-                          snackPosition:
-                              SnackPosition.BOTTOM);
-                    }
-                  },
-                  child: CustomText(
-                    text: "Change",
-                    color: const Color(0xffFFA845),
-                    fontWeight: FontWeight.w600,
-                    fontSize: getWidth(16),
-                    decoration: TextDecoration.underline,
-                    decorationColor: const Color(0xffFFA845),
-                  ))
-            ],
-          ));
-  }
-}
-
-class RecordTuneSection extends StatelessWidget {
-  const RecordTuneSection({
-    super.key,
-    required this.controller,
-  });
-
-  final CreateAlarmController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        CustomText(
-          text: "Record your tune:",
-          fontSize: getWidth(16),
-          color: const Color(0xff333333),
-          fontWeight: FontWeight.w600,
-        ),
-        Obx(() {
-          return Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  if (!controller.isRecordingNow.value) {
-                    controller.startRecording();
-                  } else {
-                    controller.stopRecording();
-                  }
-                },
-                child: Row(
-                  children: [
-                    const CustomText(
-                      text: "Record",
-                      color: Color(0xffFFA845),
-                      decoration: TextDecoration.underline,
-                      decorationColor: Color(0xffFFA845),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        if (controller.isRecordingNow.value) {
-                          controller.stopRecording();
-                        } else {
-                          controller.startRecording();
-                        }
-                      },
-                      child: controller
-                                  .isRecordingNow.value !=
-                              true
-                          ? Radio<bool>(
-                              value: false,
-                              activeColor:
-                                  const Color(0xffF34100),
-                              groupValue: controller
-                                  .isRecordingNow.value,
-                              onChanged: (value) {
-                                if (value == false) {
-                                  controller.stopRecording();
-                                }
-                              },
-                            )
-                          : SizedBox(
-                              height: getHeight(30),
-                              width: getWidth(30),
-                              child: const CircleAvatar(
-                                backgroundImage: AssetImage(
-                                    IconPath.recordingOnIcon),
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }),
-      ],
-    );
-  }
-}
-
-class SaveBackgroundButtonSection extends StatelessWidget {
-  const SaveBackgroundButtonSection({
-    super.key,
-    required this.controller,
-  });
-
-  final CreateAlarmController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() => controller.selectedImage.value != null ||
-            controller.selectedAudio.value != null ||
-            controller.recordingPath.value != null
-        ? GestureDetector(
-      onTap: () {
-        // Save data and go back
-        Map<String, dynamic> savedData = {
-          "title": controller.titleController.text,
-          "image": controller.selectedImage.value,
-          "audio": controller.selectedAudio.value,
-          "recordedAudio": controller.recordingPath.value,
-        };
-        Get.back(result: savedData); // Pass data back to previous screen
-      },
-            child: Container(
-              padding:
-                  EdgeInsets.symmetric(vertical: getHeight(12)),
-              decoration: BoxDecoration(
-                color: AppColors.yellow,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Center(
-                child: CustomText(
-                  text: 'Save background',
-                  color: AppColors.textWhite,
-                ),
-              ),
-            ),
-          )
-        : const Text(""));
-  }
-}

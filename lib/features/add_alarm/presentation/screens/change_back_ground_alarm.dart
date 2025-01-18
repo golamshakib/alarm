@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:alarm/features/add_alarm/presentation/screens/preview_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,19 +10,17 @@ import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../routes/app_routes.dart';
 import '../../controller/change_back_ground_controller.dart';
+import '../../controller/create_new_back_ground_alarm_controller.dart';
 
 class ChangeBackGroundAlarm extends StatelessWidget {
   const ChangeBackGroundAlarm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ChangeBackgroundController controller = Get.find<ChangeBackgroundController>();
-    final Map<String, dynamic> savedData = Get.arguments ?? {};
-
-    final String title = savedData["title"] ?? "";
-    final String image = savedData["image"] ?? "";
-    final String music = savedData["music"] ?? "";
-
+    final ChangeBackgroundController controller =
+        Get.put(ChangeBackgroundController());
+    final CreateAlarmController createAlarmController =
+        Get.put(CreateAlarmController());
 
     return Scaffold(
       body: SafeArea(
@@ -43,16 +43,17 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                 child: Obx(() {
                   return ListView.separated(
                     itemCount: controller.items.length,
-                    separatorBuilder: (_, __) => SizedBox(height: getHeight(12)),
+                    separatorBuilder: (_, __) =>
+                        SizedBox(height: getHeight(12)),
                     itemBuilder: (context, index) {
                       final item = controller.items[index];
                       return GestureDetector(
                         onTap: () {
                           Get.to(() => PreviewScreen(
-                            title: item['title']!,
-                            image: item['image']!,
-                            musicUrl: item['extraImage'] ?? '',
-                          ));
+                                title: item['title']!,
+                                image: item['image']!,
+                                musicUrl: item['musicUrl'] ?? '',
+                              ));
                         },
                         child: Stack(
                           children: [
@@ -60,7 +61,8 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                               width: double.infinity,
                               decoration: const BoxDecoration(
                                 color: Color(0xffF7F7F7),
-                                borderRadius: BorderRadius.all(Radius.circular(8)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
@@ -76,14 +78,21 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                           children: [
                                             Icon(
                                               controller.isPlaying[index]
-                                                  ? Icons.play_circle_fill_rounded
-                                                  : Icons.play_circle_outline_rounded,
+                                                  ? Icons
+                                                      .play_circle_fill_rounded
+                                                  : Icons
+                                                      .play_circle_outline_rounded,
                                               color: Colors.orange,
                                               size: 25,
                                             ),
-                                            if (controller.isPlaying[index]) ...[
+                                            if (controller
+                                                .isPlaying[index]) ...[
                                               SizedBox(width: getWidth(8)),
-                                              Image.asset(item['extraImage'] ?? '', height: getHeight(25), width: getWidth(75),),
+                                              Image.asset(
+                                                item['musicUrl'] ?? '',
+                                                height: getHeight(25),
+                                                width: getWidth(75),
+                                              ),
                                             ],
                                           ],
                                         );
@@ -127,93 +136,100 @@ class ChangeBackGroundAlarm extends StatelessWidget {
               ),
 
               // New section for second ListView
-              Text('----------------------'), // Separator text
-              // Expanded(
-              //   child: Obx(() {
-              //     return ListView.separated(
-              //       itemCount: controller.newItems.length,
-              //       separatorBuilder: (_, __) => SizedBox(height: getHeight(12)),
-              //       itemBuilder: (context, index) {
-              //         final item = controller.newItems[index];
-              //         return GestureDetector(
-              //           onTap: () {
-              //             Get.to(() => PreviewScreen(
-              //               title: item['title']!,
-              //               image: item['image']!,
-              //               musicUrl: item['extraImage'] ?? '',
-              //             ));
-              //           },
-              //           child: Stack(
-              //             children: [
-              //               Container(
-              //                 width: double.infinity,
-              //                 decoration: const BoxDecoration(
-              //                   color: Color(0xffF7F7F7),
-              //                   borderRadius: BorderRadius.all(Radius.circular(8)),
-              //                 ),
-              //                 child: Padding(
-              //                   padding: const EdgeInsets.all(16.0),
-              //                   child: Column(
-              //                     crossAxisAlignment: CrossAxisAlignment.start,
-              //                     children: [
-              //                       GestureDetector(
-              //                         onTap: () {
-              //                           controller.togglePlay(index);
-              //                         },
-              //                         child: Obx(() {
-              //                           return Row(
-              //                             children: [
-              //                               Icon(
-              //                                 controller.isPlaying[index]
-              //                                     ? Icons.play_circle_fill_rounded
-              //                                     : Icons.play_circle_outline_rounded,
-              //                                 color: Colors.orange,
-              //                                 size: 25,
-              //                               ),
-              //                               if (controller.isPlaying[index]) ...[
-              //                                 SizedBox(width: getWidth(8)),
-              //                                 Image.asset(item['extraImage'] ?? '', height: getHeight(25), width: getWidth(75),),
-              //                               ],
-              //                             ],
-              //                           );
-              //                         }),
-              //                       ),
-              //                       SizedBox(height: getHeight(16)),
-              //                       CustomText(
-              //                         text: item['title']!,
-              //                         fontSize: getWidth(14),
-              //                         fontWeight: FontWeight.w700,
-              //                         color: const Color(0xff333333),
-              //                         textOverflow: TextOverflow.ellipsis,
-              //                       ),
-              //                     ],
-              //                   ),
-              //                 ),
-              //               ),
-              //               Positioned(
-              //                 top: 0,
-              //                 right: 0,
-              //                 child: Container(
-              //                   padding: const EdgeInsets.all(50),
-              //                   decoration: BoxDecoration(
-              //                     borderRadius: const BorderRadius.only(
-              //                       bottomRight: Radius.circular(10),
-              //                       topRight: Radius.circular(10),
-              //                     ),
-              //                     image: DecorationImage(
-              //                       image: AssetImage(item['image']!),
-              //                       fit: BoxFit.cover,
-              //                     ),
-              //                   ),
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         );
-              //       },
-              //     );
-              //   }),
-              // ),
+              SizedBox(
+                height: getHeight(20),
+              ),
+              CustomText(text: 'Local Storage'),
+              Expanded(
+                child: Obx(() {
+                  return ListView.separated(
+                    itemCount: createAlarmController.backgrounds.length,
+                    separatorBuilder: (_, __) =>
+                        SizedBox(height: getHeight(12)),
+                    itemBuilder: (context, index) {
+                      final background =
+                          createAlarmController.backgrounds[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Get.to(() => PreviewScreen(
+                                title: background.title,
+                                image: background.image,
+                                musicUrl: background.audio,
+                              ));
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              decoration: const BoxDecoration(
+                                color: Color(0xffF7F7F7),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8)),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Add your play toggle logic if needed
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.play_circle_outline_rounded,
+                                            color: Colors.orange,
+                                            size: 25,
+                                          ),
+                                          SizedBox(width: getWidth(8)),
+                                          Image.file(
+                                            File(background.image),
+                                            height: getHeight(25),
+                                            width: getWidth(75),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: getHeight(16)),
+                                    Text(
+                                      background.title,
+                                      style: TextStyle(
+                                        fontSize: getWidth(14),
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color(0xff333333),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(50),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.only(
+                                    bottomRight: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                  ),
+                                  image: DecorationImage(
+                                    image: FileImage(File(background.image)),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }),
+              )
             ],
           ),
         ),
@@ -221,4 +237,3 @@ class ChangeBackGroundAlarm extends StatelessWidget {
     );
   }
 }
-

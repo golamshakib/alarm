@@ -29,7 +29,7 @@ class UploadToneSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         CustomText(
-          text: "Upload Background Image:",
+          text: "Upload your tone:",
           fontSize: getWidth(16),
           fontWeight: FontWeight.w600,
           color: const Color(0xff333333),

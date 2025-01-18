@@ -42,9 +42,11 @@ class CreateAlarmController extends GetxController {
   Future<void> startRecording() async {
     if (await audioRecorder.hasPermission()) {
       final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
-      final String filePath = path.join(appDocumentsDir.path, 'recording.wav');
+      final String fileName = 'recording_${DateTime.now().millisecondsSinceEpoch}.wav';
+      final String filePath = path.join(appDocumentsDir.path, fileName);
+
       await audioRecorder.start(const RecordConfig(), path: filePath);
-      recordingPath.value = null;
+      recordingPath.value = filePath;
       isRecordingNow.value = true;
     }
   }
@@ -54,7 +56,7 @@ class CreateAlarmController extends GetxController {
     String? filePath = await audioRecorder.stop();
     if (filePath != null) {
       recordingPath.value = filePath;
-      playerController.preparePlayer(path: filePath);
+      await playerController.preparePlayer(path: filePath);
       isRecordingNow.value = false;
 
       // Start playback automatically
@@ -63,33 +65,52 @@ class CreateAlarmController extends GetxController {
   }
 
   // Toggle playback
-  Future<void> togglePlayback() async {
+  Future<void> togglePlayback({String? filePath}) async {
     if (audioPlayer.playing) {
       await audioPlayer.pause();
       playerController.pausePlayer();
       isPlaying.value = false;
     } else {
-      if (recordingPath.value != null) {
-        await audioPlayer.setFilePath(recordingPath.value!);
+      if (filePath != null && File(filePath).existsSync()) {
+        await audioPlayer.setFilePath(filePath);
         await audioPlayer.play();
         playerController.startPlayer();
         isPlaying.value = true;
+      } else {
+        Get.snackbar('Error', 'Audio file not found or invalid.');
       }
     }
   }
+
   // List of alarms
   var backgrounds = <ChangeBackground>[].obs;
 
   void saveBackground() {
     final background = ChangeBackground(
       title: titleController.text.isEmpty ? 'Background Title' : titleController.text,
-      image: selectedImage.value?.path ?? '', // Use path for the image file
-      audio: selectedAudio.value?.path ?? '', // Use path for the audio file
-      record: recordingPath.value ?? '', // Recording path
+      image: selectedImage.value?.path ?? '',
+      audio: selectedAudio.value?.path ?? '',
+      record: recordingPath.value ?? '',
 
     );
+    // Prepare waveform for uploaded audio
+    if (selectedAudio.value != null) {
+      playerController.preparePlayer(path: selectedAudio.value!.path);
+    }
     backgrounds.add(background);
-    update(); // Notify listeners
+    update();// Notify listeners
+    print(background);
+  }
+
+  // Reset method to clear fields
+  void resetBackground() {
+    titleController.clear();
+    selectedImage.value = null;
+    selectedAudio.value = null;
+    recordingPath.value = null;
+    isRecordingNow.value = false;
+    isPlaying.value = false;
+    playerController.stopPlayer();
   }
 
 

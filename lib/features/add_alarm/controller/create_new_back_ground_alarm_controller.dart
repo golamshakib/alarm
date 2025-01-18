@@ -16,6 +16,11 @@ class CreateAlarmController extends GetxController {
   RxBool isRecordingNow  = false.obs;
   RxBool isPlaying = false.obs;
 
+  // var title = 'Background Title'.obs;
+  // Rx<String?> img = ''.obs;
+  // Rx<String?> aud = ''.obs;
+  // Rx<String?> rec = ''.obs;
+
   final AudioRecorder audioRecorder = AudioRecorder();
   final AudioPlayer audioPlayer = AudioPlayer();
   final PlayerController playerController = PlayerController();
@@ -23,11 +28,14 @@ class CreateAlarmController extends GetxController {
   // Image Picker
   void pickImage(File image) {
     selectedImage.value = image;
+    // img.value = File(image.path) as String?;
+
   }
 
   // Audio Picker
   void pickAudio(File audio) {
     selectedAudio.value = audio;
+    // aud.value = File(audio.path) as String?;
   }
 
   // Start recording
@@ -69,6 +77,21 @@ class CreateAlarmController extends GetxController {
       }
     }
   }
+  // List of alarms
+  var backgrounds = <ChangeBackground>[].obs;
+
+  void saveBackground() {
+    final background = ChangeBackground(
+      title: titleController.text.isEmpty ? 'Background Title' : titleController.text,
+      image: selectedImage.value?.path ?? '', // Use path for the image file
+      audio: selectedAudio.value?.path ?? '', // Use path for the audio file
+      record: recordingPath.value ?? '', // Recording path
+
+    );
+    backgrounds.add(background);
+    update(); // Notify listeners
+  }
+
 
   @override
   void onClose() {
@@ -76,5 +99,18 @@ class CreateAlarmController extends GetxController {
     playerController.dispose();
     super.onClose();
   }
+}
 
+class ChangeBackground {
+  final String title;
+  final String image;
+  final String audio;
+  final String record;
+
+  ChangeBackground({
+    required this.title,
+    required this.image,
+    required this.audio,
+    required this.record,
+  });
 }

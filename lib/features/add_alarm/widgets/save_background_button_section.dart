@@ -22,6 +22,7 @@ class SaveBackgroundButtonSection extends StatelessWidget {
         ? GestureDetector(
       onTap: () {
         controller.saveBackground();
+        controller.resetBackground();
         Get.back();
       },
       child: Container(

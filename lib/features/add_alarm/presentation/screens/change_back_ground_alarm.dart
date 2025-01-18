@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:alarm/features/add_alarm/presentation/screens/preview_screen.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -140,6 +141,7 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                 height: getHeight(20),
               ),
               CustomText(text: 'Local Storage'),
+
               Expanded(
                 child: Obx(() {
                   return ListView.separated(
@@ -171,36 +173,47 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    // Play/Pause Button with Icon Change
                                     GestureDetector(
                                       onTap: () {
-                                        // Add your play toggle logic if needed
+                                        createAlarmController.togglePlayback(
+                                            filePath: background.audio.isNotEmpty
+                                                ? background.audio
+                                                : background.record);
                                       },
                                       child: Row(
                                         children: [
                                           Icon(
-                                            Icons.play_circle_outline_rounded,
+                                            createAlarmController
+                                                    .isPlaying.value
+                                                ? Icons
+                                                    .play_circle_filled_rounded
+                                                : Icons
+                                                    .play_circle_outline_rounded,
                                             color: Colors.orange,
                                             size: 25,
                                           ),
                                           SizedBox(width: getWidth(8)),
-                                          Image.file(
-                                            File(background.image),
-                                            height: getHeight(25),
-                                            width: getWidth(75),
-                                            fit: BoxFit.cover,
-                                          ),
+                                          background.audio.isNotEmpty || background.record.isNotEmpty
+                                              ? AudioFileWaveforms(
+                                            playerController:
+                                            createAlarmController.playerController,
+                                            size: Size(getWidth(200), getHeight(25)),
+                                            playerWaveStyle: const PlayerWaveStyle(
+                                              fixedWaveColor: Colors.grey,
+                                              liveWaveColor: Color(0xffFFA845),
+                                              waveThickness: 2.0,
+                                            ),
+                                          )
+                                              : const SizedBox.shrink(),
                                         ],
-                                      ),
-                                    ),
+                                      ),),
                                     SizedBox(height: getHeight(16)),
-                                    Text(
-                                      background.title,
-                                      style: TextStyle(
-                                        fontSize: getWidth(14),
-                                        fontWeight: FontWeight.w700,
-                                        color: const Color(0xff333333),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                                    // Displaying background title
+                                    CustomText(text: background.title,
+                                      fontSize: getWidth(14),
+                                      fontWeight: FontWeight.w700,
+                                      textOverflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),

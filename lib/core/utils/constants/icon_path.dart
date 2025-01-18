@@ -19,5 +19,6 @@ class IconPath{
   static const  String fileUploadIcon ='$_basePath/upload_file_icon.png';
   static const  String recordingOnIcon ='$_basePath/recording_icon.png';
   static const  String deleteIcon ='$_basePath/delete_icon.png';
+  static const  String radioIcon ='$_basePath/radio.png';
 
 }

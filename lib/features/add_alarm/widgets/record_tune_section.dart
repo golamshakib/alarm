@@ -29,54 +29,39 @@ class RecordTuneSection extends StatelessWidget {
           return Row(
             children: [
               GestureDetector(
-                onTap: () {
+                onTap: () async  {
                   if (!controller.isRecordingNow.value) {
-                    controller.startRecording();
+                   await controller.startRecording();
                   } else {
-                    controller.stopRecording();
+                    await controller.stopRecording();
                   }
                 },
                 child: Row(
                   children: [
-                    const CustomText(
-                      text: "Record",
-                      color: Color(0xffFFA845),
+                    CustomText(
+                      text: controller.isRecordingNow.value
+                          ? "Stop Record"
+                          : "Start Record", // Change text based on isRecordingNow value
+                      color: const Color(0xffFFA845),
                       decoration: TextDecoration.underline,
-                      decorationColor: Color(0xffFFA845),
+                      decorationColor: const Color(0xffFFA845),
                     ),
                     const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        if (controller.isRecordingNow.value) {
-                          controller.stopRecording();
-                        } else {
-                          controller.startRecording();
-                        }
-                      },
-                      child: controller
-                          .isRecordingNow.value !=
-                          true
-                          ? Radio<bool>(
-                        value: false,
-                        activeColor:
-                        const Color(0xffF34100),
-                        groupValue: controller
-                            .isRecordingNow.value,
-                        onChanged: (value) {
-                          if (value == false) {
-                            controller.stopRecording();
-                          }
-                        },
-                      )
-                          : SizedBox(
-                        height: getHeight(30),
-                        width: getWidth(30),
-                        child: const CircleAvatar(
-                          backgroundImage: AssetImage(
-                              IconPath.recordingOnIcon),
-                        ),
+                    controller.isRecordingNow.value
+                        ? SizedBox(
+                      height: getHeight(30),
+                      width: getWidth(30),
+                      child: const CircleAvatar(
+                        backgroundImage: AssetImage(IconPath.recordingOnIcon),
                       ),
-                    ),
+                    )
+                        : SizedBox(
+                      height: getHeight(25),
+                      width: getWidth(25),
+                      child: const CircleAvatar(
+                        backgroundImage: AssetImage(IconPath.radioIcon),
+                      ),
+                    )
                   ],
                 ),
               ),

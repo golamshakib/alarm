@@ -30,11 +30,7 @@ class RecordTuneSection extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () async  {
-                  if (!controller.isRecordingNow.value) {
-                   await controller.startRecording();
-                  } else {
-                    await controller.stopRecording();
-                  }
+                  controller.toggleRecording();
                 },
                 child: Row(
                   children: [

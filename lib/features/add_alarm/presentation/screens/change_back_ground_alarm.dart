@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:alarm/features/add_alarm/presentation/screens/preview_screen.dart';
@@ -177,40 +178,62 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                     GestureDetector(
                                       onTap: () {
                                         createAlarmController.togglePlayback(
-                                            filePath: background.audio.isNotEmpty
-                                                ? background.audio
-                                                : background.record);
+                                          index,
+                                          filePath: background.audio.isNotEmpty
+                                              ? background.audio
+                                              : background.record,
+                                        );
                                       },
-                                      child: Row(
-                                        children: [
-                                          Icon(
+                                      child: Obx(() {
+                                        // Ensure isPlayingList is initialized and has enough items before accessing index
+                                        if (index >=
                                             createAlarmController
-                                                    .isPlaying.value
-                                                ? Icons
-                                                    .play_circle_filled_rounded
-                                                : Icons
-                                                    .play_circle_outline_rounded,
-                                            color: Colors.orange,
-                                            size: 25,
-                                          ),
-                                          SizedBox(width: getWidth(8)),
-                                          background.audio.isNotEmpty || background.record.isNotEmpty
-                                              ? AudioFileWaveforms(
-                                            playerController:
-                                            createAlarmController.playerController,
-                                            size: Size(getWidth(200), getHeight(25)),
-                                            playerWaveStyle: const PlayerWaveStyle(
-                                              fixedWaveColor: Colors.grey,
-                                              liveWaveColor: Color(0xffFFA845),
-                                              waveThickness: 2.0,
+                                                .isPlayingList.length) {
+                                          // If index exceeds list size, prevent error by adding default values
+                                          createAlarmController.isPlayingList
+                                              .add(false);
+                                        }
+
+                                        return Row(
+                                          children: [
+                                            Icon(
+                                              createAlarmController
+                                                      .isPlayingList[index]
+                                                  ? Icons
+                                                      .play_circle_filled_rounded
+                                                  : Icons
+                                                      .play_circle_outline_rounded,
+                                              color: Colors.orange,
+                                              size: 25,
                                             ),
-                                          )
-                                              : const SizedBox.shrink(),
-                                        ],
-                                      ),),
+                                            SizedBox(width: getWidth(8)),
+                                            if (createAlarmController
+                                                .isPlayingList[index])
+                                              const SizedBox.shrink()
+                                            else
+                                              AudioFileWaveforms(
+                                                playerController:
+                                                    createAlarmController
+                                                        .playerController,
+                                                size: Size(getWidth(200),
+                                                    getHeight(25)),
+                                                playerWaveStyle:
+                                                    const PlayerWaveStyle(
+                                                  fixedWaveColor: Colors.grey,
+                                                  liveWaveColor:
+                                                      Color(0xffFFA845),
+                                                  waveThickness: 2.0,
+                                                ),
+                                              ),
+                                          ],
+                                        );
+                                      }),
+                                    ),
+
                                     SizedBox(height: getHeight(16)),
                                     // Displaying background title
-                                    CustomText(text: background.title,
+                                    CustomText(
+                                      text: background.title,
                                       fontSize: getWidth(14),
                                       fontWeight: FontWeight.w700,
                                       textOverflow: TextOverflow.ellipsis,

@@ -11,6 +11,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:widgets_easier/widgets_easier.dart';
 import 'dart:io';
 
+import '../../../alarm/audio_test/previous_screen.dart';
 import '../../controller/create_new_back_ground_alarm_controller.dart';
 import '../../widgets/record_tune_section.dart';
 import '../../widgets/save_background_button_section.dart';
@@ -28,6 +29,9 @@ class CreateNewAlarmScreen extends StatelessWidget {
         ImagePicker(); // Create an instance of ImagePicker
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: (){
+        Get.to(() => const PreviousScreen());
+      }, child: const Icon(Icons.mic),),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

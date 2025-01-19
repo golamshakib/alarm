@@ -51,6 +51,7 @@ dependencies:
   path: ^1.9.0
 
 
+
   # Icons
   cupertino_icons: ^1.0.8
   # State Management

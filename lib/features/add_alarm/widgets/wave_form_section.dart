@@ -35,10 +35,10 @@ class WaveFormSection extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    controller.togglePlayback(filePath: controller.recordingPath.value);
+                    controller.toggleRecordingPlayback( filePath: controller.recordingPath.value);
                   },
                   icon: Icon(
-                    controller.isPlaying.value ? Icons.pause : Icons.play_arrow,
+                    controller.isRecordingPlaying.value ? Icons.pause : Icons.play_arrow,
                     color: const Color(0xffFFA845),
                   ),
                 ),

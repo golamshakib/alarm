@@ -13,7 +13,7 @@ class CreateAlarmController extends GetxController {
   var selectedImage = Rx<File?>(null); // Holds the selected image
   var selectedAudio = Rx<File?>(null); // Holds the selected audio file
   Rx<String?> recordingPath = Rx<String?>(null);
-  RxBool isRecordingNow  = false.obs;
+  RxBool isRecordingNow = false.obs;
   RxBool isPlaying = false.obs;
 
   // var title = 'Background Title'.obs;
@@ -29,7 +29,6 @@ class CreateAlarmController extends GetxController {
   void pickImage(File image) {
     selectedImage.value = image;
     // img.value = File(image.path) as String?;
-
   }
 
   // Audio Picker
@@ -38,31 +37,55 @@ class CreateAlarmController extends GetxController {
     // aud.value = File(audio.path) as String?;
   }
 
+  Future<void> toggleRecording() async {
+    if (isRecordingNow.value) {
+      String? filePath = await audioRecorder.stop();
+      if (filePath != null) {
+        recordingPath.value = filePath;
+        playerController.preparePlayer(path: filePath);
+        isRecordingNow.value = false;
+      }
+    } else {
+      if (await audioRecorder.hasPermission()) {
+        final Directory appDocumentsDir =
+            await getApplicationDocumentsDirectory();
+        final String fileName =
+            'recording_${DateTime.now().millisecondsSinceEpoch}.wav';
+        final String filePath = path.join(appDocumentsDir.path, fileName);
+        await audioRecorder.start(const RecordConfig(), path: filePath);
+        recordingPath.value = null;
+        isRecordingNow.value = true;
+      }
+    }
+  }
+
   // Start recording
-  Future<void> startRecording() async {
-    if (await audioRecorder.hasPermission()) {
-      final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
-      final String fileName = 'recording_${DateTime.now().millisecondsSinceEpoch}.wav';
-      final String filePath = path.join(appDocumentsDir.path, fileName);
-
-      await audioRecorder.start(const RecordConfig(), path: filePath);
-      recordingPath.value = filePath;
-      isRecordingNow.value = true;
-    }
-  }
-
-  // Stop recording and prepare playback
-  Future<void> stopRecording() async {
-    String? filePath = await audioRecorder.stop();
-    if (filePath != null) {
-      recordingPath.value = filePath;
-      await playerController.preparePlayer(path: filePath);
-      isRecordingNow.value = false;
-
-      // Start playback automatically
-      // togglePlayback();
-    }
-  }
+  // Future<void> startRecording() async {
+  //   if (!await audioRecorder.hasPermission()) {
+  //     return;
+  //   }
+  //     final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+  //     final String fileName = 'recording_${DateTime.now().millisecondsSinceEpoch}.wav';
+  //     final String filePath = path.join(appDocumentsDir.path, fileName);
+  //
+  //     await audioRecorder.start(const RecordConfig(), path: filePath);
+  //     recordingPath.value = filePath;
+  //     isRecordingNow.value = true;
+  //     update();
+  // }
+  //
+  // // Stop recording and prepare playback
+  // Future<void> stopRecording() async {
+  //   String? filePath = await audioRecorder.stop();
+  //   if (filePath != null) {
+  //     recordingPath.value = filePath;
+  //     await playerController.preparePlayer(path: filePath);
+  //     isRecordingNow.value = false;
+  //     update();
+  //     // Start playback automatically
+  //     // togglePlayback();
+  //   }
+  // }
 
   // Toggle playback
   Future<void> togglePlayback({String? filePath}) async {
@@ -87,18 +110,19 @@ class CreateAlarmController extends GetxController {
 
   void saveBackground() {
     final background = ChangeBackground(
-      title: titleController.text.isEmpty ? 'Background Title' : titleController.text,
+      title: titleController.text.isEmpty
+          ? 'Background Title'
+          : titleController.text,
       image: selectedImage.value?.path ?? '',
       audio: selectedAudio.value?.path ?? '',
       record: recordingPath.value ?? '',
-
     );
     // Prepare waveform for uploaded audio
     if (selectedAudio.value != null) {
       playerController.preparePlayer(path: selectedAudio.value!.path);
     }
     backgrounds.add(background);
-    update();// Notify listeners
+    update(); // Notify listeners
     print(background);
   }
 
@@ -112,7 +136,6 @@ class CreateAlarmController extends GetxController {
     isPlaying.value = false;
     playerController.stopPlayer();
   }
-
 
   @override
   void onClose() {

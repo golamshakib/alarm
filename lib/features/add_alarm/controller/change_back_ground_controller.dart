@@ -1,8 +1,6 @@
-import 'package:alarm/core/utils/constants/icon_path.dart';
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:get/get.dart';
 
-import 'package:get/get.dart';
 
 class ChangeBackgroundController extends GetxController {
   // Database Data List

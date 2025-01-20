@@ -6,8 +6,6 @@ import 'package:alarm/core/utils/constants/icon_path.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:widgets_easier/widgets_easier.dart';
 import 'dart:io';
 
@@ -25,13 +23,8 @@ class CreateNewAlarmScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CreateAlarmController controller = Get.put(CreateAlarmController());
-    final ImagePicker picker =
-        ImagePicker(); // Create an instance of ImagePicker
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: (){
-        Get.to(() => PreviousScreen());
-      }, child: const Icon(Icons.mic),),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -73,7 +66,9 @@ class CreateNewAlarmScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextFormField(
-                          controller: controller.titleController,
+                          onChanged: (value) {
+                            controller.labelText.value = value;
+                          },
                           decoration: InputDecoration(
                             hintText: 'Background title',
                             hintStyle: GoogleFonts.poppins(color: const Color(0xffA59F92), fontSize: getWidth(14)),
@@ -88,24 +83,12 @@ class CreateNewAlarmScreen extends StatelessWidget {
                       ),
                       SizedBox(height: getHeight(16)),
 
-                      UploadBackgroundImageSection(controller: controller, picker: picker),
+                      UploadBackgroundImageSection(controller: controller, picker: controller.picker),
 
                       SizedBox(height: getHeight(16)),
 
                       GestureDetector(
-                        onTap: () async {
-                          try {
-                            final XFile? image = await picker.pickImage(
-                              source: ImageSource.gallery,
-                            );
-                            if (image != null) {
-                              controller.pickImage(File(image.path));
-                            }
-                          } catch (e) {
-                            Get.snackbar("Error", "Failed to pick image: $e",
-                                snackPosition: SnackPosition.BOTTOM);
-                          }
-                        },
+                        onTap: ()  {controller.pickImage();},
                         child: Container(
                           decoration: ShapeDecoration(
                             color: const Color(0xffFFFFFF),
@@ -117,45 +100,45 @@ class CreateNewAlarmScreen extends StatelessWidget {
                           child: Obx(() {
                             return Padding(
                               padding: const EdgeInsets.all(16),
-                              child: controller.selectedImage.value != null
+                              child: controller.imagePath.value != null
                                   ? Image.file(
-                                      controller.selectedImage.value!,
-                                      fit: BoxFit.cover,
-                                    )
+                                File(controller.imagePath.value!), // Create a File object here
+                                fit: BoxFit.cover,
+                              )
                                   : Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                              height: getHeight(48),
-                                              width: getWidth(48),
-                                              child: CircleAvatar(
-                                                backgroundColor:
-                                                    const Color(0xffFFF8F1),
-                                                child: Center(
-                                                    child: SizedBox(
-                                                        height: getWidth(18),
-                                                        width: getWidth(18),
-                                                        child: Image.asset(IconPath
-                                                            .imageUploadIcon))),
-                                              )),
-                                          SizedBox(
-                                            width: getWidth(8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: getHeight(48),
+                                      width: getWidth(48),
+                                      child: CircleAvatar(
+                                        backgroundColor: const Color(0xffFFF8F1),
+                                        child: Center(
+                                          child: SizedBox(
+                                            height: getWidth(18),
+                                            width: getWidth(18),
+                                            child: Image.asset(IconPath.imageUploadIcon),
                                           ),
-                                          CustomText(
-                                            text: "Upload your image",
-                                            color: const Color(0xffA59F92),
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: getWidth(14),
-                                            decoration:
-                                                TextDecoration.underline,
-                                          ),
-                                        ],
+                                        ),
                                       ),
                                     ),
+                                    SizedBox(
+                                      width: getWidth(8),
+                                    ),
+                                    CustomText(
+                                      text: "Upload your image",
+                                      color: const Color(0xffA59F92),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: getWidth(14),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             );
                           }),
+
                         ),
                       ),
 
@@ -166,21 +149,8 @@ class CreateNewAlarmScreen extends StatelessWidget {
 
                       SizedBox(height: getHeight(16)),
                       GestureDetector(
-                        onTap: () async {
-                          try {
-                            FilePickerResult? result =
-                                await FilePicker.platform.pickFiles(
-                              type: FileType.audio,
-                            );
-                            if (result != null &&
-                                result.files.single.path != null) {
-                              controller
-                                  .pickAudio(File(result.files.single.path!));
-                            }
-                          } catch (e) {
-                            Get.snackbar("Error", "Failed to pick audio: $e",
-                                snackPosition: SnackPosition.BOTTOM);
-                          }
+                        onTap: ()  {
+                          controller.pickMusic();
                         },
                         child: Container(
                           decoration: ShapeDecoration(
@@ -191,7 +161,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                             ),
                           ),
                           child: Obx(() {
-                            return controller.selectedAudio.value != null
+                            return controller.musicPath.value != null
                                 ? Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Row(
@@ -218,7 +188,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                                           width: getWidth(253),
                                           child: CustomText(
                                             text: controller
-                                                .selectedAudio.value!.path
+                                                .musicPath.value!
                                                 .split('/')
                                                 .last,
                                             color: const Color(0xff333333),

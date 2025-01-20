@@ -10,17 +10,16 @@ import 'package:path/path.dart' as path;
 import 'package:record/record.dart';
 
 class AudioController extends GetxController {
-  final AudioRecorder audioRecorder = AudioRecorder();
+  Rx<String> labelText = ''.obs; // Store label text
+
+  /// -- P L A Y   M U S I C
+
+  RxList<Map<String, dynamic>> items = <Map<String, dynamic>>[].obs;
   final AudioPlayer audioPlayer = AudioPlayer();
-
-  // Create a PlayerController for each item
-  List<PlayerController> waveformControllers = [];
-
-  final PlayerController playerController = PlayerController();
+  List<PlayerController> waveformControllers = []; // Create a PlayerController for each item
   RxBool isPlaying = false.obs;
   RxInt playingIndex = (-1).obs; // To track the currently playing item
 
-  RxList<Map<String, dynamic>> items = <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
@@ -35,34 +34,6 @@ class AudioController extends GetxController {
     items.add(item);
     waveformControllers
         .add(PlayerController()); // Add a controller for the new item
-  }
-
-  RxBool isRecording = false.obs;
-  Rx<String?> recordingPath = Rx<String?>(null);
-
-  Rx<String> labelText = ''.obs; // Store label text
-  Rx<String?> imagePath = Rx<String?>(null); // Store image path
-  Rx<String?> musicUrl = Rx<String?>(null); // Store music URL
-
-  RxBool isMicDisabled = false.obs; // To disable the mic button
-  RxBool isMusicDisabled = false.obs; // To disable the music button
-
-  // Toggle playback using a simplified method
-
-  var isRecordingPlaying = false.obs;
-
-  void toggleRecordingPlayback({String? filePath}) async {
-    if (recordingPath.value != null &&
-        File(recordingPath.value!).existsSync()) {
-      isRecordingPlaying.toggle(); // Toggles the playback state
-      if (isRecordingPlaying.value) {
-        // Logic to start playback
-        playerController.startPlayer();
-      } else {
-        // Logic to pause playback
-        playerController.pausePlayer();
-      }
-    }
   }
 
   // Play Music
@@ -101,6 +72,8 @@ class AudioController extends GetxController {
     }
   }
 
+  /// -- E N D  P L A Y   M U S I C
+
 
   void stopMusic() async {
     if (isPlaying.value) {
@@ -110,6 +83,17 @@ class AudioController extends GetxController {
     }
   }
 
+  /// -- S T A R T   R E C O R D I N G
+
+  final PlayerController playerController = PlayerController();
+  final AudioRecorder audioRecorder = AudioRecorder();
+  RxBool isRecording = false.obs;
+  Rx<String?> recordingPath = Rx<String?>(null);
+  Rx<String?> musicUrl = Rx<String?>(null); // Store music URL
+  RxBool isMicDisabled = false.obs; // To disable the mic button
+  RxBool isMusicDisabled = false.obs; // To disable the music button
+
+  // Start Recording
   Future<void> toggleRecording() async {
     if (isMicDisabled.value) {
       Get.snackbar("Action Disabled",
@@ -142,20 +126,33 @@ class AudioController extends GetxController {
       }
     }
   }
+  /// -- E N D   R E C O R D I N G
 
-  // Future<void> togglePlayback() async {
-  //   if (audioPlayer.playing) {
-  //     await audioPlayer.pause();
-  //     playerController.pausePlayer();
-  //   } else {
-  //     if (recordingPath.value != null) {
-  //       await audioPlayer.setFilePath(recordingPath.value!);
-  //       await audioPlayer.play();
-  //       playerController.startPlayer();
-  //     }
-  //   }
-  // }
+  /// -- P L A Y    R E C O R D I N G
 
+  var isRecordingPlaying = false.obs;
+
+  void toggleRecordingPlayback({String? filePath}) async {
+    if (recordingPath.value != null &&
+        File(recordingPath.value!).existsSync()) {
+      isRecordingPlaying.toggle(); // Toggles the playback state
+      if (isRecordingPlaying.value) {
+        // Logic to start playback
+        playerController.startPlayer();
+      } else {
+        // Logic to pause playback
+        playerController.pausePlayer();
+      }
+    }
+  }
+  /// -- E N D    P L A Y    R E C O R D I N G
+
+
+  /// -- P I C K    I M A G E    A N D    M U S I C
+
+  Rx<String?> imagePath = Rx<String?>(null); // Store image path
+
+  // Pick Image
   Future<void> pickImage() async {
     final ImagePicker picker = ImagePicker();
 
@@ -172,6 +169,7 @@ class AudioController extends GetxController {
     }
   }
 
+  // Pick Music
   Future<void> pickMusic() async {
     if (isMusicDisabled.value) {
       Get.snackbar("Action Disabled",
@@ -189,6 +187,9 @@ class AudioController extends GetxController {
       Get.snackbar("Music Selected", "Mic recording is now disabled.");
     }
   }
+
+  /// -- E N D   P I C K    I M A G E    A N D    M U S I C
+
 
   void saveData() {
     final result = {

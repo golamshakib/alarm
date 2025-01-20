@@ -1,59 +1,146 @@
+import 'dart:io';
+
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
-import 'dart:io';
-
 import 'package:record/record.dart';
 
 class CreateAlarmController extends GetxController {
-  final titleController = TextEditingController();
-  var selectedImage = Rx<File?>(null); // Holds the selected image
-  var selectedAudio = Rx<File?>(null); // Holds the selected audio file
-  Rx<String?> recordingPath = Rx<String?>(null);
-  RxBool isRecordingNow = false.obs;
-  var isRecordingPlaying = false.obs;
+  Rx<String> labelText = ''.obs; // Store label text
 
+  /// -- P L A Y   M U S I C
+
+  RxList<Map<String, dynamic>> items = <Map<String, dynamic>>[].obs;
+  final AudioPlayer audioPlayer = AudioPlayer();
+  List<PlayerController> waveformControllers = []; // Create a PlayerController for each item
+  RxBool isPlaying = false.obs;
+  RxInt playingIndex = (-1).obs; // To track the currently playing item
+
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Initialize waveform controllers
+    for (var _ in items) {
+      waveformControllers.add(PlayerController());
+    }
+  }
+
+  void addItem(Map<String, dynamic> item) {
+    items.add(item);
+    waveformControllers.add(PlayerController());
+  }
+
+  void removeItem(int index) {
+    items.removeAt(index);
+    waveformControllers[index].dispose(); // Dispose the controller
+    waveformControllers.removeAt(index);
+  }
+
+  // Play Music
+  Future<void> playMusic(int index) async {
+    if (index >= waveformControllers.length) {
+      Get.snackbar("Error", "Waveform controller not found for this item.");
+      return;
+    }
+    final item = items[index];
+    final filePath = item['musicUrl'] ?? item['recordingUrl'];
+
+    if (filePath == null || !File(filePath).existsSync()) {
+      Get.snackbar("Error", "No audio file found!");
+      return;
+    }
+
+    try {
+      if (playingIndex.value == index && isPlaying.value) {
+        // Pause the current track
+        isPlaying.value = false;
+        await audioPlayer.pause();
+        waveformControllers[index].pausePlayer();
+      } else {
+        // Stop the previous track if playing
+        if (playingIndex.value != -1 && playingIndex.value != index) {
+          await audioPlayer.stop();
+          waveformControllers[playingIndex.value].pausePlayer();
+        }
+
+        // Play the new track
+        isPlaying.value = true;
+        playingIndex.value = index;
+        Get.forceAppUpdate();
+        await audioPlayer.setFilePath(filePath);
+        await audioPlayer.play();
+        waveformControllers[index].startPlayer();
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to play audio: $e");
+    }
+  }
+
+  /// -- E N D  P L A Y   M U S I C
+
+
+  void stopMusic() async {
+    if (isPlaying.value) {
+      await audioPlayer.stop();
+      isPlaying.value = false;
+      playingIndex.value = -1;
+    }
+  }
+
+  /// -- S T A R T   R E C O R D I N G
+
+  final PlayerController playerController = PlayerController();
   final AudioRecorder audioRecorder = AudioRecorder();
+  RxBool isRecording = false.obs;
+  Rx<String?> recordingPath = Rx<String?>(null);
+  Rx<String?> musicPath = Rx<String?>(null); // Store music URL
+  RxBool isMicDisabled = false.obs; // To disable the mic button
+  RxBool isMusicDisabled = false.obs; // To disable the music button
 
-  // Image Picker
-  void pickImage(File image) {
-    selectedImage.value = image;
-    // img.value = File(image.path) as String?;
-  }
-
-  // Audio Picker
-  void pickAudio(File audio) {
-    selectedAudio.value = audio;
-    // aud.value = File(audio.path) as String?;
-  }
-
+  // Start Recording
   Future<void> toggleRecording() async {
-    if (isRecordingNow.value) {
+    if (isMicDisabled.value) {
+      Get.snackbar("Action Disabled",
+          "Music is selected. Reset to enable mic recording.");
+      return;
+    }
+
+    if (isRecording.value) {
       String? filePath = await audioRecorder.stop();
       if (filePath != null) {
         recordingPath.value = filePath;
-        playerController.preparePlayer(path: filePath);
-        isRecordingNow.value = false;
+        playerController.preparePlayer(
+          path: filePath,
+          shouldExtractWaveform: true, // Ensure waveform data is extracted
+        );
+        isRecording.value = false;
+        isMusicDisabled.value = true;
+        Get.snackbar("Recording Stopped", "Recording saved successfully.");
       }
     } else {
       if (await audioRecorder.hasPermission()) {
         final Directory appDocumentsDir =
-            await getApplicationDocumentsDirectory();
+        await getApplicationDocumentsDirectory();
         final String fileName =
             'recording_${DateTime.now().millisecondsSinceEpoch}.wav';
         final String filePath = path.join(appDocumentsDir.path, fileName);
         await audioRecorder.start(const RecordConfig(), path: filePath);
-        recordingPath.value = null;
-        isRecordingNow.value = true;
+        isRecording.value = true;
+        musicPath.value = null;
       }
     }
   }
+  /// -- E N D   R E C O R D I N G
 
+  /// -- P L A Y    R E C O R D I N G
 
-  // Toggle playback using a simplified method
+  var isRecordingPlaying = false.obs;
+
   void toggleRecordingPlayback({String? filePath}) async {
     if (recordingPath.value != null &&
         File(recordingPath.value!).existsSync()) {
@@ -67,160 +154,88 @@ class CreateAlarmController extends GetxController {
       }
     }
   }
+  /// -- E N D    P L A Y    R E C O R D I N G
 
 
-// List of alarms
-  var backgrounds = <ChangeBackground>[].obs;
+  /// -- P I C K    I M A G E    A N D    M U S I C
 
-// Initialize isPlayingList dynamically based on backgrounds size
-  var isPlayingList = <bool>[].obs; // Ensure this matches the list size at initialization
-  final AudioPlayer audioPlayer = AudioPlayer();
-  final PlayerController playerController = PlayerController();
+  Rx<String?> imagePath = Rx<String?>(null); // Store image path
+  final ImagePicker picker = ImagePicker(); // Create an instance of ImagePicker
 
-  void togglePlayback(int index, {String? filePath}) async {
-    if (index >= isPlayingList.length) {
-      // Dynamically adjust the list size if needed
-      isPlayingList.add(false);
-    }
 
-    // Stop current playback if any audio is already playing
-    if (audioPlayer.playing) {
-      await audioPlayer.pause();
-      playerController.pausePlayer();
+  // Pick Image
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
 
-      // Reset all other indexes to false
-      isPlayingList.fillRange(0, isPlayingList.length, false);
+    // Pick an image from the gallery
+    final XFile? pickedFile =
+    await picker.pickImage(source: ImageSource.gallery);
 
-      // Schedule the refresh after the build phase
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        isPlayingList.refresh(); // Ensure the UI updates after the build phase
-      });
-    }
-
-    // Play the clicked index if not already playing
-    if (filePath != null && File(filePath).existsSync()) {
-      await audioPlayer.setFilePath(filePath);
-      await audioPlayer.play();
-      playerController.startPlayer();
-
-      // Update only the selected index to true
-      isPlayingList.fillRange(0, isPlayingList.length, false); // Reset all
-      isPlayingList[index] = true;
-
-      // Schedule the refresh after the build phase
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        isPlayingList.refresh(); // Ensure the UI updates after the build phase
-      });
-
-      // Listen for the playback starting
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        isPlayingList[index] = true;
-        isPlayingList.refresh(); // Ensure the UI updates after the build phase
-      });
+    if (pickedFile != null) {
+      // Set the image path
+      imagePath.value = pickedFile.path;
     } else {
-      Get.snackbar('Error', 'Audio file not found or invalid.');
+      // Handle the case where the user cancels the image picker
+      imagePath.value = null;
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    // Ensure that the playback state is correctly initialized when navigating back to this screen
-    isPlayingList.value = List.generate(backgrounds.length, (index) => false);
-  }
+  // Pick Music
+  Future<void> pickMusic() async {
+    if (isMusicDisabled.value) {
+      Get.snackbar("Action Disabled",
+          "Recording is in progress or completed. Reset to enable music selection.");
+      return;
+    }
 
-// // Function to toggle playback
-//   Future<void> togglePlayback(int index, {String? filePath}) async {
-//     if (index >= isPlayingList.length) {
-//       // Dynamically adjust the list size if needed
-//       isPlayingList.add(false);
-//     }
-//
-//     // Stop current playback if any audio is already playing
-//     if (audioPlayer.playing) {
-//       await audioPlayer.pause();
-//       playerController.pausePlayer();
-//
-//       // Reset all other indexes to false
-//       isPlayingList.fillRange(0, isPlayingList.length, false);
-//
-//       // Schedule the refresh after the build phase
-//       WidgetsBinding.instance.addPostFrameCallback((_) {
-//         isPlayingList.refresh(); // Ensure the UI updates after the build phase
-//       });
-//     }
-//
-//     // Play the clicked index if not already playing
-//     if (filePath != null && File(filePath).existsSync()) {
-//       await audioPlayer.setFilePath(filePath);
-//       await audioPlayer.play();
-//       playerController.startPlayer();
-//
-//       // Update only the selected index to true
-//       isPlayingList.fillRange(0, isPlayingList.length, false); // Reset all
-//       isPlayingList[index] = true;
-//
-//       // Schedule the refresh after the build phase
-//       WidgetsBinding.instance.addPostFrameCallback((_) {
-//         isPlayingList.refresh(); // Ensure the UI updates after the build phase
-//       });
-//
-//       // Listen for the playback starting
-//       WidgetsBinding.instance.addPostFrameCallback((_) {
-//         isPlayingList[index] = true;
-//         isPlayingList.refresh(); // Ensure the UI updates after the build phase
-//       });
-//     } else {
-//       Get.snackbar('Error', 'Audio file not found or invalid.');
-//     }
-//   }
-
-  void saveBackground() {
-    final background = ChangeBackground(
-      title: titleController.text.isEmpty
-          ? 'Background Title'
-          : titleController.text,
-      image: selectedImage.value?.path ?? '',
-      audio: selectedAudio.value?.path ?? '',
-      record: recordingPath.value ?? '',
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
     );
-    // Prepare waveform for uploaded audio
-    if (selectedAudio.value != null) {
-      playerController.preparePlayer(path: selectedAudio.value!.path);
+
+    if (result != null) {
+      musicPath.value = result.files.single.path;
+      isMicDisabled.value = true; // Disable the mic button
+      Get.snackbar("Music Selected", "Mic recording is now disabled.");
     }
-    backgrounds.add(background);
-    update(); // Notify listeners
   }
 
-// Reset method to clear fields
-  void resetBackground() {
-    titleController.clear();
-    selectedImage.value = null;
-    selectedAudio.value = null;
-    recordingPath.value = null;
-    isRecordingNow.value = false;
-    // isPlayingList.value = false as List<bool>;
-    playerController.stopPlayer();
+  /// -- E N D   P I C K    I M A G E    A N D    M U S I C
+
+
+  void saveData() {
+    final newItem = {
+      'labelText': labelText.value,
+      'imagePath': imagePath.value,
+      'musicUrl': musicPath.value,
+      'recordingUrl': recordingPath.value,
+      'type': musicPath.value != null ? 'music' : 'recording',
+    };
+    // Add the new item to the items list
+    items.add(newItem);
+    print('---------------------------');
+    print(items);
+    Get.back(); // Navigate back to the previous screen
+  }
+
+  void resetFields() {
+    labelText.value = ''; // Clear the label text
+    imagePath.value = null; // Clear the image path
+    musicPath.value = null; // Clear the music URL
+    recordingPath.value = null; // Clear the recording path
+    isRecording.value = false; // Reset recording state
+    isMicDisabled.value = false; // Enable mic button
+    isMusicDisabled.value = false; // Enable music button
+    isRecordingPlaying.value = false; // Stop recording playback
+    playerController.stopPlayer(); // Stop the player controller
   }
 
   @override
   void onClose() {
+    stopMusic();
     audioPlayer.dispose();
-    playerController.dispose();
+    for (var controller in waveformControllers) {
+      controller.dispose();
+    }
     super.onClose();
   }
-}
-
-class ChangeBackground {
-  final String title;
-  final String image;
-  final String audio;
-  final String record;
-
-  ChangeBackground({
-    required this.title,
-    required this.image,
-    required this.audio,
-    required this.record,
-  });
 }

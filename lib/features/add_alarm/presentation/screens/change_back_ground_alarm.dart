@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:alarm/features/add_alarm/presentation/screens/preview_screen.dart';
@@ -10,6 +9,7 @@ import '../../../../core/common/widgets/custom_appbar_with_logo.dart';
 import '../../../../core/common/widgets/custom_text.dart';
 import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
+import '../../../../core/utils/constants/image_path.dart';
 import '../../../../routes/app_routes.dart';
 import '../../controller/change_back_ground_controller.dart';
 import '../../controller/create_new_back_ground_alarm_controller.dart';
@@ -145,20 +145,28 @@ class ChangeBackGroundAlarm extends StatelessWidget {
 
               Expanded(
                 child: Obx(() {
+                  if (createAlarmController.items.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No alarms created yet.",
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                    );
+                  }
                   return ListView.separated(
-                    itemCount: createAlarmController.backgrounds.length,
+                    itemCount: createAlarmController.items.length,
                     separatorBuilder: (_, __) =>
                         SizedBox(height: getHeight(12)),
                     itemBuilder: (context, index) {
-                      final background =
-                          createAlarmController.backgrounds[index];
+                      final item =
+                          createAlarmController.items[index];
                       return GestureDetector(
                         onTap: () {
-                          Get.to(() => PreviewScreen(
-                                title: background.title,
-                                image: background.image,
-                                musicUrl: background.audio,
-                              ));
+                          // Get.to(() => PreviewScreen(
+                          //       title: background.title,
+                          //       image: background.image,
+                          //       musicUrl: background.audio,
+                          //     ));
                         },
                         child: Stack(
                           children: [
@@ -177,28 +185,15 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                     // Play/Pause Button with Icon Change
                                     GestureDetector(
                                       onTap: () {
-                                        createAlarmController.togglePlayback(
-                                          index,
-                                          filePath: background.audio.isNotEmpty
-                                              ? background.audio
-                                              : background.record,
-                                        );
+                                        createAlarmController.playMusic(index);
                                       },
                                       child: Obx(() {
-                                        // Ensure isPlayingList is initialized and has enough items before accessing index
-                                        if (index >=
-                                            createAlarmController
-                                                .isPlayingList.length) {
-                                          // If index exceeds list size, prevent error by adding default values
-                                          createAlarmController.isPlayingList
-                                              .add(false);
-                                        }
-
                                         return Row(
                                           children: [
                                             Icon(
                                               createAlarmController
-                                                      .isPlayingList[index]
+                                                      .isPlaying.value &&
+                                                  createAlarmController.playingIndex.value == index
                                                   ? Icons
                                                       .play_circle_filled_rounded
                                                   : Icons
@@ -206,25 +201,26 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                               color: Colors.orange,
                                               size: 25,
                                             ),
-                                            SizedBox(width: getWidth(8)),
-                                            if (createAlarmController
-                                                .isPlayingList[index])
-                                              const SizedBox.shrink()
-                                            else
-                                              AudioFileWaveforms(
-                                                playerController:
-                                                    createAlarmController
-                                                        .playerController,
-                                                size: Size(getWidth(200),
-                                                    getHeight(25)),
-                                                playerWaveStyle:
-                                                    const PlayerWaveStyle(
-                                                  fixedWaveColor: Colors.grey,
-                                                  liveWaveColor:
-                                                      Color(0xffFFA845),
-                                                  waveThickness: 2.0,
+                                            SizedBox(width: getWidth(10)),
+
+                                            if (createAlarmController.isPlaying.value &&
+                                                createAlarmController.playingIndex.value == index) ...[
+                                              SizedBox(width: getWidth(10)),
+                                              SizedBox(
+                                                height: 50,
+                                                child: AudioFileWaveforms(
+                                                  playerController: createAlarmController.waveformControllers[index],
+                                                  size: Size(getWidth(300), getHeight(80)),
+                                                  // enableSeekGesture: true,
+                                                  waveformType: WaveformType.long,
+                                                  playerWaveStyle: const PlayerWaveStyle(
+                                                    fixedWaveColor: Colors.grey,
+                                                    liveWaveColor: Color(0xffFFA845),
+                                                    waveThickness: 2.0,
+                                                  ),
                                                 ),
                                               ),
+                                            ],
                                           ],
                                         );
                                       }),
@@ -233,7 +229,7 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                     SizedBox(height: getHeight(16)),
                                     // Displaying background title
                                     CustomText(
-                                      text: background.title,
+                                      text: item['labelText'] ?? '',
                                       fontSize: getWidth(14),
                                       fontWeight: FontWeight.w700,
                                       textOverflow: TextOverflow.ellipsis,
@@ -253,7 +249,10 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                     topRight: Radius.circular(10),
                                   ),
                                   image: DecorationImage(
-                                    image: FileImage(File(background.image)),
+                                    image: item['imagePath'] != null &&
+                                        File(item['imagePath']!).existsSync()
+                                        ? FileImage(File(item['imagePath']!))
+                                        : const AssetImage(ImagePath.dog),
                                     fit: BoxFit.cover,
                                   ),
                                 ),

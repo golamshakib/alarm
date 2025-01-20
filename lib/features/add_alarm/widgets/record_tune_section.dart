@@ -35,7 +35,7 @@ class RecordTuneSection extends StatelessWidget {
                 child: Row(
                   children: [
                     CustomText(
-                      text: controller.isRecordingNow.value
+                      text: controller.isRecording.value
                           ? "Stop Record"
                           : "Start Record", // Change text based on isRecordingNow value
                       color: const Color(0xffFFA845),
@@ -43,7 +43,7 @@ class RecordTuneSection extends StatelessWidget {
                       decorationColor: const Color(0xffFFA845),
                     ),
                     const SizedBox(width: 8),
-                    controller.isRecordingNow.value
+                    controller.isRecording.value
                         ? SizedBox(
                       height: getHeight(30),
                       width: getWidth(30),

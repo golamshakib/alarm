@@ -30,7 +30,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(onPressed: (){
-        Get.to(() => const PreviousScreen());
+        Get.to(() => PreviousScreen());
       }, child: const Icon(Icons.mic),),
       body: SafeArea(
         child: SingleChildScrollView(

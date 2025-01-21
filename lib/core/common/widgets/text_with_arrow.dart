@@ -25,7 +25,8 @@ class TextWithArrow extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Row(
+      child:
+      Row(
         children: [
           // CustomText Widget
           CustomText(

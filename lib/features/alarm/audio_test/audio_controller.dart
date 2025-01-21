@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
@@ -10,8 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:record/record.dart';
 
-class CreateAlarmController extends GetxController {
-  ImagePicker picker = ImagePicker();
+class AudioController extends GetxController {
   Rx<String> labelText = ''.obs; // Store label text
 
   /// -- P L A Y   M U S I C
@@ -21,8 +19,6 @@ class CreateAlarmController extends GetxController {
   List<PlayerController> waveformControllers = []; // Create a PlayerController for each item
   RxBool isPlaying = false.obs;
   RxInt playingIndex = (-1).obs; // To track the currently playing item
-  RxString musicHoverMessage = ''.obs;
-
 
 
   @override
@@ -43,11 +39,10 @@ class CreateAlarmController extends GetxController {
   // Play Music
   Future<void> playMusic(int index) async {
     final item = items[index];
-    final filePath = item['musicPath'] ?? item['recordingPath'];
+    final filePath = item['musicUrl'] ?? item['recordingUrl'];
 
     if (filePath == null || !File(filePath).existsSync()) {
-      musicHoverMessage.value = "No audio file found!"; // Update hover message
-
+      Get.snackbar("Error", "No audio file found!");
       return;
     }
 
@@ -73,7 +68,7 @@ class CreateAlarmController extends GetxController {
         waveformControllers[index].startPlayer();
       }
     } catch (e) {
-      musicHoverMessage.value = "Failed to play audio: $e"; // Update hover message
+      Get.snackbar("Error", "Failed to play audio: $e");
     }
   }
 
@@ -94,15 +89,15 @@ class CreateAlarmController extends GetxController {
   final AudioRecorder audioRecorder = AudioRecorder();
   RxBool isRecording = false.obs;
   Rx<String?> recordingPath = Rx<String?>(null);
-  Rx<String?> musicPath = Rx<String?>(null); // Store music URL
+  Rx<String?> musicUrl = Rx<String?>(null); // Store music URL
   RxBool isMicDisabled = false.obs; // To disable the mic button
   RxBool isMusicDisabled = false.obs; // To disable the music button
-  RxString recordingHoverMessage = ''.obs;
 
   // Start Recording
   Future<void> toggleRecording() async {
     if (isMicDisabled.value) {
-      recordingHoverMessage.value = "Music is selected. Reset to enable mic recording.";
+      Get.snackbar("Action Disabled",
+          "Music is selected. Reset to enable mic recording.");
       return;
     }
 
@@ -116,19 +111,18 @@ class CreateAlarmController extends GetxController {
         );
         isRecording.value = false;
         isMusicDisabled.value = true;
-        recordingHoverMessage.value = "Recording saved successfully."; // Update hover message
+        Get.snackbar("Recording Stopped", "Recording saved successfully.");
       }
     } else {
       if (await audioRecorder.hasPermission()) {
         final Directory appDocumentsDir =
-        await getApplicationDocumentsDirectory();
+            await getApplicationDocumentsDirectory();
         final String fileName =
             'recording_${DateTime.now().millisecondsSinceEpoch}.wav';
         final String filePath = path.join(appDocumentsDir.path, fileName);
         await audioRecorder.start(const RecordConfig(), path: filePath);
         isRecording.value = true;
-        musicPath.value = null;
-        recordingHoverMessage.value = "Recording started.";
+        musicUrl.value = null;
       }
     }
   }
@@ -164,7 +158,7 @@ class CreateAlarmController extends GetxController {
 
     // Pick an image from the gallery
     final XFile? pickedFile =
-    await picker.pickImage(source: ImageSource.gallery);
+        await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       // Set the image path
@@ -178,7 +172,8 @@ class CreateAlarmController extends GetxController {
   // Pick Music
   Future<void> pickMusic() async {
     if (isMusicDisabled.value) {
-      musicHoverMessage.value = "Recording is in progress or completed. Reset to enable music selection.";
+      Get.snackbar("Action Disabled",
+          "Recording is in progress or completed. Reset to enable music selection.");
       return;
     }
 
@@ -187,9 +182,10 @@ class CreateAlarmController extends GetxController {
     );
 
     if (result != null) {
-      musicPath.value = result.files.single.path;
+      musicUrl.value = result.files.single.path;
       isMicDisabled.value = true; // Disable the mic button
-      musicHoverMessage.value = "Music file selected successfully.";    }
+      Get.snackbar("Music Selected", "Mic recording is now disabled.");
+    }
   }
 
   /// -- E N D   P I C K    I M A G E    A N D    M U S I C
@@ -197,32 +193,25 @@ class CreateAlarmController extends GetxController {
 
   void saveData() {
     final result = {
-      'title': labelText.value.isNotEmpty
-          ? labelText.value
-          : 'Background Title',
-      'image': imagePath.value,
-      'musicPath': musicPath.value,
-      'recordingPath': recordingPath.value,
-      'type': musicPath.value != null ? 'music' : 'recording',
+      'labelText': labelText.value,
+      'imagePath': imagePath.value,
+      'musicUrl': musicUrl.value,
+      'recordingUrl': recordingPath.value,
+      'type': musicUrl.value != null ? 'music' : 'recording', // Add this to distinguish between music and recording
     };
-
-    addItem(result); // Add the saved data to the items list
-    resetFields();   // Reset the fields
-    Get.back(result: result); // Navigate back to the previous screen
+    Get.back(result: result); // Pass data back
   }
 
   void resetFields() {
     labelText.value = ''; // Clear the label text
     imagePath.value = null; // Clear the image path
-    musicPath.value = null; // Clear the music URL
+    musicUrl.value = null; // Clear the music URL
     recordingPath.value = null; // Clear the recording path
     isRecording.value = false; // Reset recording state
     isMicDisabled.value = false; // Enable mic button
     isMusicDisabled.value = false; // Enable music button
     isRecordingPlaying.value = false; // Stop recording playback
     playerController.stopPlayer(); // Stop the player controller
-    recordingHoverMessage.value = "";
-    musicHoverMessage.value = "";
   }
 
   @override

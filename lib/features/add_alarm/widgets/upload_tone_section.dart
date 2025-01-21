@@ -1,6 +1,4 @@
-import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +16,7 @@ class UploadToneSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => controller.selectedAudio.value == null
+    return Obx(() => controller.musicPath.value == null
         ? CustomText(
       text: "Upload your tone:",
       fontSize: getWidth(16),
@@ -34,33 +32,28 @@ class UploadToneSection extends StatelessWidget {
           fontWeight: FontWeight.w600,
           color: const Color(0xff333333),
         ),
-        GestureDetector(
-            onTap: () async {
-              try {
-                FilePickerResult? result =
-                await FilePicker.platform.pickFiles(
-                  type: FileType.audio,
-                );
-                if (result != null &&
-                    result.files.single.path != null) {
-                  controller.pickAudio(
-                      File(result.files.single.path!));
-                }
-              } catch (e) {
-                Get.snackbar(
-                    "Error", "Failed to pick audio: $e",
-                    snackPosition:
-                    SnackPosition.BOTTOM);
-              }
-            },
-            child: CustomText(
-              text: "Change",
-              color: const Color(0xffFFA845),
-              fontWeight: FontWeight.w600,
-              fontSize: getWidth(16),
-              decoration: TextDecoration.underline,
-              decorationColor: const Color(0xffFFA845),
-            ))
+        Obx(() => Tooltip(
+          message: controller.musicHoverMessage.value.isNotEmpty
+              ? controller.musicHoverMessage.value
+              : "Pick an audio file",
+            child: GestureDetector(
+                onTap: controller.isMusicDisabled.value
+                    ? null // Disable interaction if isMusicDisabled is true
+                    : () async {
+                  controller.pickMusic();
+                },
+                child: CustomText(
+                  text: "Change",
+                  color: controller.isMusicDisabled.value
+                      ? Colors.grey // Change text color when disabled
+                      : const Color(0xffFFA845),
+                  fontWeight: FontWeight.w600,
+                  fontSize: getWidth(16),
+                  decoration: TextDecoration.underline,
+                  decorationColor: const Color(0xffFFA845),
+                )),
+          ),
+        )
       ],
     ));
   }

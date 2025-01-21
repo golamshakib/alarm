@@ -1,19 +1,19 @@
 import 'dart:io';
 
+import 'package:alarm/features/alarm/audio_test/audio_controller.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/constants/app_sizes.dart';
-import '../controller/create_new_back_ground_alarm_controller.dart';
 
-class WaveFormSection extends StatelessWidget {
-  const WaveFormSection({
+class TestWaveFormSection extends StatelessWidget {
+  const TestWaveFormSection({
     super.key,
     required this.controller,
   });
 
-  final CreateAlarmController controller;
+  final AudioController controller;
 
   @override
   Widget build(BuildContext context) {

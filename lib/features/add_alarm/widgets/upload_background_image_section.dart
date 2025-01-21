@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,7 +19,7 @@ class UploadBackgroundImageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => controller.selectedImage.value == null
+    return Obx(() => controller.imagePath.value == null
         ? CustomText(
       text: "Upload Background Image:",
       fontSize: getWidth(16),
@@ -37,22 +36,8 @@ class UploadBackgroundImageSection extends StatelessWidget {
           color: const Color(0xff333333),
         ),
         GestureDetector(
-            onTap: () async {
-              try {
-                final XFile? image =
-                await picker.pickImage(
-                  source: ImageSource.gallery,
-                );
-                if (image != null) {
-                  controller
-                      .pickImage(File(image.path));
-                }
-              } catch (e) {
-                Get.snackbar(
-                    "Error", "Failed to pick image: $e",
-                    snackPosition:
-                    SnackPosition.BOTTOM);
-              }
+            onTap: ()  {
+              controller.pickImage();
             },
             child: CustomText(
               text: "Change",

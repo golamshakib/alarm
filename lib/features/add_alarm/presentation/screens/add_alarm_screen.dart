@@ -23,10 +23,11 @@ class AddAlarmScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: getWidth(16), vertical: getHeight(16)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
                 // App Bar
                 CustomAppbarWithLogo(
                   text: 'Add Alarm',

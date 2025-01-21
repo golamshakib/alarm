@@ -17,12 +17,12 @@ class PreviewScreen extends StatelessWidget {
     super.key,
     required this.title,
     required this.image,
-    required this.musicUrl,
+    required this.musicPath,
   });
 
   final String title;
   final String image;
-  final String musicUrl;
+  final String musicPath;
 
   @override
   Widget build(BuildContext context) {
@@ -60,15 +60,15 @@ class PreviewScreen extends StatelessWidget {
                       );
                     }),
                     SizedBox(width: getWidth(10)),
-                    Obx(() {
-                      return controller.showExtraImage.value
-                          ? Image.asset(
-                        musicUrl,
-                        height: getHeight(25),
-                        width: getWidth(75),
-                      )
-                          : const SizedBox();
-                    }),
+                    // Obx(() {
+                    //   return controller.showExtraImage.value
+                    //       ? Image.asset(
+                    //     musicPath,
+                    //     height: getHeight(25),
+                    //     width: getWidth(75),
+                    //   )
+                    //       : const SizedBox();
+                    // }),
                   ],
                 ),
                 SizedBox(height: getHeight(16)),

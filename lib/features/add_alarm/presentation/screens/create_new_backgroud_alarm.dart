@@ -9,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:widgets_easier/widgets_easier.dart';
 import 'dart:io';
 
-import '../../../alarm/audio_test/previous_screen.dart';
 import '../../controller/create_new_back_ground_alarm_controller.dart';
 import '../../widgets/record_tune_section.dart';
 import '../../widgets/save_background_button_section.dart';
@@ -36,8 +35,9 @@ class CreateNewAlarmScreen extends StatelessWidget {
                 CustomAppbarWithLogo(
                   text: "Create New",
                   showBackIcon: true,
-                  onBackTap: () {
-                    Get.back();
+                  iconPath: IconPath.deleteIcon,
+                  onIconTap: (){
+                    controller.resetFields();
                   },
                 ),
                 SizedBox(height: getHeight(24)),
@@ -148,89 +148,104 @@ class CreateNewAlarmScreen extends StatelessWidget {
                       // Upload Tone
 
                       SizedBox(height: getHeight(16)),
-                      GestureDetector(
-                        onTap: ()  {
-                          controller.pickMusic();
-                        },
-                        child: Container(
-                          decoration: ShapeDecoration(
-                            color: const Color(0xffFFFFFF),
-                            shape: DashedBorder(
-                              color: const Color(0xffA59F92),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Obx(() {
-                            return controller.musicPath.value != null
-                                ? Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                            height: getHeight(48),
-                                            width: getWidth(48),
-                                            child: CircleAvatar(
-                                              backgroundColor:
-                                                  const Color(0xffFFF8F1),
-                                              child: Center(
-                                                  child: SizedBox(
-                                                      height: getWidth(18),
-                                                      width: getWidth(18),
-                                                      child: Image.asset(IconPath
-                                                          .fileUploadIcon))),
-                                            )),
-                                        SizedBox(
-                                          width: getWidth(8),
+                      Obx(() => Tooltip(
+                        message: controller.musicHoverMessage.value.isNotEmpty
+                            ? controller.musicHoverMessage.value
+                            : "Pick an audio file",
+                          child: GestureDetector(
+                            onTap: controller.isMusicDisabled.value
+                                ? null // Disable interaction if isMusicDisabled is true
+                                : () async {
+                              controller.pickMusic();
+                            },
+                            child: Container(
+                              decoration: ShapeDecoration(
+                                color: const Color(0xffFFFFFF),
+                                shape: DashedBorder(
+                                  color: const Color(0xffA59F92),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Obx(() {
+                                return controller.musicPath.value != null
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                                height: getHeight(48),
+                                                width: getWidth(48),
+                                                child: CircleAvatar(
+                                                  backgroundColor:
+                                                      const Color(0xffFFF8F1),
+                                                  child: Center(
+                                                      child: SizedBox(
+                                                          height: getWidth(18),
+                                                          width: getWidth(18),
+                                                          child: Image.asset(IconPath
+                                                              .fileUploadIcon))),
+                                                )),
+                                            SizedBox(
+                                              width: getWidth(8),
+                                            ),
+                                            SizedBox(
+                                              width: getWidth(253),
+                                              child: CustomText(
+                                                text: controller
+                                                    .musicPath.value!
+                                                    .split('/')
+                                                    .last,
+                                                color: const Color(0xff333333),
+                                                textOverflow: TextOverflow.clip,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        SizedBox(
-                                          width: getWidth(253),
-                                          child: CustomText(
-                                            text: controller
-                                                .musicPath.value!
-                                                .split('/')
-                                                .last,
-                                            color: const Color(0xff333333),
-                                            textOverflow: TextOverflow.clip,
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Opacity(
+                                          opacity: controller.isMusicDisabled.value ? 0.5 : 1.0, // Visual indication
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                  height: getHeight(48),
+                                                  width: getWidth(48),
+                                                  child: CircleAvatar(
+                                                    backgroundColor:
+                                                    controller.isMusicDisabled.value
+                                                        ? Colors.grey // Change text color when disabled
+                                                        : const Color(0xffFFF8F1),
+                                                    child: Center(
+                                                        child: SizedBox(
+                                                            height: getWidth(18),
+                                                            width: getWidth(18),
+                                                            child: Image.asset(IconPath
+                                                                .fileUploadIcon))),
+                                                  )),
+                                              SizedBox(
+                                                width: getWidth(8),
+                                              ),
+                                              CustomText(
+                                                text: "Upload your Audio file",
+                                                fontSize: getWidth(14),
+                                                fontWeight: FontWeight.w400,
+                                                color: controller.isMusicDisabled.value
+                                                    ? Colors.grey // Change text color when disabled
+                                                      : const Color(0xffA59F92),
+                                                decoration: TextDecoration.underline,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                : Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                            height: getHeight(48),
-                                            width: getWidth(48),
-                                            child: CircleAvatar(
-                                              backgroundColor:
-                                                  const Color(0xffFFF8F1),
-                                              child: Center(
-                                                  child: SizedBox(
-                                                      height: getWidth(18),
-                                                      width: getWidth(18),
-                                                      child: Image.asset(IconPath
-                                                          .fileUploadIcon))),
-                                            )),
-                                        SizedBox(
-                                          width: getWidth(8),
-                                        ),
-                                        CustomText(
-                                          text: "Upload your Audio file",
-                                          fontSize: getWidth(14),
-                                          fontWeight: FontWeight.w400,
-                                          color: const Color(0xffA59F92),
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                          }),
+                                      );
+                              }),
+                            ),
+                          ),
                         ),
                       ),
 

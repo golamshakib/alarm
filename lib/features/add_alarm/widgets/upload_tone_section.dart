@@ -32,18 +32,28 @@ class UploadToneSection extends StatelessWidget {
           fontWeight: FontWeight.w600,
           color: const Color(0xff333333),
         ),
-        GestureDetector(
-            onTap: ()  {
-              controller.pickMusic();
-            },
-            child: CustomText(
-              text: "Change",
-              color: const Color(0xffFFA845),
-              fontWeight: FontWeight.w600,
-              fontSize: getWidth(16),
-              decoration: TextDecoration.underline,
-              decorationColor: const Color(0xffFFA845),
-            ))
+        Obx(() => Tooltip(
+          message: controller.musicHoverMessage.value.isNotEmpty
+              ? controller.musicHoverMessage.value
+              : "Pick an audio file",
+            child: GestureDetector(
+                onTap: controller.isMusicDisabled.value
+                    ? null // Disable interaction if isMusicDisabled is true
+                    : () async {
+                  controller.pickMusic();
+                },
+                child: CustomText(
+                  text: "Change",
+                  color: controller.isMusicDisabled.value
+                      ? Colors.grey // Change text color when disabled
+                      : const Color(0xffFFA845),
+                  fontWeight: FontWeight.w600,
+                  fontSize: getWidth(16),
+                  decoration: TextDecoration.underline,
+                  decorationColor: const Color(0xffFFA845),
+                )),
+          ),
+        )
       ],
     ));
   }

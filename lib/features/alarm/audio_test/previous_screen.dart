@@ -74,9 +74,10 @@ class PreviousScreen extends StatelessWidget {
                                     color: Colors.orange,
                                     size: 25,
                                   ),
+                                  SizedBox(width: getWidth(10)),
+
                                   if (controller.isPlaying.value &&
                                       controller.playingIndex.value == index) ...[
-                                    SizedBox(width: getWidth(10)),
                                     SizedBox(
                                       height: 50,
                                       child: AudioFileWaveforms(

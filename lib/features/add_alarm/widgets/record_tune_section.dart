@@ -25,45 +25,54 @@ class RecordTuneSection extends StatelessWidget {
           color: const Color(0xff333333),
           fontWeight: FontWeight.w600,
         ),
-        Obx(() {
-          return Row(
-            children: [
-              GestureDetector(
-                onTap: () async  {
-                  controller.toggleRecording();
-                },
-                child: Row(
-                  children: [
-                    CustomText(
-                      text: controller.isRecording.value
-                          ? "Stop Record"
-                          : "Start Record", // Change text based on isRecordingNow value
-                      color: const Color(0xffFFA845),
-                      decoration: TextDecoration.underline,
-                      decorationColor: const Color(0xffFFA845),
+        Row(
+          children: [
+            Obx(() {
+              // Tooltip with dynamic message
+              return Tooltip(
+                message: controller.recordingHoverMessage.value.isNotEmpty
+                    ? controller.recordingHoverMessage.value
+                    : "Start recording audio",
+                child: GestureDetector(
+                  onTap: controller.isMicDisabled.value
+                      ? null // Disable interaction if isMicDisabled is true
+                      : () async {
+                    controller.toggleRecording();
+                  },
+                  child: Opacity(
+                    opacity: controller.isMicDisabled.value ? 0.5 : 1.0, // Visual indication,
+                    child: Row(
+                      children: [
+                        // Text for start/stop recording
+                        Obx(() => CustomText(
+                          text: controller.isRecording.value ? "Stop Record" : "Start Record",
+                          color: controller.isMicDisabled.value
+                              ? Colors.grey // Change text color when disabled
+                              : const Color(0xffFFA845),
+                          decoration: TextDecoration.underline,
+                          decorationColor: const Color(0xffFFA845),
+                        )),
+                        const SizedBox(width: 8),
+                        // Icon for recording state
+                        Obx(() => SizedBox(
+                          height: getHeight(30),
+                          width: getWidth(30),
+                          child: CircleAvatar(
+                            backgroundImage: AssetImage(
+                              controller.isRecording.value
+                                  ? IconPath.recordingOnIcon
+                                  : IconPath.radioIcon,
+                            ),
+                          ),
+                        )),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    controller.isRecording.value
-                        ? SizedBox(
-                      height: getHeight(30),
-                      width: getWidth(30),
-                      child: const CircleAvatar(
-                        backgroundImage: AssetImage(IconPath.recordingOnIcon),
-                      ),
-                    )
-                        : SizedBox(
-                      height: getHeight(25),
-                      width: getWidth(25),
-                      child: const CircleAvatar(
-                        backgroundImage: AssetImage(IconPath.radioIcon),
-                      ),
-                    )
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        }),
+              );
+            }),
+          ],
+        ),
       ],
     );
   }

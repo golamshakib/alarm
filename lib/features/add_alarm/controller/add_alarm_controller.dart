@@ -1,13 +1,44 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../settings/controller/settings_controller.dart';
 
 class AddAlarmController extends GetxController {
+  final SettingsController settingsController = Get.find<SettingsController>();
+
   final labelController = TextEditingController();
 
   // Time selection
   var selectedHour = 7.obs;
   var selectedMinute = 0.obs;
   var isAm = true.obs;
+  /// Track the current time format (12-hour or 24-hour)
+  var timeFormat = 12.obs;
+
+  /// Fetch and apply the user's time format preference
+  Future<void> loadTimeFormat() async {
+    final prefs = await SharedPreferences.getInstance();
+    timeFormat.value = prefs.getInt('timeFormat') ?? 12;
+  }
+
+  /// Adjust the default selected time when time format changes
+  void adjustTimeFormat() {
+    if (timeFormat.value == 24) {
+      // Convert to 24-hour format
+      if (!isAm.value) {
+        selectedHour.value += 12;
+      }
+    } else {
+      // Convert to 12-hour format
+      if (selectedHour.value > 12) {
+        selectedHour.value -= 12;
+        isAm.value = false;
+      } else {
+        isAm.value = true;
+      }
+    }
+  }
 
   void setCurrentTime() {
     // Set the current time to the selected hour and minute
@@ -20,7 +51,14 @@ class AddAlarmController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    setCurrentTime(); // Set the current time when the controller is initialized
+    setCurrentTime();
+    timeFormat.value = settingsController.selectedTime.value;
+
+    /// Watch for changes in time format and adjust time accordingly
+    ever(settingsController.selectedTime, (_) {
+      timeFormat.value = settingsController.selectedTime.value;
+      adjustTimeFormat();
+    });
   }
 
 

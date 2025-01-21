@@ -7,6 +7,15 @@ class LocalStoragePreviewScreenController extends GetxController {
   final RxBool isPlaying = false.obs; // Tracks playback state
   final AudioPlayer audioPlayer = AudioPlayer(); // AudioPlayer instance
 
+  @override
+  void onInit() {
+    super.onInit();
+    // Sync `isPlaying` with the AudioPlayer's playing state
+    audioPlayer.playerStateStream.listen((state) {
+      isPlaying.value = state.playing; // Updates based on actual playback state
+    });
+  }
+
   void togglePlay(String audioPath) async {
     try {
       if (!File(audioPath).existsSync()) {
@@ -18,24 +27,14 @@ class LocalStoragePreviewScreenController extends GetxController {
         // Pause the playback
         await audioPlayer.pause();
       } else {
-        // Set the file path and play the audio
-        await audioPlayer.setFilePath(audioPath);
+        // Set the file path (if not already set) and play the audio
+        if (audioPlayer.processingState == ProcessingState.idle) {
+          await audioPlayer.setFilePath(audioPath);
+        }
         await audioPlayer.play();
       }
-
-      // Toggle the playing state
-      isPlaying.toggle();
     } catch (e) {
       Get.snackbar("Playback Error", "Could not play the audio file: $e");
-    }
-  }
-
-  Future<void> stopPlayback() async {
-    try {
-      await audioPlayer.stop();
-      isPlaying.value = false;
-    } catch (e) {
-      Get.snackbar("Error", "Unable to stop playback: $e");
     }
   }
 

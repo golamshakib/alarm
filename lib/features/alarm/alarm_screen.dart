@@ -7,12 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/common/widgets/custom_text.dart';
 import 'alarm_showing_screen.dart';
+import 'package:alarm/features/settings/controller/settings_controller.dart';  // Import the SettingsController
 
 class AlarmScreen extends StatelessWidget {
   const AlarmScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Initialize the SettingsController
+    final SettingsController settingsController = Get.put(SettingsController());
     final controller = Get.put(AddAlarmController());
 
     return Scaffold(
@@ -171,7 +174,8 @@ class AlarmScreen extends StatelessWidget {
                                           },
                                           child: Obx(
                                                 () => AnimatedContainer(
-                                              duration: const Duration(
+                                              duration:
+                                              const Duration(
                                                   milliseconds: 300),
                                               width: getWidth(37),
                                               height: getHeight(21),

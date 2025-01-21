@@ -4,12 +4,11 @@ import 'package:alarm/core/common/widgets/text_with_arrow.dart';
 import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/icon_path.dart';
-import 'package:alarm/features/alarm/alarm_screen.dart';
-import 'package:alarm/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/utils/constants/image_path.dart';
+import '../../../../routes/app_routes.dart';
+import '../../../settings/controller/settings_controller.dart';
 import '../../controller/add_alarm_controller.dart';
 
 class AddAlarmScreen extends StatelessWidget {
@@ -18,6 +17,7 @@ class AddAlarmScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AddAlarmController controller = Get.put(AddAlarmController());
+    final settingsController = Get.find<SettingsController>();
 
     return Scaffold(
       body: SafeArea(
@@ -31,15 +31,12 @@ class AddAlarmScreen extends StatelessWidget {
                 CustomAppbarWithLogo(
                   text: 'Add Alarm',
                   iconPath: IconPath.check,
-
                   onIconTap: () {
-
                     controller.saveAlarm();
-                    // controller.resetFields();
-                    Get.snackbar("Success", "Successfully Alarm Added");
-
+                    Get.snackbar("Success", "Alarm added successfully");
                   },
                 ),
+                SizedBox(height: getHeight(16)),
 
                 // Time Picker
                 Container(
@@ -52,34 +49,41 @@ class AddAlarmScreen extends StatelessWidget {
                   child: SizedBox(
                     height: getHeight(60),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: controller.timeFormat.value == 24 ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Hour Dropdown
+                        // Hour Dropdown (Reactive to time format)
                         Flexible(
-                          child: Obx(() => DropdownButton<int>(
-                            value: controller.selectedHour.value,
-                            items: List.generate(12, (index) {
-                              return DropdownMenuItem(
-                                value: index + 1,
-                                child: Text(
-                                  (index + 1).toString(),
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 24, // Adjust as needed
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              );
-                            }),
-                            onChanged: (value) {
-                              if (value != null) {
-                                controller.selectedHour.value = value;
-                              }
-                            },
-                            dropdownColor: AppColors.lightYellowContainer,
-                            menuMaxHeight: 200,
-                          )),
+                          child: Obx(() {
+                            final is24Hour = controller.timeFormat.value == 24;
+                            return DropdownButton<int>(
+                              value: controller.selectedHour.value,
+                              items: List.generate(
+                                is24Hour ? 24 : 12,
+                                    (index) {
+                                  return DropdownMenuItem(
+                                    value: is24Hour ? index : index + 1,
+                                    child: Text(
+                                      is24Hour ? index.toString() : (index + 1).toString(),
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  controller.selectedHour.value = value;
+                                }
+                              },
+                              dropdownColor: AppColors.lightYellowContainer,
+                              menuMaxHeight: getHeight(250),
+                            );
+                          }),
                         ),
+
                         // Minute Dropdown
                         Flexible(
                           child: Obx(() => DropdownButton<int>(
@@ -90,7 +94,7 @@ class AddAlarmScreen extends StatelessWidget {
                                 child: Text(
                                   index.toString().padLeft(2, '0'),
                                   style: GoogleFonts.poppins(
-                                    fontSize: 24, // Adjust as needed
+                                    fontSize: 24,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -102,49 +106,57 @@ class AddAlarmScreen extends StatelessWidget {
                               }
                             },
                             dropdownColor: AppColors.lightYellowContainer,
-                            menuMaxHeight: 200,
+                            menuMaxHeight: getHeight(250),
                           )),
                         ),
-                        // AM/PM Dropdown
+
+                        // AM/PM Dropdown (Reactive to 12-hour format)
                         Flexible(
-                          child: Obx(() => DropdownButton<bool>(
-                            value: controller.isAm.value,
-                            items: [
-                              DropdownMenuItem(
-                                value: true,
-                                child: Text(
-                                  "AM",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 24, // Adjust as needed
-                                    fontWeight: FontWeight.w500,
+                          child: Obx(() {
+                            final is24Hour = controller.timeFormat.value == 24;
+                            if (!is24Hour) {
+                              return DropdownButton<bool>(
+                                value: controller.isAm.value,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: true,
+                                    child: Text(
+                                      "AM",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: false,
-                                child: Text(
-                                  "PM",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 24, // Adjust as needed
-                                    fontWeight: FontWeight.w500,
+                                  DropdownMenuItem(
+                                    value: false,
+                                    child: Text(
+                                      "PM",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value != null) {
-                                controller.isAm.value = value;
-                              }
-                            },
-                            dropdownColor: AppColors.lightYellowContainer,
-                            menuMaxHeight: 150,
-                          )),
+                                ],
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    controller.isAm.value = value;
+                                  }
+                                },
+                                dropdownColor: AppColors.lightYellowContainer,
+                                menuMaxHeight: getHeight(150),
+                              );
+                            }
+
+                            // Return an empty widget for 24-hour format
+                            return const SizedBox.shrink();
+                          }),
                         ),
                       ],
                     ),
                   ),
                 ),
-
 
                 // Background Section
                 Container(
@@ -156,7 +168,6 @@ class AddAlarmScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Background Info
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -422,7 +433,6 @@ void _showSnoozePopup(BuildContext context, AddAlarmController controller) {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
             const CustomText(text: 'Snooze:'),
             SizedBox(height: getHeight(10)),
 

@@ -16,12 +16,12 @@ class PreviewScreen extends StatelessWidget {
   const PreviewScreen({
     super.key,
     required this.title,
-    required this.image,
+    required this.imagePath,
     required this.musicPath,
   });
 
   final String title;
-  final String image;
+  final String imagePath;
   final String musicPath;
 
   @override
@@ -77,7 +77,7 @@ class PreviewScreen extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(
-                    image,
+                    imagePath,
                     width: double.infinity,
                     fit: BoxFit.contain,
                   ),
@@ -89,7 +89,7 @@ class PreviewScreen extends StatelessWidget {
                     // Set the background image and title in AddAlarmController
                     final addAlarmController = Get.find<AddAlarmController>();
                     addAlarmController.selectedBackground.value = title;
-                    addAlarmController.selectedBackgroundImage.value = image;
+                    addAlarmController.selectedBackgroundImage.value = imagePath;
                     Get.snackbar("Success", "Successfully Change the background");
                     Get.back();
                   },

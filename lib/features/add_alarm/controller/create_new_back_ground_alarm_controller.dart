@@ -10,6 +10,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:record/record.dart';
 
+import '../../../core/utils/helpers/db_helper.dart';
+import '../../../routes/app_routes.dart';
+
 class CreateAlarmController extends GetxController {
   ImagePicker picker = ImagePicker();
   Rx<String> labelText = ''.obs; // Store label text
@@ -28,9 +31,11 @@ class CreateAlarmController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchBackgroundsFromDB(); // Reload backgrounds from the database
     // Initialize waveform controllers
     for (var _ in items) {
       waveformControllers.add(PlayerController());
+
     }
   }
 
@@ -39,6 +44,30 @@ class CreateAlarmController extends GetxController {
     waveformControllers
         .add(PlayerController()); // Add a controller for the new item
   }
+
+  ///---- Fetch Data from Local Storage ----///
+
+  Future<void> fetchBackgroundsFromDB() async {
+    final dbHelper = DBHelper();
+    try {
+      final data = await dbHelper.fetchBackgrounds();
+
+      // Update the items and recreate waveform controllers
+      items.value = data.toList();
+      waveformControllers.clear(); // Clear existing controllers
+      for (var _ in items) {
+        waveformControllers.add(PlayerController()); // Create a controller for each item
+      }
+
+      log('Fetched backgrounds: $items');
+    } catch (e) {
+      log('Error fetching backgrounds: $e');
+    }
+  }
+
+
+
+  ///---- End  Fetch Data from Local Storage ----///
 
   // Play Music
   Future<void> playMusic(int index) async {
@@ -79,14 +108,23 @@ class CreateAlarmController extends GetxController {
 
   /// -- E N D  P L A Y   M U S I C
 
-
   void stopMusic() async {
     if (isPlaying.value) {
-      await audioPlayer.stop();
+      await audioPlayer.stop(); // Stop the audio player
       isPlaying.value = false;
-      playingIndex.value = -1;
+      if (playingIndex.value != -1) {
+        waveformControllers[playingIndex.value].pausePlayer(); // Pause the waveform controller
+      }
+      playingIndex.value = -1; // Reset the playing index
     }
   }
+  // void stopMusic() async {
+  //   if (isPlaying.value) {
+  //     await audioPlayer.stop();
+  //     isPlaying.value = false;
+  //     playingIndex.value = -1;
+  //   }
+  // }
 
   /// -- S T A R T   R E C O R D I N G
 
@@ -194,22 +232,75 @@ class CreateAlarmController extends GetxController {
 
   /// -- E N D   P I C K    I M A G E    A N D    M U S I C
 
-
-  void saveData() {
+  void saveData({int? id}) async {
     final result = {
-      'title': labelText.value.isNotEmpty
-          ? labelText.value
-          : 'Background Title',
-      'image': imagePath.value,
+      'title': labelText.value.isNotEmpty ? labelText.value : 'Background Title',
+      'imagePath': imagePath.value,
       'musicPath': musicPath.value,
       'recordingPath': recordingPath.value,
       'type': musicPath.value != null ? 'music' : 'recording',
     };
 
-    addItem(result); // Add the saved data to the items list
-    resetFields();   // Reset the fields
-    Get.back(result: result); // Navigate back to the previous screen
+    final dbHelper = DBHelper();
+
+    try {
+      if (id != null) {
+        // Update existing entry
+        int rowsUpdated = await dbHelper.updateBackground(result, id);
+        if (rowsUpdated > 0) {
+          Get.snackbar("Success", "Background updated successfully!");
+          // Update the local list
+          int indexToUpdate =
+          items.indexWhere((element) => element['id'] == id);
+          if (indexToUpdate != -1) {
+            items[indexToUpdate] = {...result, 'id': id}; // Update local list
+            items.refresh();
+          }
+        } else {
+          Get.snackbar("Error", "Failed to update background.");
+        }
+      } else {
+        // Insert new entry
+       await dbHelper.insertBackground(result);
+        // result['id'] = newId; // Add the ID to the result
+        addItem(result); // Add the new item to the list
+         waveformControllers.add(PlayerController()); // Add a controller for the new item
+        Get.snackbar("Success", "Background saved successfully!");
+      }
+
+      resetFields(); // Reset fields
+
+        Get.toNamed(AppRoute.changeBackgroundScreen, arguments: result);
+
+    } catch (e) {
+      log('Error saving data: $e');
+      Get.snackbar("Error", "Failed to save background: $e");
+    }
   }
+
+
+  // void saveData() async {
+  //   final result = {
+  //     'title': labelText.value.isNotEmpty ? labelText.value : 'Background Title',
+  //     'imagePath': imagePath.value,
+  //     'musicPath': musicPath.value,
+  //     'recordingPath': recordingPath.value,
+  //     'type': musicPath.value != null ? 'music' : 'recording',
+  //   };
+  //
+  //   // Insert into the database
+  //   // final dbHelper = DBHelper();
+  //   try {
+  //     // await dbHelper.insertBackground(result); // Save to database
+  //     addItem(result); // Add the saved data to the items list
+  //     waveformControllers.add(PlayerController()); // Add a controller for the new item
+  //     resetFields(); // Reset fields
+  //     Get.offAllNamed(AppRoute.changeBackgroundScreen, arguments: result); // Replace this with your route name
+  //   } catch (e) {
+  //     log('Error saving data: $e');
+  //   }
+  // }
+
 
   void resetFields() {
     labelText.value = ''; // Clear the label text

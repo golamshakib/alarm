@@ -17,7 +17,7 @@ class CustomAppbarWithLogo extends StatelessWidget {
   final double? avatarSize;
   final double? spacing;
   final double? iconSize;
-  final Color? backgroundColor;
+  final Color? iconPathColor;
   final bool showBackIcon;
 
   const CustomAppbarWithLogo({
@@ -34,7 +34,7 @@ class CustomAppbarWithLogo extends StatelessWidget {
     this.avatarSize,
     this.spacing,
     this.iconSize,
-    this.backgroundColor,
+    this.iconPathColor,
     this.showBackIcon = false,
   });
 
@@ -98,6 +98,7 @@ class CustomAppbarWithLogo extends StatelessWidget {
             child: Center(
               child: Image.asset(
                 iconPath!,
+                color: iconPathColor,
                 height: (iconSize ?? getWidth(24)),
                 width: (iconSize ?? getWidth(24)),
               ),

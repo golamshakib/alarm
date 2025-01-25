@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:alarm/features/add_alarm/presentation/screens/local_storage_preview_screen.dart';
 import 'package:alarm/features/add_alarm/presentation/screens/preview_screen.dart';
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -60,8 +59,8 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                       return GestureDetector(
                         onTap: () {
                           Get.to(() => PreviewScreen(
-                                title: item['title']!,
-                                image: item['image']!,
+                                title: item['title'] ?? '',
+                                imagePath: item['imagePath'] ?? '',
                                 musicPath: item['musicPath'] ?? '',
                               ));
                         },
@@ -131,7 +130,9 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                     topRight: Radius.circular(10),
                                   ),
                                   image: DecorationImage(
-                                    image: AssetImage(item['image']!),
+                                    image: item['imagePath'] != null
+                                        ? FileImage(File(item['imagePath']!))
+                                        : const AssetImage(ImagePath.dog),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -161,10 +162,12 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                             final item = createAlarmController.items[index];
                             return GestureDetector(
                               onTap: () {
+                                createAlarmController.stopMusic();
                                 Get.to(
                                   () => LocalStoragePreviewScreen(
+                                    id: item['id'],
                                     title: item['title'] ?? '',
-                                    image: item['image'] ?? '',
+                                    imagePath: item['imagePath'] ?? '',
                                     musicPath: item['musicPath'] ?? '',
                                    recordingPath: item['recordingPath']?? '',
                                   ),
@@ -253,8 +256,8 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                           topRight: Radius.circular(10),
                                         ),
                                         image: DecorationImage(
-                                          image: item['image'] != null
-                                              ? FileImage(File(item['image']!))
+                                          image: item['imagePath'] != null
+                                              ? FileImage(File(item['imagePath']!))
                                               : const AssetImage(ImagePath.dog),
                                           fit: BoxFit.cover,
                                         ),

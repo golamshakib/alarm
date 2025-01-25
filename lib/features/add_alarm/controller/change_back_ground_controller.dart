@@ -1,8 +1,12 @@
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:get/get.dart';
 
+import 'create_new_back_ground_alarm_controller.dart';
+
 
 class ChangeBackgroundController extends GetxController {
+  final CreateAlarmController createAlarmController = Get.find<CreateAlarmController>();
+
   // Database Data List
   var items = [
     {'title': 'Cute Dog in bed', 'image': ImagePath.dog3,'musicUrl': ImagePath.extraImage,},
@@ -28,5 +32,12 @@ class ChangeBackgroundController extends GetxController {
       isPlaying[i] = (i == index) ? !isPlaying[i] : false;
     }
     isPlaying.refresh(); // Notify observers to rebuild
+  }
+
+  @override
+  void onClose() {
+    // Stop music when navigating away
+    createAlarmController.stopMusic();
+    super.onClose();
   }
 }

@@ -30,6 +30,6 @@ class AppRoute {
 
     GetPage(name: loginScreen, page: () => const LoginScreen()),
     GetPage(name: changeBackgroundScreen, page: () => const ChangeBackGroundAlarm()),
-    GetPage(name: createNewAlarmScreen, page: () => const CreateNewAlarmScreen ()),
+    GetPage(name: createNewAlarmScreen, page: () => const CreateNewBackgroundScreen()),
   ];
 }

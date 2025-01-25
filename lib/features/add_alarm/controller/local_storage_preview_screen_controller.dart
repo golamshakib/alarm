@@ -38,6 +38,7 @@ class LocalStoragePreviewScreenController extends GetxController {
     }
   }
 
+
   @override
   void onClose() {
     audioPlayer.dispose(); // Dispose of the audio player

@@ -4,7 +4,6 @@ import 'package:alarm/core/common/widgets/custom_text.dart';
 import 'package:alarm/features/add_alarm/controller/local_storage_preview_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/common/widgets/custom_appbar_with_logo.dart';
 import '../../../../core/utils/constants/app_colors.dart';
@@ -12,18 +11,22 @@ import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/add_alarm_controller.dart';
+import '../../controller/create_new_back_ground_alarm_controller.dart';
+import 'create_new_backgroud_alarm.dart';
 
 class LocalStoragePreviewScreen extends StatelessWidget {
   const LocalStoragePreviewScreen({
     super.key,
+    this.id,
     required this.title,
-    required this.image,
+    required this.imagePath,
     required this.musicPath,
     required this.recordingPath,
   });
 
+  final int? id;
   final String title;
-  final String image;
+  final String imagePath;
   final String musicPath;
   final String recordingPath;
 
@@ -31,6 +34,8 @@ class LocalStoragePreviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller =
         Get.put(LocalStoragePreviewScreenController()); // Initialize controller
+    final CreateAlarmController createAlarmController = Get.put(CreateAlarmController());
+
     // Determine which path to use for playback
     final audioPlay = musicPath.isNotEmpty ? musicPath : recordingPath;
     return Scaffold(
@@ -43,8 +48,21 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                 CustomAppbarWithLogo(
                   text: "Preview",
                   showBackIcon: true,
+                  iconPathColor: AppColors.yellow,
                   iconPath: IconPath.editSquare,
-                  onIconTap: () {},
+                  onIconTap: () {
+                    createAlarmController.stopMusic();
+                    Get.to(
+                      () => const CreateNewBackgroundScreen(),
+                      arguments: {
+                        'id': id,
+                        'title': title,
+                        'imagePath': imagePath,
+                        'musicPath': musicPath,
+                        'recordingPath': recordingPath,
+                      },
+                    );
+                  },
                 ),
                 SizedBox(height: getHeight(24)),
                 Row(
@@ -76,9 +94,9 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                 // Image Preview
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: image.isNotEmpty && File(image).existsSync()
+                  child: imagePath.isNotEmpty && File(imagePath).existsSync()
                       ? Image.file(
-                          File(image), // Display local image
+                          File(imagePath), // Display local image
                           width: double.infinity,
                           fit: BoxFit.contain,
                         )
@@ -95,7 +113,8 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                     // Set the background image and title in AddAlarmController
                     final addAlarmController = Get.find<AddAlarmController>();
                     addAlarmController.selectedBackground.value = title;
-                    addAlarmController.selectedBackgroundImage.value = image;
+                    addAlarmController.selectedBackgroundImage.value =
+                        imagePath;
                     Get.snackbar(
                         "Success", "Successfully Change the background");
                     Get.back();

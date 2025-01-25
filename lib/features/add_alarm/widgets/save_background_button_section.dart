@@ -10,17 +10,20 @@ class SaveBackgroundButtonSection extends StatelessWidget {
   const SaveBackgroundButtonSection({
     super.key,
     required this.controller,
+    this.id,
   });
 
   final CreateAlarmController controller;
+  final int? id;
 
   @override
   Widget build(BuildContext context) {
     return Obx(() => controller.musicPath.value != null ||
         controller.recordingPath.value != null
         ? GestureDetector(
-      onTap: () {
-        controller.saveData(); // Save the data and go back
+      onTap: () async {
+        // Call saveData with the provided ID
+        controller.saveData(id: id);
       },
       child: Container(
         padding:

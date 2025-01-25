@@ -16,12 +16,27 @@ import '../../widgets/upload_background_image_section.dart';
 import '../../widgets/upload_tone_section.dart';
 import '../../widgets/wave_form_section.dart';
 
-class CreateNewAlarmScreen extends StatelessWidget {
-  const CreateNewAlarmScreen({super.key});
+class CreateNewBackgroundScreen extends StatelessWidget {
+  const CreateNewBackgroundScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    // Fetch the arguments
+    final Map<String, dynamic>? arguments = Get.arguments;
+    final int? id = arguments?['id'];
+    final String? title = arguments?['title'];
+    final String? imagePath = arguments?['imagePath'];
+    final String? musicPath = arguments?['musicPath'];
+    final String? recordingPath = arguments?['recordingPath'];
+
     final CreateAlarmController controller = Get.put(CreateAlarmController());
+
+    // Pre-fill the fields if arguments are provided
+    if (title != null) controller.labelText.value = title;
+    if (imagePath != null) controller.imagePath.value = imagePath;
+    if (musicPath != null) controller.musicPath.value = musicPath;
+    if (recordingPath != null) controller.recordingPath.value = recordingPath;
 
     return Scaffold(
       body: SafeArea(
@@ -66,6 +81,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextFormField(
+                          initialValue: title, // Pre-fill with the passed title
                           onChanged: (value) {
                             controller.labelText.value = value;
                           },
@@ -268,7 +284,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                 SizedBox(
                   height: getHeight(50),
                 ),
-                SaveBackgroundButtonSection(controller: controller),
+                SaveBackgroundButtonSection(controller: controller, id: id),
               ],
             ),
           ),

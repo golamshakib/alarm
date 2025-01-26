@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -118,13 +119,6 @@ class CreateAlarmController extends GetxController {
       playingIndex.value = -1; // Reset the playing index
     }
   }
-  // void stopMusic() async {
-  //   if (isPlaying.value) {
-  //     await audioPlayer.stop();
-  //     isPlaying.value = false;
-  //     playingIndex.value = -1;
-  //   }
-  // }
 
   /// -- S T A R T   R E C O R D I N G
 
@@ -264,13 +258,14 @@ class CreateAlarmController extends GetxController {
        await dbHelper.insertBackground(result);
         // result['id'] = newId; // Add the ID to the result
         addItem(result); // Add the new item to the list
-         waveformControllers.add(PlayerController()); // Add a controller for the new item
+
+       waveformControllers.add(PlayerController()); // Add a controller for the new item
         Get.snackbar("Success", "Background saved successfully!");
       }
 
       resetFields(); // Reset fields
 
-        Get.toNamed(AppRoute.changeBackgroundScreen, arguments: result);
+        Get.offNamed(AppRoute.changeBackgroundScreen, arguments: result);
 
     } catch (e) {
       log('Error saving data: $e');

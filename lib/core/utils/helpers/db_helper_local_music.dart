@@ -72,4 +72,14 @@ class DBHelper {
       throw Exception('Error fetching backgrounds: $e');
     }
   }
+
+  // Delete Background by ID
+  Future<void> deleteBackground(int id) async {
+    final db = await database;
+    await db.delete(
+      'backgrounds',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

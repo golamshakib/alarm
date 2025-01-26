@@ -28,6 +28,7 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedBackground.value = arguments['title'] ?? '';
       controller.selectedBackgroundImage.value = arguments['imagePath'] ?? '';
       controller.selectedMusicPath.value = arguments['musicPath'] ?? '';
+      // controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
     }
 
     return Scaffold(
@@ -340,9 +341,11 @@ class AddAlarmScreen extends StatelessWidget {
                             child: Obx(() {
                               return Slider(
                                 value: controller.volume.value,
-                                min: 0,
-                                max: 100,
-                                onChanged: controller.setVolume,
+                                min: 0.0,
+                                max: 1.0,
+                                onChanged: (value) async {
+                                  await controller.setDeviceVolume(value);
+                                },
                                 activeColor: Colors.orange,
                               );
                             }),

@@ -49,7 +49,7 @@ class CreateAlarmController extends GetxController {
   ///---- Fetch Data from Local Storage ----///
 
   Future<void> fetchBackgroundsFromDB() async {
-    final dbHelper = DBHelper();
+    final dbHelper = DBHelperMusic();
     try {
       final data = await dbHelper.fetchBackgrounds();
 
@@ -235,7 +235,7 @@ class CreateAlarmController extends GetxController {
       'type': musicPath.value != null ? 'music' : 'recording',
     };
 
-    final dbHelper = DBHelper();
+    final dbHelper = DBHelperMusic();
 
     try {
       if (id != null) {

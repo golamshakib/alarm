@@ -1,67 +1,71 @@
-import 'dart:async';
-
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
-class DatabaseHelper {
-  static final DatabaseHelper _instance = DatabaseHelper._internal();
-  factory DatabaseHelper() => _instance;
+class DBHelperAlarm {
+  static const String _tableName = 'alarms';
+  static const String _dbName = 'alarm_database.db';
 
-  DatabaseHelper._internal();
-
-  static Database? _database;
-
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDatabase();
-    return _database!;
-  }
-
-  Future<Database> _initDatabase() async {
+  static Future<Database> _getDatabase() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'alarms.db');
-
     return openDatabase(
-      path,
+      join(dbPath, _dbName),
+      onCreate: (db, version) {
+        return db.execute('''
+          CREATE TABLE $_tableName (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            hour INTEGER,
+            minute INTEGER,
+            isAm INTEGER,
+            label TEXT,
+            backgroundImage TEXT,
+            musicPath TEXT,
+            recordingPath TEXT,
+            repeatDays TEXT,
+            isVibrationEnabled INTEGER,
+            volume REAL,
+            isToggled INTEGER
+          )
+        ''');
+      },
       version: 1,
-      onCreate: _createDatabase,
     );
   }
 
-  Future<void> _createDatabase(Database db, int version) async {
-    await db.execute('''
-    CREATE TABLE alarms (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      hour INTEGER,
-      minute INTEGER,
-      isAm INTEGER,
-      label TEXT,
-      backgroundImage TEXT,
-      musicPath TEXT,
-      repeatDays TEXT,
-      isVibrationEnabled INTEGER,
-      isToggled INTEGER
-    )
-  ''');
+  static Future<void> insertAlarm(Map<String, dynamic> alarm) async {
+    final db = await _getDatabase();
+    await db.insert(
+      _tableName,
+      alarm,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
-  Future<int> insertAlarm(Map<String, dynamic> alarmData) async {
-    final db = await database;
-    return await db.insert('alarms', alarmData);
+  static Future<List<Map<String, dynamic>>> fetchAlarms() async {
+    final db = await _getDatabase();
+    return await db.query(_tableName);
   }
 
-  Future<List<Map<String, dynamic>>> getAlarms() async {
-    final db = await database;
-    return await db.query('alarms');
+  static Future<void> deleteAlarm(int id) async {
+    final db = await _getDatabase();
+    await db.delete(
+      _tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
-  Future<int> updateAlarm(int id, Map<String, dynamic> alarmData) async {
-    final db = await database;
-    return await db.update('alarms', alarmData, where: 'id = ?', whereArgs: [id]);
+  static Future<void> updateAlarm(Map<String, dynamic> alarm, int id) async {
+    final db = await _getDatabase();
+    await db.update(
+      _tableName,
+      alarm,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
-  Future<int> deleteAlarm(int id) async {
-    final db = await database;
-    return await db.delete('alarms', where: 'id = ?', whereArgs: [id]);
+  static Future<void> deleteAllAlarms() async {
+    final db = await _getDatabase();
+    await db.delete(_tableName);
   }
 }

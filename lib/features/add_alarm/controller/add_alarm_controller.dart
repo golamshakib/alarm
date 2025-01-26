@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:alarm/core/utils/helpers/db_helper_local_music.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -194,6 +195,7 @@ class AddAlarmController extends GetxController {
   var selectedBackground = "Cute Dog in bed".obs;
   var selectedBackgroundImage = "assets/images/dog.png".obs;
   var selectedMusicPath = ''.obs;
+  var selectedRecordingPath = ''.obs;
 
   // Update background
   void updateBackground(String title, String imagePath, String musicPath) {
@@ -241,41 +243,6 @@ class AddAlarmController extends GetxController {
     }
   }
 
-  // Future<void> saveAlarmToDatabase(Alarm alarm) async {
-  //   final alarmData = {
-  //     'hour': alarm.hour,
-  //     'minute': alarm.minute,
-  //     'am_pm': alarm.amPm, // Save as a string
-  //     'label': alarm.label,
-  //     'backgroundImage': alarm.backgroundImage,
-  //     'musicPath': alarm.musicPath,
-  //     'repeatDays': alarm.repeatDays.join(','),
-  //     'isVibrationEnabled': alarm.isVibrationEnabled ? 1 : 0,
-  //     'isToggled': alarm.isToggled.value ? 1 : 0,
-  //   };
-  //
-  //   await databaseHelper.insertAlarm(alarmData);
-  //   fetchAlarmsFromDatabase(); // Refresh the alarms list
-  // }
-  //
-  // Future<void> fetchAlarmsFromDatabase() async {
-  //   final alarmList = await databaseHelper.getAlarms();
-  //   alarms.value = alarmList.map((data) {
-  //     return Alarm(
-  //       hour: data['hour'],
-  //       minute: data['minute'],
-  //       amPm: data['am_pm'], // Retrieve as string
-  //       label: data['label'],
-  //       backgroundImage: data['backgroundImage'],
-  //       musicPath: data['musicPath'],
-  //       repeatDays: (data['repeatDays'] as String).split(','),
-  //       isVibrationEnabled: data['isVibrationEnabled'] == 1, // Convert to bool
-  //       isToggled: data['isToggled'] == 1,
-  //     );
-  //   }).toList();
-  // }
-
-
   // Save the current alarm
   void saveAlarm() {
     final alarm = Alarm(
@@ -284,6 +251,7 @@ class AddAlarmController extends GetxController {
       isAm: isAm.value,
       backgroundImage: selectedBackgroundImage.value,
       musicPath: selectedMusicPath.value,
+      recordingPath: selectedRecordingPath.value,
       label: label.value.isEmpty ? 'Morning Alarm' : label.value,
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
@@ -367,6 +335,7 @@ class Alarm {
   String label;
   String backgroundImage;
   String musicPath;
+  String recordingPath;
   List<String> repeatDays;
   bool isVibrationEnabled; // Add this field
   RxBool isToggled;
@@ -378,6 +347,7 @@ class Alarm {
     required this.label,
     required this.backgroundImage,
     required this.musicPath,
+    required this.recordingPath,
     required this.repeatDays,
     this.isVibrationEnabled = false, // Default is false
     bool isToggled = false,

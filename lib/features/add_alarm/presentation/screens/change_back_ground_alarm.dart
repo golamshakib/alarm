@@ -25,7 +25,7 @@ class ChangeBackGroundAlarm extends StatelessWidget {
         Get.put(ChangeBackgroundController());
     final CreateAlarmController createAlarmController =
         Get.put(CreateAlarmController());
-    final DBHelper dbHelper = DBHelper();
+    final DBHelperMusic dbHelper = DBHelperMusic();
 
     return Scaffold(
       body: SafeArea(

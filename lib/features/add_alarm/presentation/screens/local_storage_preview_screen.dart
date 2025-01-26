@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:alarm/core/common/widgets/custom_text.dart';
 import 'package:alarm/features/add_alarm/controller/local_storage_preview_screen_controller.dart';
+import 'package:alarm/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,7 +12,6 @@ import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/add_alarm_controller.dart';
-import '../../controller/create_new_back_ground_alarm_controller.dart';
 import 'create_new_backgroud_alarm.dart';
 
 class LocalStoragePreviewScreen extends StatelessWidget {
@@ -34,7 +34,6 @@ class LocalStoragePreviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller =
         Get.put(LocalStoragePreviewScreenController()); // Initialize controller
-    final CreateAlarmController createAlarmController = Get.put(CreateAlarmController());
 
     // Determine which path to use for playback
     final audioPlay = musicPath.isNotEmpty ? musicPath : recordingPath;
@@ -51,7 +50,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                   iconPathColor: AppColors.yellow,
                   iconPath: IconPath.editSquare,
                   onIconTap: () {
-                    createAlarmController.stopMusic();
+                    controller.stopMusic();
                     Get.to(
                       () => const CreateNewBackgroundScreen(),
                       arguments: {
@@ -110,14 +109,18 @@ class LocalStoragePreviewScreen extends StatelessWidget {
 
                 GestureDetector(
                   onTap: () {
-                    // Set the background image and title in AddAlarmController
+                    controller.stopMusic();
                     final addAlarmController = Get.find<AddAlarmController>();
                     addAlarmController.selectedBackground.value = title;
-                    addAlarmController.selectedBackgroundImage.value =
-                        imagePath;
-                    Get.snackbar(
-                        "Success", "Successfully Change the background");
-                    Get.back();
+                    addAlarmController.selectedBackgroundImage.value = imagePath;
+                    addAlarmController.selectedMusicPath.value = musicPath; // Pass music path
+                    Get.toNamed(AppRoute.navBarScreen, arguments: {
+                      'title': title,
+                      'imagePath': imagePath,
+                      'musicPath': musicPath,
+                      'recordingPath': recordingPath,
+                    });
+                    Get.snackbar("Success", "Background set successfully!");
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: getHeight(12)),

@@ -14,6 +14,13 @@ class AlarmShowingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AddAlarmController controller = Get.find<AddAlarmController>();
+
+    // Trigger vibration when the alarm screen is shown
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.triggerAlarmVibration(alarm);
+    });
+
     return Scaffold(
     
       body: Stack(
@@ -23,6 +30,7 @@ class AlarmShowingScreen extends StatelessWidget {
             bottom: getHeight(92),
             left: getWidth(50),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Row(
                   children: [
@@ -56,6 +64,7 @@ class AlarmShowingScreen extends StatelessWidget {
                 SizedBox(height: getHeight(24),),
                 GestureDetector(
                   onTap: (){
+                    controller.stopAlarmVibration(); // Stop vibration on snooze
                     Get.back();
                   },
                   child: Container(

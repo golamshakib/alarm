@@ -38,9 +38,21 @@ class LocalStoragePreviewScreenController extends GetxController {
     }
   }
 
+  // Stop music playback
+  Future<void> stopMusic() async {
+    try {
+      if (isPlaying.value) {
+        await audioPlayer.stop(); // Stop the audio playback
+        isPlaying.value = false; // Reset the playing state
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to stop the audio: $e");
+    }
+  }
 
   @override
   void onClose() {
+    stopMusic(); // Ensure music is stopped before disposing
     audioPlayer.dispose(); // Dispose of the audio player
     super.onClose();
   }

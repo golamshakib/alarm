@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-class DBHelper {
-  static final DBHelper _instance = DBHelper._internal();
-  factory DBHelper() => _instance;
-  DBHelper._internal();
+class DBHelperMusic {
+  static final DBHelperMusic _instance = DBHelperMusic._internal();
+  factory DBHelperMusic() => _instance;
+  DBHelperMusic._internal();
 
   static Database? _database;
 

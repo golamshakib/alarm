@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/icon_path.dart';
@@ -132,8 +134,10 @@ class AlarmScreen extends StatelessWidget {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            image: const DecorationImage(
-                              image: AssetImage(ImagePath.dog),
+                            image: DecorationImage(
+                              image: File(alarm.backgroundImage).existsSync()
+                                  ? FileImage(File(alarm.backgroundImage))
+                                  : const AssetImage(ImagePath.dog) as ImageProvider,
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(10),
@@ -160,12 +164,21 @@ class AlarmScreen extends StatelessWidget {
                                     Row(
                                       children: [
                                         GestureDetector(
-                                          onTap: () {},
-                                          child: const Icon(
-                                            Icons.play_circle_outline,
-                                            color: Colors.orange,
-                                            size: 28,
-                                          ),
+                                          onTap: () {
+                                            controller.togglePlayPause(index); // Play/pause logic
+                                          },
+                                          child: Obx(() {
+                                            // Dynamically show play/pause icon
+                                            final isPlaying = controller.isPlaying.value &&
+                                                controller.currentlyPlayingIndex.value == index;
+                                            return Icon(
+                                              isPlaying
+                                                  ? Icons.play_circle_fill_rounded
+                                                  : Icons.play_circle_outline_rounded,
+                                              color: Colors.orange,
+                                              size: 25,
+                                            );
+                                          }),
                                         ),
                                         SizedBox(width: getWidth(12)),
                                         GestureDetector(

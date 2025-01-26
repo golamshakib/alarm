@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../settings/controller/settings_controller.dart';
@@ -51,6 +54,7 @@ class AddAlarmController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    loadScreenPreferences(); // Load preferences on initialization
     setCurrentTime();
     timeFormat.value = settingsController.selectedTime.value;
 
@@ -59,6 +63,39 @@ class AddAlarmController extends GetxController {
       timeFormat.value = settingsController.selectedTime.value;
       adjustTimeFormat();
     });
+  }
+  /// Save screen state to `SharedPreferences`
+  Future<void> saveScreenPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('selectedHour', selectedHour.value);
+    await prefs.setInt('selectedMinute', selectedMinute.value);
+    await prefs.setBool('isAm', isAm.value);
+    await prefs.setString('label', label.value);
+    await prefs.setString('repeatDays', jsonEncode(repeatDays));
+    await prefs.setInt('snoozeDuration', selectedSnoozeDuration.value);
+    await prefs.setBool('isVibrationEnabled', isVibrationEnabled.value);
+    await prefs.setDouble('volume', volume.value);
+    await prefs.setString('selectedBackground', selectedBackground.value);
+    await prefs.setString('selectedBackgroundImage', selectedBackgroundImage.value);
+    await prefs.setString('selectedMusicPath', selectedMusicPath.value);
+  }
+
+  /// Load screen state from `SharedPreferences`
+  Future<void> loadScreenPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    label.value = prefs.getString('label') ?? 'Morning Alarm';
+    final repeatDaysString = prefs.getString('repeatDays');
+    if (repeatDaysString != null) {
+      final Map<String, dynamic> repeatDaysMap = jsonDecode(repeatDaysString);
+      repeatDays.value = repeatDaysMap.map((key, value) => MapEntry(key, value as bool));
+    }
+    selectedSnoozeDuration.value = prefs.getInt('snoozeDuration') ?? 5;
+    isVibrationEnabled.value = prefs.getBool('isVibrationEnabled') ?? true;
+    volume.value = prefs.getDouble('volume') ?? 100.0;
+    selectedBackground.value = prefs.getString('selectedBackground') ?? "Cute Dog in bed";
+    selectedBackgroundImage.value = prefs.getString('selectedBackgroundImage') ?? "assets/images/dog.png";
+    selectedMusicPath.value = prefs.getString('selectedMusicPath') ?? '';
   }
 
 
@@ -70,6 +107,7 @@ class AddAlarmController extends GetxController {
   void updateLabel(String text) {
     label.value = text;
     labelController.text = text;
+    saveScreenPreferences(); // Save preferences on label change
   }
 
   // Repeat days
@@ -87,6 +125,7 @@ class AddAlarmController extends GetxController {
   void toggleDay(String day) {
     repeatDays[day] = !repeatDays[day]!;
     repeatDays.refresh();
+    saveScreenPreferences(); // Save preferences on day toggle
   }
 
   // Snooze duration
@@ -95,6 +134,7 @@ class AddAlarmController extends GetxController {
 
   void updateSnoozeDuration(int duration) {
     selectedSnoozeDuration.value = duration;
+    saveScreenPreferences(); // Save preferences on snooze change
   }
 
   // Vibration toggle
@@ -102,6 +142,7 @@ class AddAlarmController extends GetxController {
   // Toggle vibration
   void toggleVibration() {
     isVibrationEnabled.value = !isVibrationEnabled.value;
+    saveScreenPreferences(); // Save preferences on vibration toggle
   }
 
   // Volume
@@ -110,15 +151,60 @@ class AddAlarmController extends GetxController {
   // Set volume
   void setVolume(double newVolume) {
     volume.value = newVolume;
+    saveScreenPreferences(); // Save preferences on volume change
   }
 
   // Set Background
   var selectedBackground = "Cute Dog in bed".obs;
   var selectedBackgroundImage = "assets/images/dog.png".obs;
+  var selectedMusicPath = ''.obs;
+
+  // Update background
+  void updateBackground(String title, String imagePath, String musicPath) {
+    selectedBackground.value = title;
+    selectedBackgroundImage.value = imagePath;
+    selectedMusicPath.value = musicPath;
+    saveScreenPreferences(); // Save preferences on background change
+  }
 
 
   // List of alarms
   var alarms = <Alarm>[].obs;
+
+  final audioPlayer = AudioPlayer(); // Audio player instance
+  var isPlaying = false.obs; // Track playback state
+  var currentlyPlayingIndex = (-1).obs; // Track the currently playing alarm
+
+  Future<void> togglePlayPause(int index) async {
+    if (currentlyPlayingIndex.value == index && isPlaying.value) {
+      // Pause the current playback
+      isPlaying.value = false; // Update UI immediately
+      await audioPlayer.pause();
+    } else {
+      // Play a new alarm's music
+      if (currentlyPlayingIndex.value != -1 && isPlaying.value) {
+        await audioPlayer.stop(); // Stop previous playback
+      }
+
+      final musicPath = alarms[index].musicPath;
+      if (musicPath.isNotEmpty) {
+        try {
+          currentlyPlayingIndex.value = index; // Update playing index
+          isPlaying.value = true; // Update UI immediately
+          await audioPlayer.setFilePath(musicPath);
+          await audioPlayer.play();
+        } catch (e) {
+          // Handle errors (e.g., file not found)
+          isPlaying.value = false;
+          currentlyPlayingIndex.value = -1;
+          Get.snackbar("Error", "Failed to play audio: $e");
+        }
+      } else {
+        Get.snackbar("Error", "No music file found for this alarm.");
+      }
+    }
+  }
+
 
   // Save the current alarm
   void saveAlarm() {
@@ -126,6 +212,8 @@ class AddAlarmController extends GetxController {
       hour: selectedHour.value,
       minute: selectedMinute.value,
       isAm: isAm.value,
+      backgroundImage: selectedBackgroundImage.value,
+      musicPath: selectedMusicPath.value,
       label: label.value.isEmpty ? 'Morning Alarm' : label.value,
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
@@ -192,6 +280,12 @@ class AddAlarmController extends GetxController {
     labelController.dispose();
     super.dispose();
   }
+
+  @override
+  void onClose() {
+    audioPlayer.dispose(); // Dispose of the audio player when the controller is closed
+    super.onClose();
+  }
 }
 
 // Alarm model
@@ -200,6 +294,8 @@ class Alarm {
   int minute;
   bool isAm;
   String label;
+  String backgroundImage;
+  String musicPath;
   List<String> repeatDays;
   RxBool isToggled;
 
@@ -208,6 +304,8 @@ class Alarm {
     required this.minute,
     required this.isAm,
     required this.label,
+    required this.backgroundImage,
+    required this.musicPath,
     required this.repeatDays,
     bool isToggled = false,
   }) : isToggled = isToggled.obs;

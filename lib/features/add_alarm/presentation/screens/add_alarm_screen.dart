@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:alarm/core/common/widgets/custom_appbar_with_logo.dart';
 import 'package:alarm/core/common/widgets/custom_text.dart';
 import 'package:alarm/core/common/widgets/text_with_arrow.dart';
 import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/icon_path.dart';
+import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,6 +21,14 @@ class AddAlarmScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AddAlarmController controller = Get.put(AddAlarmController());
     final settingsController = Get.find<SettingsController>();
+
+    final arguments = Get.arguments;
+
+    if (arguments != null) {
+      controller.selectedBackground.value = arguments['title'] ?? '';
+      controller.selectedBackgroundImage.value = arguments['imagePath'] ?? '';
+      controller.selectedMusicPath.value = arguments['musicPath'] ?? '';
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -34,6 +45,7 @@ class AddAlarmScreen extends StatelessWidget {
                   iconPath: IconPath.check,
                   onIconTap: () {
                     controller.saveAlarm();
+                    controller.saveScreenPreferences();
                     Get.snackbar("Success", "Alarm added successfully");
                   },
                 ),
@@ -187,10 +199,24 @@ class AddAlarmScreen extends StatelessWidget {
                       ),
                       SizedBox(height: getHeight(16)),
                       Obx(() {
-                        return Image.asset(
-                          controller.selectedBackgroundImage.value,
-                        );
+                        final imagePath = controller.selectedBackgroundImage.value;
+                        if (imagePath.isNotEmpty) {
+                          return Container(
+                            height: getHeight(150),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              image: DecorationImage(
+                                image: File(imagePath).existsSync()
+                                    ? FileImage(File(imagePath)) // Use FileImage for local files
+                                    : const AssetImage(ImagePath.dog) as ImageProvider, // Fallback asset
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink(); // If no imagePath, return an empty widget
                       }),
+
                       SizedBox(height: getHeight(24)),
 
                       // Repeat Section

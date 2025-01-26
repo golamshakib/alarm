@@ -110,14 +110,16 @@ class LocalStoragePreviewScreen extends StatelessWidget {
 
                 GestureDetector(
                   onTap: () {
-                    // Set the background image and title in AddAlarmController
                     final addAlarmController = Get.find<AddAlarmController>();
                     addAlarmController.selectedBackground.value = title;
-                    addAlarmController.selectedBackgroundImage.value =
-                        imagePath;
-                    Get.snackbar(
-                        "Success", "Successfully Change the background");
-                    Get.back();
+                    addAlarmController.selectedBackgroundImage.value = imagePath;
+                    addAlarmController.selectedMusicPath.value = musicPath; // Pass music path
+                    Get.back(result: {
+                      'title': title,
+                      'imagePath': imagePath,
+                      'musicPath': musicPath,
+                    });
+                    Get.snackbar("Success", "Background set successfully!");
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: getHeight(12)),

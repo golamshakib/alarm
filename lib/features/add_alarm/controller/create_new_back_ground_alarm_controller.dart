@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:record/record.dart';
 
-import '../../../core/utils/helpers/db_helper.dart';
+import '../../../core/utils/helpers/db_helper_local_music.dart';
 import '../../../routes/app_routes.dart';
 
 class CreateAlarmController extends GetxController {

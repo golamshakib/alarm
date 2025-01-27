@@ -30,6 +30,15 @@ class AlarmScreen extends StatelessWidget {
       return "No Repeat Days";
     }
 
+    // Format time based on the format setting
+    String formatTime(int hour, int minute, bool isAm, int timeFormat) {
+      if (timeFormat == 24) {
+        return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+      } else {
+        return "${hour > 12 ? hour - 12 : hour}:${minute.toString().padLeft(2, '0')} ${isAm ? 'AM' : 'PM'}";
+      }
+    }
+
 
     return Scaffold(
       body: SafeArea(
@@ -254,8 +263,7 @@ class AlarmScreen extends StatelessWidget {
                                   ],
                                 ),
                                 Text(
-                                  "${alarm.hour}:${alarm.minute.toString().padLeft(2, '0')} ${alarm.isAm ? 'AM' : 'PM'}",
-                                  style: TextStyle(
+                                  formatTime(alarm.hour, alarm.minute, alarm.isAm, controller.timeFormat.value),                                  style: TextStyle(
                                     fontWeight: FontWeight.w300,
                                     fontSize: getWidth(36),
                                   ),
@@ -264,7 +272,7 @@ class AlarmScreen extends StatelessWidget {
                                 Row(
                                   children: [
                                     CustomText(
-                                      text: formatRepeatDays(alarm.repeatDays),                                      fontSize: getWidth(14),
+                                      text: formatRepeatDays(alarm.repeatDays), fontSize: getWidth(14),
                                       fontWeight: FontWeight.w400,
                                       color: const Color(0xffA59F92),
                                     ),

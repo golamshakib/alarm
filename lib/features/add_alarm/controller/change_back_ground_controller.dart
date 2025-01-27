@@ -10,7 +10,7 @@ class ChangeBackgroundController extends GetxController {
   // Database Data List
   var items = [
     {'title': 'Cute Dog in bed', 'image': ImagePath.dog3,'musicUrl': ImagePath.extraImage,},
-    {'title': 'Cute Cat under blanket', 'image': ImagePath.dog2,'musicUrl': ImagePath.extraImage,},
+    {'title': 'Cute Cat under blanket', 'image': ImagePath.dog3,'musicUrl': ImagePath.extraImage,},
     {'title': 'Cute Bird over sink', 'image': ImagePath.dog3,'musicUrl': ImagePath.extraImage,},
     {'title': 'Cute Dog in bed', 'image': ImagePath.dog3,'musicUrl': ImagePath.extraImage,},
     {'title': 'Cute Dog in bed', 'image': ImagePath.dog3,'musicUrl': ImagePath.extraImage,},

@@ -198,7 +198,7 @@ void _resetAlarmPopup(BuildContext context, SettingsController controller) {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      Get.back();
+                      Get.back(); // Close the popup immediately on "Cancel"
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: getHeight(10)),
@@ -218,8 +218,17 @@ void _resetAlarmPopup(BuildContext context, SettingsController controller) {
                 SizedBox(width: getWidth(10)),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      // Close the dialog immediately after pressing "Yes"
                       Get.back();
+
+                      // Reset all alarms
+                      await controller.resetAllAlarms();
+
+                      Get.snackbar(
+                        "Success",
+                        "All alarms have been reset.",
+                      );
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: getHeight(10)),

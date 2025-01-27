@@ -1,9 +1,14 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/utils/helpers/db_helper_alarm.dart';
+import '../../add_alarm/controller/add_alarm_controller.dart';
+
 class SettingsController extends GetxController {
   final RxInt selectedTime = 12.obs; // Default to 12-hour format
   final List<int> timeFormat = [12, 24]; // Available time formats
+  final DBHelperAlarm dbHelper = DBHelperAlarm(); // To interact with DB
+
 
   @override
   void onInit() {
@@ -23,5 +28,15 @@ class SettingsController extends GetxController {
   Future<void> loadTimeFormat() async {
     final prefs = await SharedPreferences.getInstance();
     selectedTime.value = prefs.getInt('timeFormat') ?? 12; // Default to 12-hour format
+  }
+
+  /// Reset all alarms from the database and clear UI
+  Future<void> resetAllAlarms() async {
+    try {
+      await dbHelper.clearAlarms();
+      Get.find<AddAlarmController>().alarms.clear(); // Clear alarms list in UI controller
+    } catch (e) {
+      Get.snackbar("Error", "Failed to reset alarms: $e");
+    }
   }
 }

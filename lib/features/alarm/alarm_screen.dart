@@ -8,6 +8,7 @@ import 'package:alarm/features/add_alarm/controller/add_alarm_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/common/widgets/custom_text.dart';
+import '../add_alarm/presentation/screens/add_alarm_screen.dart';
 import 'alarm_showing_screen.dart';
 import 'package:alarm/features/settings/controller/settings_controller.dart';  // Import the SettingsController
 
@@ -19,6 +20,16 @@ class AlarmScreen extends StatelessWidget {
     // Initialize the SettingsController
     final SettingsController settingsController = Get.put(SettingsController());
     final controller = Get.put(AddAlarmController());
+
+    String formatRepeatDays(List<String> repeatDays) {
+      if (repeatDays.length == 7) {
+        return "Everyday";  // If all days are selected
+      } else if (repeatDays.isNotEmpty) {
+        return repeatDays.join(', ');  // Join the days with a comma if not all days are selected
+      }
+      return "No Repeat Days";
+    }
+
 
     return Scaffold(
       body: SafeArea(
@@ -130,6 +141,13 @@ class AlarmScreen extends StatelessWidget {
                         onTap: () {
                           if (controller.isSelectionMode.value) {
                             controller.toggleSelection(index);
+                          } else {
+                            Get.to(() => const AddAlarmScreen(),
+                              arguments: {
+                                'isEditMode': true, // Set flag to indicate editing
+                                'alarm': alarm, // Pass the alarm data to the edit screen
+                              },
+                            );
                           }
                         },
                         child: Container(
@@ -246,10 +264,7 @@ class AlarmScreen extends StatelessWidget {
                                 Row(
                                   children: [
                                     CustomText(
-                                      text: alarm.repeatDays.isNotEmpty
-                                          ? "${alarm.repeatDays.first} to ${alarm.repeatDays.last}"
-                                          : "No Repeat Days",
-                                      fontSize: getWidth(14),
+                                      text: formatRepeatDays(alarm.repeatDays),                                      fontSize: getWidth(14),
                                       fontWeight: FontWeight.w400,
                                       color: const Color(0xffA59F92),
                                     ),

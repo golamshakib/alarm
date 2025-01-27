@@ -30,6 +30,7 @@ class DBHelperAlarm {
             minute INTEGER,
             isAm INTEGER,
             label TEXT,
+            backgroundTitle TEXT,
             backgroundImage TEXT,
             musicPath TEXT,
             recordingPath TEXT,

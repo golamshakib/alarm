@@ -262,27 +262,6 @@ class AddAlarmController extends GetxController {
     isPlaying.value = false; // Update the playback state
   }
 
-
-  // Save the current alarm
-  // void saveAlarm() {
-  //   final alarm = Alarm(
-  //     hour: selectedHour.value,
-  //     minute: selectedMinute.value,
-  //     isAm: isAm.value,
-  //     backgroundImage: selectedBackgroundImage.value,
-  //     musicPath: selectedMusicPath.value,
-  //     recordingPath: selectedRecordingPath.value,
-  //     label: label.value.isEmpty ? 'Morning Alarm' : label.value,
-  //     repeatDays: repeatDays.entries
-  //         .where((entry) => entry.value)
-  //         .map((entry) => entry.key)
-  //         .toList(),
-  //     isToggled: false,
-  //   );
-  //   alarms.add(alarm);
-  //   update(); // Notify listeners
-  // }
-
   /// Save an alarm to the SQLite database
   Future<void> saveAlarmToDatabase() async {
     final dbHelper = DBHelperAlarm();
@@ -291,6 +270,7 @@ class AddAlarmController extends GetxController {
       minute: selectedMinute.value,
       isAm: isAm.value,
       label: label.value.isEmpty ? 'Morning Alarm' : label.value,
+      backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
       musicPath: selectedMusicPath.value,
       recordingPath: selectedRecordingPath.value,
@@ -321,6 +301,36 @@ class AddAlarmController extends GetxController {
       Get.snackbar("Error", "Failed to fetch alarms: $e");
     }
   }
+
+  Future<void> updateAlarmInDatabase(Alarm existingAlarm) async {
+    final dbHelper = DBHelperAlarm();
+    final updatedAlarm = Alarm(
+      id: existingAlarm.id, // Retain the existing alarm's ID
+      hour: selectedHour.value,
+      minute: selectedMinute.value,
+      isAm: isAm.value,
+      label: label.value.isEmpty ? 'Morning Alarm' : label.value,
+      backgroundTitle: selectedBackground.value,
+      backgroundImage: selectedBackgroundImage.value,
+      musicPath: selectedMusicPath.value,
+      recordingPath: selectedRecordingPath.value,
+      repeatDays: repeatDays.entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key)
+          .toList(),
+      isVibrationEnabled: isVibrationEnabled.value,
+      snoozeDuration: selectedSnoozeDuration.value,
+      volume: volume.value,
+    );
+    try {
+      await dbHelper.updateAlarm(updatedAlarm); // Update the alarm in the database
+      fetchAlarmsFromDatabase(); // Refresh the list of alarms
+      Get.snackbar("Success", "Alarm updated successfully!");
+    } catch (e) {
+      Get.snackbar("Error", "Failed to update alarm: $e");
+    }
+  }
+
 
   /// Delete an alarm from the SQLite database
   Future<void> deleteAlarmFromDatabase(int id) async {
@@ -425,6 +435,7 @@ class Alarm {
   int minute;
   bool isAm;
   String label;
+  String backgroundTitle;
   String backgroundImage;
   String musicPath;
   String recordingPath;
@@ -440,6 +451,7 @@ class Alarm {
     required this.minute,
     required this.isAm,
     required this.label,
+    required this.backgroundTitle,
     required this.backgroundImage,
     required this.musicPath,
     required this.recordingPath,
@@ -458,6 +470,7 @@ class Alarm {
       'minute': minute,
       'isAm': isAm ? 1 : 0, // Store bool as int
       'label': label,
+      'backgroundTitle': backgroundTitle,
       'backgroundImage': backgroundImage,
       'musicPath': musicPath,
       'recordingPath': recordingPath,
@@ -477,6 +490,7 @@ class Alarm {
       minute: map['minute'],
       isAm: map['isAm'] == 1,
       label: map['label'],
+      backgroundTitle: map['backgroundTitle'],
       backgroundImage: map['backgroundImage'],
       musicPath: map['musicPath'],
       recordingPath: map['recordingPath'],

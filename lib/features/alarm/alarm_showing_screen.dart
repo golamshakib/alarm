@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:alarm/core/common/widgets/custom_text.dart';
 import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
@@ -21,11 +23,20 @@ class AlarmShowingScreen extends StatelessWidget {
       controller.triggerAlarmVibration(alarm);
     });
 
+    // Determine the image source, check if the background image is a local file or asset
+    String backgroundImage = alarm.backgroundImage;
+    ImageProvider imageProvider;
+    if (File(backgroundImage).existsSync()) {
+      imageProvider = FileImage(File(backgroundImage));
+    } else {
+      imageProvider = AssetImage(backgroundImage); // Fallback to asset image if file doesn't exist
+    }
+
     return Scaffold(
     
       body: Stack(
         children: [
-          Image.asset(ImagePath.dog2,height: double.infinity,width: double.infinity,fit: BoxFit.fill,),
+          Image(image: imageProvider,height: double.infinity,width: double.infinity,fit: BoxFit.cover),
           Positioned(
             bottom: getHeight(92),
             left: getWidth(50),

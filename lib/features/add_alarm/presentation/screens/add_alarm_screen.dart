@@ -21,7 +21,6 @@ class AddAlarmScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AddAlarmController controller = Get.put(AddAlarmController());
     final settingsController = Get.find<SettingsController>();
-
     final arguments = Get.arguments;
 
     if (arguments != null) {
@@ -30,6 +29,29 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedMusicPath.value = arguments['musicPath'] ?? '';
       controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
     }
+
+    final isEditMode = arguments?['isEditMode'] ?? false;
+    final alarm = arguments?['alarm']; // Get alarm if in edit mode
+
+    if (isEditMode && alarm != null) {
+      // Prepopulate fields with the existing alarm's data
+      controller.selectedHour.value = alarm.hour;
+      controller.selectedMinute.value = alarm.minute;
+      controller.isAm.value = alarm.isAm;
+      controller.label.value = alarm.label;
+      controller.repeatDays.updateAll((key, value) => false); // Reset and update repeat days
+      for (var day in alarm.repeatDays) {
+        controller.repeatDays[day] = true;
+      }
+      controller.selectedBackground.value = alarm.backgroundTitle;
+      controller.selectedBackgroundImage.value = alarm.backgroundImage;
+      controller.selectedMusicPath.value = alarm.musicPath;
+      controller.selectedRecordingPath.value = alarm.recordingPath;
+      controller.selectedSnoozeDuration.value = alarm.snoozeDuration;
+      controller.isVibrationEnabled.value = alarm.isVibrationEnabled;
+      controller.volume.value = alarm.volume;
+    }
+
 
     return Scaffold(
       body: SafeArea(
@@ -42,10 +64,15 @@ class AddAlarmScreen extends StatelessWidget {
 
                 // App Bar
                 CustomAppbarWithLogo(
-                  text: 'Add Alarm',
+                  text: isEditMode ? 'Edit Alarm' : 'Add Alarm',
                   iconPath: IconPath.check,
                   onIconTap: () {
-                    controller.saveAlarmToDatabase();
+                    if (isEditMode) {
+                      controller.updateAlarmInDatabase(alarm); // Update the existing alarm
+                      Get.back();
+                    } else {
+                      controller.saveAlarmToDatabase(); // Save a new alarm
+                    }
                     controller.saveScreenPreferences();
                   },
                 ),
@@ -186,7 +213,7 @@ class AddAlarmScreen extends StatelessWidget {
                         children: [
                           const CustomText(text: 'Background:'),
                           InkWell(
-                            onTap: () {
+                            onTap: isEditMode ? null : () {
                               Get.toNamed(AppRoute.changeBackgroundScreen);
                             },
                             child: Obx(() {

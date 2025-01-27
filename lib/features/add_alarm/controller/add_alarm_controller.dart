@@ -225,20 +225,30 @@ class AddAlarmController extends GetxController {
       }
 
       final musicPath = alarms[index].musicPath;
+      final recordingPath = alarms[index].recordingPath;
+
+      String? filePathToPlay;
+
+      // Check which path is available to play
       if (musicPath.isNotEmpty) {
-        try {
-          currentlyPlayingIndex.value = index; // Update playing index
-          isPlaying.value = true; // Update UI immediately
-          await audioPlayer.setFilePath(musicPath);
-          await audioPlayer.play();
-        } catch (e) {
-          // Handle errors (e.g., file not found)
-          isPlaying.value = false;
-          currentlyPlayingIndex.value = -1;
-          Get.snackbar("Error", "Failed to play audio: $e");
-        }
+        filePathToPlay = musicPath;
+      } else if (recordingPath.isNotEmpty) {
+        filePathToPlay = recordingPath;
       } else {
-        Get.snackbar("Error", "No music file found for this alarm.");
+        Get.snackbar("Error", "No audio file found for this alarm.");
+        return;
+      }
+
+      try {
+        currentlyPlayingIndex.value = index; // Update playing index
+        isPlaying.value = true; // Update UI immediately
+        await audioPlayer.setFilePath(filePathToPlay);
+        await audioPlayer.play();
+      } catch (e) {
+        // Handle errors (e.g., file not found)
+        isPlaying.value = false;
+        currentlyPlayingIndex.value = -1;
+        Get.snackbar("Error", "Failed to play audio: $e");
       }
     }
   }

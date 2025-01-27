@@ -28,7 +28,7 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedBackground.value = arguments['title'] ?? '';
       controller.selectedBackgroundImage.value = arguments['imagePath'] ?? '';
       controller.selectedMusicPath.value = arguments['musicPath'] ?? '';
-      // controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
+      controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
     }
 
     return Scaffold(

@@ -45,9 +45,8 @@ class AddAlarmScreen extends StatelessWidget {
                   text: 'Add Alarm',
                   iconPath: IconPath.check,
                   onIconTap: () {
-                    controller.saveAlarm();
+                    controller.saveAlarmToDatabase();
                     controller.saveScreenPreferences();
-                    Get.snackbar("Success", "Alarm added successfully");
                   },
                 ),
                 SizedBox(height: getHeight(16)),

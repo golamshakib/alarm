@@ -1,17 +1,30 @@
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import '../../../features/add_alarm/controller/add_alarm_controller.dart';
 
 class DBHelperAlarm {
-  static const String _tableName = 'alarms';
-  static const String _dbName = 'alarm_database.db';
+  static final DBHelperAlarm _instance = DBHelperAlarm._internal();
+  factory DBHelperAlarm() => _instance;
 
-  static Future<Database> _getDatabase() async {
+  static Database? _database;
+
+  DBHelperAlarm._internal();
+
+  /// Initialize the database
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDatabase();
+    return _database!;
+  }
+
+  /// Create the database and the alarms table
+  Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     return openDatabase(
-      join(dbPath, _dbName),
-      onCreate: (db, version) {
-        return db.execute('''
-          CREATE TABLE $_tableName (
+      join(dbPath, 'alarms.db'),
+      onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE alarms (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             hour INTEGER,
             minute INTEGER,
@@ -22,6 +35,7 @@ class DBHelperAlarm {
             recordingPath TEXT,
             repeatDays TEXT,
             isVibrationEnabled INTEGER,
+            snoozeDuration INTEGER,
             volume REAL,
             isToggled INTEGER
           )
@@ -31,41 +45,48 @@ class DBHelperAlarm {
     );
   }
 
-  static Future<void> insertAlarm(Map<String, dynamic> alarm) async {
-    final db = await _getDatabase();
-    await db.insert(
-      _tableName,
-      alarm,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  /// Insert a new alarm into the database
+  Future<int> insertAlarm(Alarm alarm) async {
+    final db = await database;
+    return db.insert('alarms', alarm.toMap());
   }
 
-  static Future<List<Map<String, dynamic>>> fetchAlarms() async {
-    final db = await _getDatabase();
-    return await db.query(_tableName);
+  /// Fetch all alarms from the database
+  Future<List<Alarm>> fetchAlarms() async {
+    final db = await database;
+    final maps = await db.query('alarms');
+
+    return List.generate(maps.length, (i) {
+      return Alarm.fromMap(maps[i]);
+    });
   }
 
-  static Future<void> deleteAlarm(int id) async {
-    final db = await _getDatabase();
-    await db.delete(
-      _tableName,
+  /// Update an existing alarm
+  Future<int> updateAlarm(Alarm alarm) async {
+    final db = await database;
+    return db.update(
+      'alarms',
+      alarm.toMap(),
       where: 'id = ?',
-      whereArgs: [id],
+      whereArgs: [alarm.id],
     );
   }
 
-  static Future<void> updateAlarm(Map<String, dynamic> alarm, int id) async {
-    final db = await _getDatabase();
-    await db.update(
-      _tableName,
-      alarm,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  /// Delete an alarm by ID
+  Future<int> deleteAlarm(int id) async {
+    final db = await database;
+    return db.delete('alarms', where: 'id = ?', whereArgs: [id]);
   }
 
-  static Future<void> deleteAllAlarms() async {
-    final db = await _getDatabase();
-    await db.delete(_tableName);
+  /// Clear all alarms from the database (if needed)
+  Future<int> clearAlarms() async {
+    final db = await database;
+    return db.delete('alarms');
+  }
+
+  /// Close the database connection
+  Future<void> closeDatabase() async {
+    final db = await database;
+    await db.close();
   }
 }

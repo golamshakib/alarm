@@ -56,7 +56,9 @@ class SettingsScreen extends StatelessWidget {
                   const CustomText(text: 'Reset Alarms'),
                   GestureDetector(
                     onTap: () => _resetAlarmPopup(context, controller),
-                    child: const TextWithArrow(),
+                    child: const TextWithArrow(
+                    text: '',
+                    ),
                   ),
                 ],
               ),
@@ -227,7 +229,7 @@ void _resetAlarmPopup(BuildContext context, SettingsController controller) {
 
                       Get.snackbar(
                         "Success",
-                        "All alarms have been reset.",
+                        "All alarms have been reset.", duration: const Duration(seconds: 2)
                       );
                     },
                     child: Container(

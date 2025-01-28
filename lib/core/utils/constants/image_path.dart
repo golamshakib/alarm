@@ -14,6 +14,7 @@ class ImagePath{
   static const  String lineImage ='$_basePath/line_image.png';
   static const  String lineImage2 ='$_basePath/line_image.png';
   static const  String dog3 ='$_basePath/dog3.png';
+  static const  String cat ='$_basePath/cat.jpg';
 
 
 }

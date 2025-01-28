@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -242,7 +241,7 @@ class CreateAlarmController extends GetxController {
         // Update existing entry
         int rowsUpdated = await dbHelper.updateBackground(result, id);
         if (rowsUpdated > 0) {
-          Get.snackbar("Success", "Background updated successfully!");
+          Get.snackbar("Success", "Background updated successfully!", duration: const Duration(seconds: 2));
           // Update the local list
           int indexToUpdate =
           items.indexWhere((element) => element['id'] == id);
@@ -251,7 +250,7 @@ class CreateAlarmController extends GetxController {
             items.refresh();
           }
         } else {
-          Get.snackbar("Error", "Failed to update background.");
+          Get.snackbar("Error", "Failed to update background.", duration: const Duration(seconds: 2));
         }
       } else {
         // Insert new entry
@@ -260,7 +259,7 @@ class CreateAlarmController extends GetxController {
         addItem(result); // Add the new item to the list
 
        waveformControllers.add(PlayerController()); // Add a controller for the new item
-        Get.snackbar("Success", "Background saved successfully!");
+        Get.snackbar("Success", "Background saved successfully!", duration: const Duration(seconds: 2));
       }
 
       resetFields(); // Reset fields
@@ -269,32 +268,9 @@ class CreateAlarmController extends GetxController {
 
     } catch (e) {
       log('Error saving data: $e');
-      Get.snackbar("Error", "Failed to save background: $e");
+      Get.snackbar("Error", "Failed to save background: $e", duration: const Duration(seconds: 2));
     }
   }
-
-
-  // void saveData() async {
-  //   final result = {
-  //     'title': labelText.value.isNotEmpty ? labelText.value : 'Background Title',
-  //     'imagePath': imagePath.value,
-  //     'musicPath': musicPath.value,
-  //     'recordingPath': recordingPath.value,
-  //     'type': musicPath.value != null ? 'music' : 'recording',
-  //   };
-  //
-  //   // Insert into the database
-  //   // final dbHelper = DBHelper();
-  //   try {
-  //     // await dbHelper.insertBackground(result); // Save to database
-  //     addItem(result); // Add the saved data to the items list
-  //     waveformControllers.add(PlayerController()); // Add a controller for the new item
-  //     resetFields(); // Reset fields
-  //     Get.offAllNamed(AppRoute.changeBackgroundScreen, arguments: result); // Replace this with your route name
-  //   } catch (e) {
-  //     log('Error saving data: $e');
-  //   }
-  // }
 
 
   void resetFields() {

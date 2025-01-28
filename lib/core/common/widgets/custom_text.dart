@@ -8,6 +8,7 @@ import '../../utils/constants/app_sizes.dart';
 
 class CustomText extends StatelessWidget {
   final String text;
+  final TextAlign? textAlign;
   final double? fontSize;
   final Color? color;
   final FontWeight? fontWeight;
@@ -17,7 +18,7 @@ class CustomText extends StatelessWidget {
   final Color? decorationColor;
   const CustomText(
       {super.key,
-      required this.text,
+      required this.text, this.textAlign,
       this.maxLines,
       this.textOverflow,
       this.fontSize,
@@ -28,6 +29,7 @@ class CustomText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
+      textAlign: textAlign,
       style: GoogleFonts.poppins(
         decoration:decoration,
           decorationColor: decorationColor??const Color(0xffA59F92),

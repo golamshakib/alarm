@@ -15,7 +15,7 @@ class TextWithArrow extends StatelessWidget {
     super.key,
     this.text,
     this.fontSize,
-    this.textOverflow = TextOverflow.ellipsis,
+    this.textOverflow,
     this.color,
     this.fontWeight,
     this.onTap,
@@ -32,7 +32,6 @@ class TextWithArrow extends StatelessWidget {
           CustomText(
             text: text ?? '',
             fontSize: fontSize ?? getWidth(14),
-            maxLines: 1,
             textOverflow: TextOverflow.ellipsis,
             color: AppColors.textGrey,
             fontWeight: fontWeight ?? FontWeight.w400

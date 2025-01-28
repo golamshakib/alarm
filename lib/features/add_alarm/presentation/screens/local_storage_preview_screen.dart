@@ -100,7 +100,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                           fit: BoxFit.contain,
                         )
                       : Image.asset(
-                          ImagePath.dog, // Fallback asset image
+                          ImagePath.cat, // Fallback asset image
                           width: double.infinity,
                           fit: BoxFit.contain,
                         ),
@@ -120,7 +120,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                       'musicPath': musicPath,
                       'recordingPath': recordingPath,
                     });
-                    Get.snackbar("Success", "Background set successfully!");
+                    Get.snackbar("Success", "Background set successfully!", duration: const Duration(seconds: 2));
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: getHeight(12)),

@@ -40,6 +40,8 @@ dependencies:
   intl: ^0.18.1
   logger: ^2.0.1
   url_launcher: ^6.1.12
+  image_picker: ^0.8.7
+  file_picker: ^8.1.7
   google_fonts: ^6.2.1
   shared_preferences: ^2.3.2
   widgets_easier: ^0.0.10
@@ -52,14 +54,16 @@ dependencies:
   vibration: ^3.1.1
   volume_controller: ^3.1.0
   sqflite: ^2.4.1
+#  flutter_local_notifications: ^17.0.0
+#  timezone: ^0.9.0
+
 
 
 
   # Icons
   cupertino_icons: ^1.0.8
   # State Management
-  image_picker: ^0.8.7
-  file_picker: ^8.1.7
+
   get: ^4.6.5
 
 dev_dependencies:

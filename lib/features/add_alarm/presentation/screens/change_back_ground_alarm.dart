@@ -53,19 +53,22 @@ class ChangeBackGroundAlarm extends StatelessWidget {
               // First ListView for `items`
               Expanded(
                 child: Obx(() {
+                  if (controller.items.isEmpty) {
+                    return const Center(child: CustomText(text: 'No Backgrounds Found'));
+                  }
                   return ListView.separated(
                     itemCount: controller.items.length,
-                    separatorBuilder: (_, __) =>
-                        SizedBox(height: getHeight(12)),
+                    separatorBuilder: (_, __) => SizedBox(height: getHeight(12)),
                     itemBuilder: (context, index) {
                       final item = controller.items[index];
                       return GestureDetector(
                         onTap: () {
+                          controller.stopMusic();
                           Get.to(() => PreviewScreen(
-                                title: item['title'] ?? '',
-                                imagePath: item['imagePath'] ?? '',
-                                musicPath: item['musicPath'] ?? '',
-                              ));
+                            title: item['title'] ?? '',
+                            imagePath: item['imagePath'] ?? '',
+                            musicPath: item['musicPath'] ?? '',
+                          ));
                         },
                         child: Stack(
                           children: [
@@ -73,8 +76,7 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                               width: double.infinity,
                               decoration: const BoxDecoration(
                                 color: Color(0xffF7F7F7),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                borderRadius: BorderRadius.all(Radius.circular(8)),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
@@ -86,33 +88,18 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                         controller.togglePlay(index);
                                       },
                                       child: Obx(() {
-                                        return Row(
-                                          children: [
-                                            Icon(
-                                              controller.isPlaying[index]
-                                                  ? Icons
-                                                      .play_circle_fill_rounded
-                                                  : Icons
-                                                      .play_circle_outline_rounded,
-                                              color: Colors.orange,
-                                              size: 25,
-                                            ),
-                                            // if (controller
-                                            //     .isPlaying[index]) ...[
-                                            //   SizedBox(width: getWidth(8)),
-                                            //   Image.asset(
-                                            //     item['musicPath'] ?? '',
-                                            //     height: getHeight(25),
-                                            //     width: getWidth(75),
-                                            //   ),
-                                            // ],
-                                          ],
+                                        return Icon(
+                                          controller.isPlaying[index]
+                                          ? Icons.play_circle_fill_rounded
+                                          : Icons.play_circle_outline_rounded,
+                                          color: Colors.orange,
+                                          size: 25,
                                         );
                                       }),
                                     ),
                                     SizedBox(height: getHeight(16)),
                                     CustomText(
-                                      text: item['title']!,
+                                      text: item['title'] ?? '',
                                       fontSize: getWidth(14),
                                       fontWeight: FontWeight.w700,
                                       color: const Color(0xff333333),
@@ -126,17 +113,29 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                               top: 0,
                               right: 0,
                               child: Container(
-                                padding: const EdgeInsets.all(50),
-                                decoration: BoxDecoration(
+                                width: getWidth(100), // Set the width for the right-side image
+                                height: getHeight(120), // Set the height for the right-side image
+                                decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                  ),
+                                ),
+                                child: ClipRRect(
                                   borderRadius: const BorderRadius.only(
                                     bottomRight: Radius.circular(10),
                                     topRight: Radius.circular(10),
                                   ),
-                                  image: DecorationImage(
-                                    image: item['imagePath'] != null
-                                        ? FileImage(File(item['imagePath']!))
-                                        : const AssetImage(ImagePath.dog),
+                                  child: Image.network(
+                                    item['imagePath'] ?? '', // Network image URL
                                     fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      // Fallback image in case of error
+                                      return Image.asset(
+                                        ImagePath.cat, // Replace with your fallback asset image path
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
@@ -153,158 +152,123 @@ class ChangeBackGroundAlarm extends StatelessWidget {
               SizedBox(height: getHeight(24)),
               Expanded(
                 child: Obx(
-                  () => createAlarmController.items.isEmpty
-                      ? const Center(
-                          child: CustomText(text: 'No Background available'))
+                      () => createAlarmController.items.isEmpty
+                      ? const Center(child: CustomText(text: 'No Background available'))
                       : ListView.separated(
-                          itemCount: createAlarmController.items.length,
-                          separatorBuilder: (_, __) => SizedBox(
-                            height: getHeight(12),
-                          ),
-                          itemBuilder: (context, index) {
-                            final item = createAlarmController.items[index];
-                            return Dismissible(
-                              key: UniqueKey(),
-                              direction: DismissDirection.endToStart,
-                              background: Container(
-                                alignment: Alignment.centerRight,
-                                color: Colors.red,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: getWidth(16)),
-                                child: const Icon(Icons.delete,
-                                    color: Colors.white),
-                              ),
-                              onDismissed: (direction) async {
-                                // Remove item from the database and UI
-                                // Show a confirmation popup before deleting
-                                final confirmed =
-                                    await showDeleteConfirmationPopup(context);
-                                if (confirmed) {
-                                  // Remove item from the database and UI
-                                  final id = item['id'];
-                                  await dbHelper.deleteBackground(id);
-                                  createAlarmController.items.removeAt(index);
-                                  Get.snackbar("Success",
-                                      "Background deleted successfully!");
-                                } else {
-                                  // Re-insert the item back into the list if deletion is canceled
-                                  createAlarmController.items.refresh();
-                                }
-                              },
-                              child: GestureDetector(
-                                onTap: () {
-                                  createAlarmController.stopMusic();
-                                  Get.to(
-                                    () => LocalStoragePreviewScreen(
-                                      id: item['id'],
-                                      title: item['title'] ?? '',
-                                      imagePath: item['imagePath'] ?? '',
-                                      musicPath: item['musicPath'] ?? '',
-                                      recordingPath:
-                                          item['recordingPath'] ?? '',
-                                    ),
-                                  );
-                                },
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      width: double.infinity,
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xffF7F7F7),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8)),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                createAlarmController
-                                                    .playMusic(index);
-                                              },
-                                              child: Obx(() {
-                                                return Row(
-                                                  children: [
-                                                    Icon(
-                                                      createAlarmController
-                                                                  .isPlaying
-                                                                  .value &&
-                                                              createAlarmController
-                                                                      .playingIndex
-                                                                      .value ==
-                                                                  index
-                                                          ? Icons
-                                                              .play_circle_fill_rounded
-                                                          : Icons
-                                                              .play_circle_outline_rounded,
-                                                      color: Colors.orange,
-                                                      size: 25,
-                                                    ),
-                                                    // if (createAlarmController.isPlaying.value &&
-                                                    //     createAlarmController.playingIndex.value == index) ...[
-                                                    //   SizedBox(
-                                                    //     height: getHeight(30),
-                                                    //     child: AudioFileWaveforms(
-                                                    //       playerController: createAlarmController.waveformControllers[index],
-                                                    //       size: Size(getWidth(300), getHeight(80)),
-                                                    //       enableSeekGesture: true,
-                                                    //       waveformType: WaveformType.long,
-                                                    //       playerWaveStyle: const PlayerWaveStyle(
-                                                    //         fixedWaveColor: Colors.grey,
-                                                    //         liveWaveColor: Color(0xffFFA845),
-                                                    //         waveThickness: 2.0,
-                                                    //       ),
-                                                    //     ),
-                                                    //   ),
-                                                    // ],
-                                                  ],
-                                                );
-                                              }),
-                                            ),
-                                            SizedBox(height: getHeight(16)),
-                                            CustomText(
-                                              text: item['title'] ?? '',
-                                              fontSize: getWidth(14),
-                                              fontWeight: FontWeight.w700,
-                                              color: const Color(0xff333333),
-                                              textOverflow:
-                                                  TextOverflow.ellipsis,
-                                            ),
-                                            // Add spacing
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(50),
-                                        decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.only(
-                                            bottomRight: Radius.circular(10),
-                                            topRight: Radius.circular(10),
-                                          ),
-                                          image: DecorationImage(
-                                            image: item['imagePath'] != null
-                                                ? FileImage(
-                                                    File(item['imagePath']!))
-                                                : const AssetImage(
-                                                    ImagePath.dog),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                    itemCount: createAlarmController.items.length,
+                    separatorBuilder: (_, __) => SizedBox(
+                      height: getHeight(12),
+                    ),
+                    itemBuilder: (context, index) {
+                      final item = createAlarmController.items[index];
+                      return Dismissible(
+                        key: UniqueKey(),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          color: Colors.red,
+                          padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (direction) async {
+                          final confirmed =
+                          await showDeleteConfirmationPopup(context);
+                          if (confirmed) {
+                            final id = item['id'];
+                            await dbHelper.deleteBackground(id);
+                            createAlarmController.items.removeAt(index);
+                            Get.snackbar("Success", "Background deleted successfully!",
+                                duration: const Duration(seconds: 2));
+                          } else {
+                            createAlarmController.items.refresh();
+                          }
+                        },
+                        child: GestureDetector(
+                          onTap: () {
+                            createAlarmController.stopMusic();
+                            Get.to(
+                                  () => LocalStoragePreviewScreen(
+                                id: item['id'],
+                                title: item['title'] ?? '',
+                                imagePath: item['imagePath'] ?? '',
+                                musicPath: item['musicPath'] ?? '',
+                                recordingPath: item['recordingPath'] ?? '',
                               ),
                             );
                           },
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xffF7F7F7),
+                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          createAlarmController.playMusic(index);
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Obx(() {
+                                              return Icon(
+                                                createAlarmController.isPlaying.value &&
+                                                    createAlarmController
+                                                        .playingIndex.value ==
+                                                        index
+                                                    ? Icons.play_circle_fill_rounded
+                                                    : Icons.play_circle_outline_rounded,
+                                                color: Colors.orange,
+                                                size: 25,
+                                              );
+                                            }),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: getHeight(16)),
+                                      CustomText(
+                                        text: item['title'] ?? '',
+                                        fontSize: getWidth(14),
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color(0xff333333),
+                                        textOverflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  key: ValueKey(item['imagePath']), // Use a ValueKey for the image
+                                  padding: const EdgeInsets.all(50),
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.only(
+                                      bottomRight: Radius.circular(10),
+                                      topRight: Radius.circular(10),
+                                    ),
+                                    image: DecorationImage(
+                                      image: item['imagePath'] != null
+                                          ? FileImage(File(item['imagePath']!))
+                                          : const AssetImage(ImagePath.cat)
+                                      as ImageProvider,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      );
+                    },
+                  ),
                 ),
               )
             ],

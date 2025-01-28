@@ -19,7 +19,7 @@ class LocalStoragePreviewScreenController extends GetxController {
   void togglePlay(String audioPath) async {
     try {
       if (!File(audioPath).existsSync()) {
-        Get.snackbar("Error", "Audio file does not exist.");
+        Get.snackbar("Error", "Audio file does not exist.", duration: const Duration(seconds: 2));
         return;
       }
 
@@ -34,7 +34,7 @@ class LocalStoragePreviewScreenController extends GetxController {
         await audioPlayer.play();
       }
     } catch (e) {
-      Get.snackbar("Playback Error", "Could not play the audio file: $e");
+      Get.snackbar("Playback Error", "Could not play the audio file: $e", duration: const Duration(seconds: 2));
     }
   }
 
@@ -46,7 +46,7 @@ class LocalStoragePreviewScreenController extends GetxController {
         isPlaying.value = false; // Reset the playing state
       }
     } catch (e) {
-      Get.snackbar("Error", "Failed to stop the audio: $e");
+      Get.snackbar("Error", "Failed to stop the audio: $e", duration: const Duration(seconds: 2));
     }
   }
 

@@ -5,12 +5,13 @@ import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/icon_path.dart';
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:alarm/features/add_alarm/controller/add_alarm_controller.dart';
+import 'package:alarm/features/alarm/controller/alarm_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/common/widgets/custom_text.dart';
 import '../add_alarm/presentation/screens/add_alarm_screen.dart';
 import 'alarm_showing_screen.dart';
-import 'package:alarm/features/settings/controller/settings_controller.dart';  // Import the SettingsController
+import 'package:alarm/features/settings/controller/settings_controller.dart';
 
 class AlarmScreen extends StatelessWidget {
   const AlarmScreen({super.key});
@@ -19,7 +20,8 @@ class AlarmScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Initialize the SettingsController
     final SettingsController settingsController = Get.put(SettingsController());
-    final controller = Get.put(AddAlarmController());
+    final AddAlarmController addAlarmController = Get.put(AddAlarmController());
+    final AlarmScreenController controller = Get.put(AlarmScreenController());
 
     String formatRepeatDays(List<String> repeatDays) {
       if (repeatDays.length == 7) {
@@ -45,7 +47,7 @@ class AlarmScreen extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(getWidth(16)),
           child: Obx(() {
-            if (controller.alarms.isEmpty) {
+            if (addAlarmController.alarms.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -130,11 +132,11 @@ class AlarmScreen extends StatelessWidget {
                   ListView.separated(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: controller.alarms.length,
+                    itemCount: addAlarmController.alarms.length,
                     separatorBuilder: (context, _) =>
                         SizedBox(height: getHeight(16)),
                     itemBuilder: (context, index) {
-                      final alarm = controller.alarms[index];
+                      final alarm = addAlarmController.alarms[index];
                       final isSelected =
                       controller.selectedAlarms.contains(index);
 
@@ -192,12 +194,12 @@ class AlarmScreen extends StatelessWidget {
                                       children: [
                                         GestureDetector(
                                           onTap: () {
-                                            controller.togglePlayPause(index); // Play/pause logic
+                                            addAlarmController.togglePlayPause(index); // Play/pause logic
                                           },
                                           child: Obx(() {
                                             // Dynamically show play/pause icon
-                                            final isPlaying = controller.isPlaying.value &&
-                                                controller.currentlyPlayingIndex.value == index;
+                                            final isPlaying = addAlarmController.isPlaying.value &&
+                                                addAlarmController.currentlyPlayingIndex.value == index;
                                             return Icon(
                                               isPlaying
                                                   ? Icons.play_circle_fill_rounded
@@ -263,7 +265,7 @@ class AlarmScreen extends StatelessWidget {
                                   ],
                                 ),
                                 Text(
-                                  formatTime(alarm.hour, alarm.minute, alarm.isAm, controller.timeFormat.value),                                  style: TextStyle(
+                                  formatTime(alarm.hour, alarm.minute, alarm.isAm, addAlarmController.timeFormat.value),                                  style: TextStyle(
                                     fontWeight: FontWeight.w300,
                                     fontSize: getWidth(36),
                                   ),
@@ -282,11 +284,14 @@ class AlarmScreen extends StatelessWidget {
                                       width: getWidth(20),
                                     ),
                                     SizedBox(width: getWidth(8)),
-                                    CustomText(
-                                      text: alarm.label,
-                                      fontSize: getWidth(14),
-                                      fontWeight: FontWeight.w400,
-                                      color: const Color(0xffA59F92),
+                                    Flexible(
+                                      child: CustomText(
+                                        text: alarm.label,
+                                        textOverflow: TextOverflow.ellipsis,
+                                        fontSize: getWidth(14),
+                                        fontWeight: FontWeight.w400,
+                                        color: const Color(0xffA59F92),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -307,7 +312,7 @@ class AlarmScreen extends StatelessWidget {
   }
 }
 
-void _showLabelPopup(BuildContext context, AddAlarmController controller) {
+void _showLabelPopup(BuildContext context, AlarmScreenController controller) {
   showDialog(
     context: context,
     builder: (context) {

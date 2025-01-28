@@ -44,8 +44,8 @@ class PreviewScreen extends StatelessWidget {
                 SizedBox(height: getHeight(24)),
                 Row(
                   children: [
-                    CustomText(text: title),
-                    const CustomText(text: ':'),
+                    Flexible(child: CustomText(text: title)),
+                    const CustomText(text: ' :'),
                     SizedBox(width: getWidth(8)),
                     Obx(() {
                       return GestureDetector(
@@ -76,7 +76,7 @@ class PreviewScreen extends StatelessWidget {
                 // Image Preview
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
+                  child: Image.network(
                     imagePath,
                     width: double.infinity,
                     fit: BoxFit.contain,
@@ -90,7 +90,7 @@ class PreviewScreen extends StatelessWidget {
                     final addAlarmController = Get.find<AddAlarmController>();
                     addAlarmController.selectedBackground.value = title;
                     addAlarmController.selectedBackgroundImage.value = imagePath;
-                    Get.snackbar("Success", "Successfully Change the background");
+                    Get.snackbar("Success", "Successfully Change the background", duration: const Duration(seconds: 2));
                     Get.back();
                   },
                   child: Container(

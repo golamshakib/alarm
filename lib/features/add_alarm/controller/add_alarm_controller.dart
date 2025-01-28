@@ -7,28 +7,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:volume_controller/volume_controller.dart';
 
+
 import '../../../core/utils/helpers/db_helper_alarm.dart';
 import '../../settings/controller/settings_controller.dart';
+import '../data/alarm_model.dart';
 
 class AddAlarmController extends GetxController {
   final SettingsController settingsController = Get.find<SettingsController>();
 
   final labelController = TextEditingController();
 
-  // Time selection
+ /// T I M E   S E C T I O N
   var selectedHour = 7.obs;
   var selectedMinute = 0.obs;
   var isAm = true.obs;
-  /// Track the current time format (12-hour or 24-hour)
+
+  // Track the current time format (12-hour or 24-hour)
   var timeFormat = 12.obs;
 
-  /// Fetch and apply the user's time format preference
+  // Fetch and apply the user's time format preference
   Future<void> loadTimeFormat() async {
     final prefs = await SharedPreferences.getInstance();
     timeFormat.value = prefs.getInt('timeFormat') ?? 12;
   }
 
-  /// Adjust the default selected time when time format changes
+  // Adjust the default selected time when time format changes
   void adjustTimeFormat() {
     if (timeFormat.value == 24) {
       // Convert to 24-hour format
@@ -53,6 +56,8 @@ class AddAlarmController extends GetxController {
     selectedMinute.value = now.minute;
     isAm.value = now.hour < 12;
   }
+  /// E N D  T I M E   S E C T I O N
+
 
   @override
   void onInit() {
@@ -63,13 +68,14 @@ class AddAlarmController extends GetxController {
     setCurrentTime();
     timeFormat.value = settingsController.selectedTime.value;
 
-    /// Watch for changes in time format and adjust time accordingly
+    // Watch for changes in time format and adjust time accordingly
     ever(settingsController.selectedTime, (_) {
       timeFormat.value = settingsController.selectedTime.value;
       adjustTimeFormat();
     });
   }
-  /// Save screen state to `SharedPreferences`
+
+  /// S A V E   S C R E E N   S E T T I N G S
   Future<void> saveScreenPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('selectedHour', selectedHour.value);
@@ -85,7 +91,7 @@ class AddAlarmController extends GetxController {
     await prefs.setString('selectedMusicPath', selectedMusicPath.value);
   }
 
-  /// Load screen state from `SharedPreferences`
+  // Load screen settings
   Future<void> loadScreenPreferences() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -103,9 +109,10 @@ class AddAlarmController extends GetxController {
     selectedMusicPath.value = prefs.getString('selectedMusicPath') ?? '';
   }
 
+  /// E N D   S A V E   &   L O A D  S C R E E N   S E T T I N G S
 
 
-  // Alarm label
+ /// A L A R M   L A B E L   S E C T I O N
   var label = 'Morning Alarm'.obs;
 
   // Update label value
@@ -114,8 +121,9 @@ class AddAlarmController extends GetxController {
     labelController.text = text;
     saveScreenPreferences(); // Save preferences on label change
   }
+  /// E N D   A L A R M   L A B E L   S E C T I O N
 
-  // Repeat days
+  /// R E P E A T   D A Y S
   var repeatDays = {
     'Mon': false,
     'Tue': false,
@@ -132,8 +140,9 @@ class AddAlarmController extends GetxController {
     repeatDays.refresh();
     saveScreenPreferences(); // Save preferences on day toggle
   }
+  /// E N D   R E P E A T   D A Y S
 
-  // Snooze duration
+  /// S N O O Z E   D U R A T I O N
   var selectedSnoozeDuration = 5.obs; // Default snooze duration (5 minutes)
   final List<int> snoozeOptions = [5, 10, 15, 20, 25, 30];
 
@@ -141,8 +150,9 @@ class AddAlarmController extends GetxController {
     selectedSnoozeDuration.value = duration;
     saveScreenPreferences(); // Save preferences on snooze change
   }
+  /// S N O O Z E   D U R A T I O N
 
-  // Vibration toggle
+  /// V I B R A T I O N   S E C T I O N
   var isVibrationEnabled = true.obs;
   // Toggle vibration
   void toggleVibration() {
@@ -165,34 +175,33 @@ class AddAlarmController extends GetxController {
       Vibration.cancel();
     }
   }
+  /// E N D   V I B R A T I O N   S E C T I O N
 
 
-  // Volume
+ /// V O L U M E   S E C T I O N
   var volume = 0.5.obs; // Default volume set to 50%
   late VolumeController volumeController; // VolumeController instance
 
-  /// Initialize volume controller
+  // Initialize volume controller
   Future<void> initializeVolumeController() async {
-    // Initialize the VolumeController instance
-    volumeController = VolumeController.instance;
-
+    volumeController = VolumeController.instance; // Initialize the VolumeController instance
     // Add a listener for volume changes
     volumeController.addListener((double newVolume) {
       volume.value = newVolume; // Update the volume value
     });
-
     // Get the initial system volume
     volume.value = await volumeController.getVolume();
   }
 
-  /// Set device volume
+  // Set device volume
   Future<void> setDeviceVolume(double newVolume) async {
     volume.value = newVolume; // Update the volume value
     await volumeController.setVolume(newVolume); // Set the system volume
     saveScreenPreferences(); // Save the volume to preferences
   }
+  /// E N D   V O L U M E   S E C T I O N
 
-  // Set Background
+  /// S E T   B A C K G R O U N D
   var selectedBackground = "Cute Dog in bed".obs;
   var selectedBackgroundImage = "assets/images/dog.png".obs;
   var selectedMusicPath = ''.obs;
@@ -205,11 +214,13 @@ class AddAlarmController extends GetxController {
     selectedMusicPath.value = musicPath;
     saveScreenPreferences(); // Save preferences on background change
   }
+  /// E N D   S E T   B A C K G R O U N D
 
 
   // List of alarms
   var alarms = <Alarm>[].obs;
 
+  /// M U S I C   P L A Y / P A U S E
   final audioPlayer = AudioPlayer(); // Audio player instance
   var isPlaying = false.obs; // Track playback state
   var currentlyPlayingIndex = (-1).obs; // Track the currently playing alarm
@@ -236,7 +247,7 @@ class AddAlarmController extends GetxController {
       } else if (recordingPath.isNotEmpty) {
         filePathToPlay = recordingPath;
       } else {
-        Get.snackbar("Error", "No audio file found for this alarm.");
+        Get.snackbar("Error", "No audio file found for this alarm.", duration: const Duration(seconds: 2));
         return;
       }
 
@@ -249,20 +260,23 @@ class AddAlarmController extends GetxController {
         // Handle errors (e.g., file not found)
         isPlaying.value = false;
         currentlyPlayingIndex.value = -1;
-        Get.snackbar("Error", "Failed to play audio: $e");
+        Get.snackbar("Error", "Failed to play audio: $e", duration: const Duration(seconds: 2));
       }
     }
   }
+  /// E N D   M U S I C   P L A Y / P A U S E
 
-  // Stop Music
+  /// S T O P   M U S I C
   Future<void> stopMusic() async {
     if (audioPlayer.playing) {
       await audioPlayer.stop(); // Stop the music playback
     }
     isPlaying.value = false; // Update the playback state
   }
+  /// E N D   S T O P   M U S I C
 
-  /// Save an alarm to the SQLite database
+  ///  D A T A B A S E   S E R V I C E S
+  // Save alarm to Database
   Future<void> saveAlarmToDatabase() async {
     final dbHelper = DBHelperAlarm();
     final newAlarm = Alarm(
@@ -286,22 +300,21 @@ class AddAlarmController extends GetxController {
       final id = await dbHelper.insertAlarm(newAlarm);
       newAlarm.id = id; // Assign the database ID to the alarm
       alarms.add(newAlarm);
-      Get.snackbar("Success", "Alarm saved successfully!");
+      Get.snackbar("Success", "Alarm saved successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to save alarm: $e");
+      Get.snackbar("Error", "Failed to save alarm: $e", duration: const Duration(seconds: 2));
     }
   }
-
-  /// Fetch alarms from the SQLite database
+  // Fetch alarms from the database
   Future<void> fetchAlarmsFromDatabase() async {
     final dbHelper = DBHelperAlarm();
     try {
       alarms.value = await dbHelper.fetchAlarms();
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch alarms: $e");
+      Get.snackbar("Error", "Failed to fetch alarms: $e", duration: const Duration(seconds: 2));
     }
   }
-
+  // Update alarms from the database
   Future<void> updateAlarmInDatabase(Alarm existingAlarm) async {
     final dbHelper = DBHelperAlarm();
     final updatedAlarm = Alarm(
@@ -325,24 +338,23 @@ class AddAlarmController extends GetxController {
     try {
       await dbHelper.updateAlarm(updatedAlarm); // Update the alarm in the database
       fetchAlarmsFromDatabase(); // Refresh the list of alarms
-      Get.snackbar("Success", "Alarm updated successfully!");
+      Get.snackbar("Success", "Alarm updated successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to update alarm: $e");
+      Get.snackbar("Error", "Failed to update alarm: $e", duration: const Duration(seconds: 2));
     }
   }
-
-
-  /// Delete an alarm from the SQLite database
+  // Delete an alarm from the SQLite database
   Future<void> deleteAlarmFromDatabase(int id) async {
     final dbHelper = DBHelperAlarm();
     try {
       await dbHelper.deleteAlarm(id);
       alarms.removeWhere((alarm) => alarm.id == id);
-      Get.snackbar("Success", "Alarm deleted successfully!");
+      Get.snackbar("Success", "Alarm deleted successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to delete alarm: $e");
+      Get.snackbar("Error", "Failed to delete alarm: $e", duration: const Duration(seconds: 2));
     }
   }
+  /// E N D   D A T A B A S E   S E R V I C E S
 
   // Reset fields after saving
   void resetFields() {
@@ -354,59 +366,6 @@ class AddAlarmController extends GetxController {
     selectedSnoozeDuration.value = 5;
     isVibrationEnabled.value = false;
     volume.value = 0.5;
-  }
-
-
-  // Alarm Screen Method
-  void toggleAlarm(int index) {
-    alarms[index].isToggled.value = !alarms[index].isToggled.value;
-    alarms.refresh(); // Notify the UI to rebuild
-  }
-
-  // Selection mode on the Alarm Screen
-  var isSelectionMode = false.obs;
-  var selectedAlarms = <int>[].obs;
-
-  // Enable selection mode
-  void enableSelectionMode(int index) {
-    isSelectionMode.value = true;
-    selectedAlarms.add(index);
-  }
-
-  // Toggle selection
-  void toggleSelection(int index) {
-    if (selectedAlarms.contains(index)) {
-      selectedAlarms.remove(index);
-    } else {
-      selectedAlarms.add(index);
-    }
-  }
-
-  // Exit selection mode
-  void exitSelectionMode() {
-    isSelectionMode.value = false;
-    selectedAlarms.clear();
-  }
-
-  // Delete selected alarms
-  Future<void> deleteSelectedAlarms() async {
-    final dbHelper = DBHelperAlarm(); // Instantiate the database helper
-
-    // Loop through selected alarms and delete them from the database
-    for (int index in selectedAlarms) {
-      final alarm = alarms[index]; // Get the alarm at the selected index
-      if (alarm.id != null) {
-        await dbHelper.deleteAlarm(alarm.id!); // Delete the alarm from the database
-      }
-    }
-
-    // Remove the alarms from the local list
-    alarms.removeWhere((alarm) => selectedAlarms.contains(alarms.indexOf(alarm)));
-
-    // Exit selection mode and clear the selection
-    exitSelectionMode();
-
-    Get.snackbar("Success", "Selected alarms deleted successfully!");
   }
 
 
@@ -427,79 +386,5 @@ class AddAlarmController extends GetxController {
   }
 }
 
-// Alarm model
-// Alarm model
-class Alarm {
-  int? id; // Nullable for database ID
-  int hour;
-  int minute;
-  bool isAm;
-  String label;
-  String backgroundTitle;
-  String backgroundImage;
-  String musicPath;
-  String recordingPath;
-  List<String> repeatDays;
-  bool isVibrationEnabled;
-  int snoozeDuration; // New field for snooze duration
-  double volume; // New field for volume
-  RxBool isToggled;
 
-  Alarm({
-    this.id,
-    required this.hour,
-    required this.minute,
-    required this.isAm,
-    required this.label,
-    required this.backgroundTitle,
-    required this.backgroundImage,
-    required this.musicPath,
-    required this.recordingPath,
-    required this.repeatDays,
-    this.isVibrationEnabled = false,
-    this.snoozeDuration = 5, // Default snooze duration is 5 minutes
-    this.volume = 0.5, // Default volume is 50%
-    bool isToggled = false,
-  }) : isToggled = isToggled.obs;
-
-  /// Convert Alarm object to a Map for SQLite
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'hour': hour,
-      'minute': minute,
-      'isAm': isAm ? 1 : 0, // Store bool as int
-      'label': label,
-      'backgroundTitle': backgroundTitle,
-      'backgroundImage': backgroundImage,
-      'musicPath': musicPath,
-      'recordingPath': recordingPath,
-      'repeatDays': repeatDays.join(','), // Convert list to comma-separated string
-      'isVibrationEnabled': isVibrationEnabled ? 1 : 0,
-      'snoozeDuration': snoozeDuration,
-      'volume': volume,
-      'isToggled': isToggled.value ? 1 : 0, // Store RxBool as int
-    };
-  }
-
-  /// Create Alarm object from Map
-  factory Alarm.fromMap(Map<String, dynamic> map) {
-    return Alarm(
-      id: map['id'],
-      hour: map['hour'],
-      minute: map['minute'],
-      isAm: map['isAm'] == 1,
-      label: map['label'],
-      backgroundTitle: map['backgroundTitle'],
-      backgroundImage: map['backgroundImage'],
-      musicPath: map['musicPath'],
-      recordingPath: map['recordingPath'],
-      repeatDays: (map['repeatDays'] as String).split(','),
-      isVibrationEnabled: map['isVibrationEnabled'] == 1,
-      snoozeDuration: map['snoozeDuration'],
-      volume: map['volume'],
-      isToggled: map['isToggled'] == 1,
-    );
-  }
-}
 

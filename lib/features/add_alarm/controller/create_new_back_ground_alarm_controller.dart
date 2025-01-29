@@ -132,37 +132,56 @@ class CreateAlarmController extends GetxController {
 
   // Start Recording
   Future<void> toggleRecording() async {
-    if (isMicDisabled.value) {
-      recordingHoverMessage.value = "Music is selected. Reset to enable mic recording.";
-      return;
-    }
-
-    if (isRecording.value) {
-      String? filePath = await audioRecorder.stop();
-      if (filePath != null) {
-        recordingPath.value = filePath;
-        playerController.preparePlayer(
-          path: filePath,
-          shouldExtractWaveform: true, // Ensure waveform data is extracted
-        );
-        isRecording.value = false;
-        isMusicDisabled.value = true;
-        recordingHoverMessage.value = "Recording saved successfully."; // Update hover message
+    try {
+      if (isMicDisabled.value) {
+        recordingHoverMessage.value = "Music is selected. Reset to enable mic recording.";
+        return;
       }
-    } else {
-      if (await audioRecorder.hasPermission()) {
-        final Directory appDocumentsDir =
-        await getApplicationDocumentsDirectory();
-        final String fileName =
-            'recording_${DateTime.now().millisecondsSinceEpoch}.wav';
+
+      if (isRecording.value) {
+        String? filePath = await audioRecorder.stop();
+        if (filePath != null) {
+          recordingPath.value = filePath;
+
+          // Ensure the file exists before attempting playback
+          if (await File(filePath).exists()) {
+            playerController.preparePlayer(
+              path: filePath,
+              shouldExtractWaveform: true, // Ensure waveform data is extracted
+            );
+            isRecording.value = false;
+            isMusicDisabled.value = true;
+            recordingHoverMessage.value = "Recording saved successfully.";
+          } else {
+            recordingHoverMessage.value = "Recording file not found!";
+          }
+        }
+      } else {
+        if (!await audioRecorder.hasPermission()) {
+          recordingHoverMessage.value = "Permission denied for recording!";
+          return;
+        }
+
+        final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+        final String fileName = 'recording_${DateTime.now().millisecondsSinceEpoch}.wav';
         final String filePath = path.join(appDocumentsDir.path, fileName);
+
+        // Check if the directory exists, create if not
+        if (!await appDocumentsDir.exists()) {
+          await appDocumentsDir.create(recursive: true);
+        }
+
         await audioRecorder.start(const RecordConfig(), path: filePath);
         isRecording.value = true;
         musicPath.value = null;
         recordingHoverMessage.value = "Recording started.";
       }
+    } catch (e) {
+      log("Error in recording: $e");
+      recordingHoverMessage.value = "Error starting/stopping recording.";
     }
   }
+
   /// -- E N D   R E C O R D I N G
 
   /// -- P L A Y    R E C O R D I N G

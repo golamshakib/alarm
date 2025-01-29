@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/common/widgets/custom_text.dart';
 import '../add_alarm/presentation/screens/add_alarm_screen.dart';
-import 'alarm_showing_screen.dart';
+import 'alarm_trigger_screen.dart';
 import 'package:alarm/features/settings/controller/settings_controller.dart';
 
 class AlarmScreen extends StatelessWidget {
@@ -145,7 +145,7 @@ class AlarmScreen extends StatelessWidget {
                           controller.enableSelectionMode(index);
                         },
                         onDoubleTap: () {
-                          Get.to(() => AlarmShowingScreen(
+                          Get.to(() => AlarmTriggerScreen(
                             alarm: alarm,
                           ));
                         },

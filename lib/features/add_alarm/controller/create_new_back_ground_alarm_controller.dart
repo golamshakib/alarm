@@ -264,7 +264,7 @@ class CreateAlarmController extends GetxController {
 
       resetFields(); // Reset fields
 
-        Get.offNamed(AppRoute.changeBackgroundScreen, arguments: result);
+        Get.offNamed(AppRoute.localBackgroundScreen, arguments: result);
 
     } catch (e) {
       log('Error saving data: $e');

@@ -1,3 +1,4 @@
+import 'package:alarm/features/add_alarm/presentation/screens/local_background_screen.dart';
 import 'package:alarm/features/nav_bar/presentation/screens/nav_bar.dart';
 import 'package:alarm/features/splash_screen/presentation/screens/onboarding1.dart';
 import 'package:alarm/features/splash_screen/presentation/screens/onboarding2.dart';
@@ -15,6 +16,7 @@ class AppRoute {
   static String onboarding3 = "/onboarding3";
   static String navBarScreen = "/navBarScreen";
   static String changeBackgroundScreen = "/changeBackgroundScreen";
+  static String localBackgroundScreen = "/localBackgroundScreen";
   static String createNewAlarmScreen = "/createNewAlarmScreen";
 
 
@@ -26,6 +28,7 @@ class AppRoute {
     GetPage(name: navBarScreen, page: () => const CreatorNavBar()),
 
     GetPage(name: changeBackgroundScreen, page: () => const ChangeBackGroundAlarm()),
+    GetPage(name: localBackgroundScreen, page: () => const LocalBackgroundScreen()),
     GetPage(name: createNewAlarmScreen, page: () => const CreateNewBackgroundScreen()),
   ];
 }

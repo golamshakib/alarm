@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:alarm/core/utils/constants/app_colors.dart';
-import 'package:alarm/features/add_alarm/presentation/screens/local_storage_preview_screen.dart';
 import 'package:alarm/features/add_alarm/presentation/screens/preview_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,23 +6,16 @@ import 'package:get/get.dart';
 import '../../../../core/common/widgets/custom_appbar_with_logo.dart';
 import '../../../../core/common/widgets/custom_text.dart';
 import '../../../../core/utils/constants/app_sizes.dart';
-import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
-import '../../../../core/utils/helpers/db_helper_local_music.dart';
 import '../../../../routes/app_routes.dart';
 import '../../controller/change_back_ground_controller.dart';
-import '../../controller/create_new_back_ground_alarm_controller.dart';
 
 class ChangeBackGroundAlarm extends StatelessWidget {
   const ChangeBackGroundAlarm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ChangeBackgroundController controller =
-        Get.put(ChangeBackgroundController());
-    final CreateAlarmController createAlarmController =
-        Get.put(CreateAlarmController());
-    final DBHelperMusic dbHelper = DBHelperMusic();
+    final ChangeBackgroundController controller = Get.put(ChangeBackgroundController());
 
     return Scaffold(
       body: SafeArea(
@@ -34,167 +24,54 @@ class ChangeBackGroundAlarm extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomAppbarWithLogo(
+              const CustomAppbarWithLogo(
                 text: "Change background",
-                showBackIcon: true,
-                iconPath: IconPath.addIconActive,
-                onIconTap: () async {
-                  createAlarmController.stopMusic();
-                  final result =
-                      await Get.toNamed(AppRoute.createNewAlarmScreen);
-                  if (result != null && createAlarmController.items.isEmpty) {
-                    createAlarmController.addItem(
-                        result); // Add the returned result to the items list
-                  }
+                showBackIcon: true,),
+              SizedBox(height: getHeight(24)),
+              InkWell(
+                onTap: (){
+                  Get.toNamed(AppRoute.localBackgroundScreen);
                 },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomText(text: 'Local Background', fontSize: getWidth(18)),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: getWidth(16),
+                      color: AppColors.textGrey,
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: getHeight(24)),
 
               // First ListView for `items`
               Expanded(
-                child: Obx(() {
-                  if (controller.items.isEmpty) {
-                    return const Center(child: CustomText(text: 'No Backgrounds Found'));
-                  }
-                  return ListView.separated(
-                    itemCount: controller.items.length,
-                    separatorBuilder: (_, __) => SizedBox(height: getHeight(12)),
-                    itemBuilder: (context, index) {
-                      final item = controller.items[index];
-                      return GestureDetector(
-                        onTap: () {
-                          controller.stopMusic();
-                          Get.to(() => PreviewScreen(
-                            title: item['title'] ?? '',
-                            imagePath: item['imagePath'] ?? '',
-                            musicPath: item['musicPath'] ?? '',
-                          ));
-                        },
-                        child: Stack(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              decoration: const BoxDecoration(
-                                color: Color(0xffF7F7F7),
-                                borderRadius: BorderRadius.all(Radius.circular(8)),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        controller.togglePlay(index);
-                                      },
-                                      child: Obx(() {
-                                        return Icon(
-                                          controller.isPlaying[index]
-                                          ? Icons.play_circle_fill_rounded
-                                          : Icons.play_circle_outline_rounded,
-                                          color: Colors.orange,
-                                          size: 25,
-                                        );
-                                      }),
-                                    ),
-                                    SizedBox(height: getHeight(16)),
-                                    CustomText(
-                                      text: item['title'] ?? '',
-                                      fontSize: getWidth(14),
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xff333333),
-                                      textOverflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: Container(
-                                width: getWidth(100), // Set the width for the right-side image
-                                height: getHeight(120), // Set the height for the right-side image
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    bottomRight: Radius.circular(10),
-                                    topRight: Radius.circular(10),
-                                  ),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    bottomRight: Radius.circular(10),
-                                    topRight: Radius.circular(10),
-                                  ),
-                                  child: Image.network(
-                                    item['imagePath'] ?? '', // Network image URL
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      // Fallback image in case of error
-                                      return Image.asset(
-                                        ImagePath.cat, // Replace with your fallback asset image path
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                }),
-              ),
-              SizedBox(height: getHeight(24)),
-              CustomText(text: 'Local Background', fontSize: getWidth(18)),
-              SizedBox(height: getHeight(24)),
-              Expanded(
-                child: Obx(
-                      () => createAlarmController.items.isEmpty
-                      ? const Center(child: CustomText(text: 'No Background available'))
-                      : ListView.separated(
-                    itemCount: createAlarmController.items.length,
-                    separatorBuilder: (_, __) => SizedBox(
-                      height: getHeight(12),
-                    ),
-                    itemBuilder: (context, index) {
-                      final item = createAlarmController.items[index];
-                      return Dismissible(
-                        key: UniqueKey(),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          color: Colors.red,
-                          padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
-                          child: const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        onDismissed: (direction) async {
-                          final confirmed =
-                          await showDeleteConfirmationPopup(context);
-                          if (confirmed) {
-                            final id = item['id'];
-                            await dbHelper.deleteBackground(id);
-                            createAlarmController.items.removeAt(index);
-                            Get.snackbar("Success", "Background deleted successfully!",
-                                duration: const Duration(seconds: 2));
-                          } else {
-                            createAlarmController.items.refresh();
-                          }
-                        },
-                        child: GestureDetector(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await controller
+                        .fetchBackgroundsFromNetwork(); // Reload custom backgrounds
+                  },
+                  child: Obx(() {
+                    if (controller.items.isEmpty) {
+                      return const Center(
+                          child: CustomText(text: 'No Backgrounds Found'));
+                    }
+                    return ListView.separated(
+                      itemCount: controller.items.length,
+                      separatorBuilder: (_, __) =>
+                          SizedBox(height: getHeight(12)),
+                      itemBuilder: (context, index) {
+                        final item = controller.items[index];
+                        return GestureDetector(
                           onTap: () {
-                            createAlarmController.stopMusic();
-                            Get.to(
-                                  () => LocalStoragePreviewScreen(
-                                id: item['id'],
-                                title: item['title'] ?? '',
-                                imagePath: item['imagePath'] ?? '',
-                                musicPath: item['musicPath'] ?? '',
-                                recordingPath: item['recordingPath'] ?? '',
-                              ),
-                            );
+                            controller.stopMusic();
+                            Get.to(() => PreviewScreen(
+                                  title: item['title'] ?? '',
+                                  imagePath: item['imagePath'] ?? '',
+                                  musicPath: item['musicPath'] ?? '',
+                                ));
                           },
                           child: Stack(
                             children: [
@@ -202,33 +79,29 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                 width: double.infinity,
                                 decoration: const BoxDecoration(
                                   color: Color(0xffF7F7F7),
-                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       GestureDetector(
                                         onTap: () {
-                                          createAlarmController.playMusic(index);
+                                          controller.togglePlay(index);
                                         },
-                                        child: Row(
-                                          children: [
-                                            Obx(() {
-                                              return Icon(
-                                                createAlarmController.isPlaying.value &&
-                                                    createAlarmController
-                                                        .playingIndex.value ==
-                                                        index
-                                                    ? Icons.play_circle_fill_rounded
-                                                    : Icons.play_circle_outline_rounded,
-                                                color: Colors.orange,
-                                                size: 25,
-                                              );
-                                            }),
-                                          ],
-                                        ),
+                                        child: Obx(() {
+                                          return Icon(
+                                            controller.isPlaying[index]
+                                                ? Icons.play_circle_fill_rounded
+                                                : Icons
+                                                    .play_circle_outline_rounded,
+                                            color: Colors.orange,
+                                            size: 25,
+                                          );
+                                        }),
                                       ),
                                       SizedBox(height: getHeight(16)),
                                       CustomText(
@@ -246,72 +119,46 @@ class ChangeBackGroundAlarm extends StatelessWidget {
                                 top: 0,
                                 right: 0,
                                 child: Container(
-                                  key: ValueKey(item['imagePath']), // Use a ValueKey for the image
-                                  padding: const EdgeInsets.all(50),
-                                  decoration: BoxDecoration(
+                                  width: getWidth(100),
+                                  height: getHeight(120),
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      bottomRight: Radius.circular(10),
+                                      topRight: Radius.circular(10),
+                                    ),
+                                  ),
+                                  child: ClipRRect(
                                     borderRadius: const BorderRadius.only(
                                       bottomRight: Radius.circular(10),
                                       topRight: Radius.circular(10),
                                     ),
-                                    image: DecorationImage(
-                                      image: item['imagePath'] != null
-                                          ? FileImage(File(item['imagePath']!))
-                                          : const AssetImage(ImagePath.cat)
-                                      as ImageProvider,
+                                    child: Image.network(
+                                      item['imagePath'] ?? '',
                                       fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          ImagePath.cat,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    );
+                  }),
                 ),
-              )
+              ),
+              SizedBox(height: getHeight(24)),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Future<bool> showDeleteConfirmationPopup(BuildContext context) async {
-    return await showDialog<bool>(
-          context: context,
-          barrierDismissible: false, // Prevent dismissal by tapping outside
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: CustomText(
-                text: "Delete Background",
-                fontSize: getWidth(18),
-              ),
-              content: CustomText(
-                text: "Are you sure you want to delete this background?",
-                color: AppColors.textPrimary.withOpacity(0.5),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  // Cancel action
-                  child: CustomText(
-                      text: "Cancel",
-                      color: AppColors.textPrimary.withOpacity(0.5)),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  // Confirm action
-                  child: const CustomText(
-                    text: "Delete",
-                    color: Colors.red,
-                  ),
-                ),
-              ],
-            );
-          },
-        ) ??
-        false; // Return false if dialog is dismissed without action
   }
 }

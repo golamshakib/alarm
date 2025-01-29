@@ -9,6 +9,7 @@ import 'package:volume_controller/volume_controller.dart';
 
 
 import '../../../core/utils/helpers/db_helper_alarm.dart';
+import '../../alarm_notification/notification_helper.dart';
 import '../../settings/controller/settings_controller.dart';
 import '../data/alarm_model.dart';
 
@@ -144,7 +145,7 @@ class AddAlarmController extends GetxController {
 
   /// S N O O Z E   D U R A T I O N
   var selectedSnoozeDuration = 5.obs; // Default snooze duration (5 minutes)
-  final List<int> snoozeOptions = [5, 10, 15, 20, 25, 30];
+  final List<int> snoozeOptions = [1, 5, 10, 15, 20, 25, 30];
 
   void updateSnoozeDuration(int duration) {
     selectedSnoozeDuration.value = duration;
@@ -286,7 +287,7 @@ class AddAlarmController extends GetxController {
       label: label.value.isEmpty ? 'Morning Alarm' : label.value,
       backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
-      musicPath: selectedMusicPath.value,
+      musicPath: selectedMusicPath.value, // Custom sound path from database
       recordingPath: selectedRecordingPath.value,
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
@@ -296,15 +297,42 @@ class AddAlarmController extends GetxController {
       snoozeDuration: selectedSnoozeDuration.value,
       volume: volume.value,
     );
+
     try {
       final id = await dbHelper.insertAlarm(newAlarm);
-      newAlarm.id = id; // Assign the database ID to the alarm
+      newAlarm.id = id; // Assign database ID
       alarms.add(newAlarm);
-      Get.snackbar("Success", "Alarm saved successfully!", duration: const Duration(seconds: 2));
+
+      // Convert time into DateTime format
+      DateTime now = DateTime.now();
+      DateTime alarmTime;
+
+      if (newAlarm.isAm && newAlarm.hour == 12) {
+        alarmTime = DateTime(now.year, now.month, now.day, 0, newAlarm.minute);
+      } else if (!newAlarm.isAm && newAlarm.hour < 12) {
+        alarmTime = DateTime(now.year, now.month, now.day, newAlarm.hour + 12, newAlarm.minute);
+      } else {
+        alarmTime = DateTime(now.year, now.month, now.day, newAlarm.hour, newAlarm.minute);
+      }
+
+      // Schedule notification (without sound)
+      await NotificationHelper.scheduleAlarm(
+        id: id,
+        title: "Alarm",
+        body: newAlarm.label,
+        // imagePath: newAlarm.backgroundImage,
+        // soundPath: newAlarm.musicPath, // This will be used in AlarmTriggerScreen
+        scheduledTime: alarmTime,
+      );
+
+      Get.snackbar("Success", "Alarm saved Successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to save alarm: $e", duration: const Duration(seconds: 2));
+      Get.snackbar("Error", "Failed to Save Alarm: $e", duration: const Duration(seconds: 5));
     }
   }
+
+
+
   // Fetch alarms from the database
   Future<void> fetchAlarmsFromDatabase() async {
     final dbHelper = DBHelperAlarm();

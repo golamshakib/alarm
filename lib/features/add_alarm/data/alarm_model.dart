@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:get/get.dart';
 
 class Alarm {
@@ -24,10 +22,10 @@ class Alarm {
     required this.musicPath,
     required this.recordingPath,
     required this.repeatDays,
-    this.isVibrationEnabled = false,
+    this.isVibrationEnabled = true,
     this.snoozeDuration = 5,
     this.volume = 0.5,
-    bool isToggled = false,
+    bool isToggled = true,
   }) : isToggled = isToggled.obs;
 
   Map<String, dynamic> toMap() => {
@@ -61,7 +59,7 @@ class Alarm {
     isVibrationEnabled: map['isVibrationEnabled'] == 1,
     snoozeDuration: map['snoozeDuration'],
     volume: map['volume'],
-    isToggled: map['isToggled'] == 1,
+    isToggled: (map['isToggled'] == 1.obs),
   );
 
 

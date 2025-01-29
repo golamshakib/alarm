@@ -102,6 +102,12 @@ class NotificationHelper {
     print("Alarm scheduled for: $scheduledDate with ID: $id");
   }
 
+  /// **Cancel a Scheduled Alarm Notification**
+  static Future<void> cancelAlarm(int id) async {
+    await flutterLocalNotificationsPlugin.cancel(id);
+    print("Alarm with ID: $id has been canceled.");
+  }
+
   /// **Snooze the Alarm (Re-Schedule After Snooze Duration)**
   static Future<void> snoozeAlarm({required Alarm alarm}) async {
     // Calculate the new time for the snoozed alarm

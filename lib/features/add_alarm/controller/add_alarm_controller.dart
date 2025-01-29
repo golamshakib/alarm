@@ -296,6 +296,7 @@ class AddAlarmController extends GetxController {
       isVibrationEnabled: isVibrationEnabled.value,
       snoozeDuration: selectedSnoozeDuration.value,
       volume: volume.value,
+      isToggled: true,
     );
 
     try {
@@ -305,15 +306,7 @@ class AddAlarmController extends GetxController {
 
       // Convert time into DateTime format
       DateTime now = DateTime.now();
-      DateTime alarmTime;
-
-      if (newAlarm.isAm && newAlarm.hour == 12) {
-        alarmTime = DateTime(now.year, now.month, now.day, 0, newAlarm.minute);
-      } else if (!newAlarm.isAm && newAlarm.hour < 12) {
-        alarmTime = DateTime(now.year, now.month, now.day, newAlarm.hour + 12, newAlarm.minute);
-      } else {
-        alarmTime = DateTime(now.year, now.month, now.day, newAlarm.hour, newAlarm.minute);
-      }
+      DateTime alarmTime = calculateNextAlarmTime(newAlarm, now);
 
       // Schedule notification (without sound)
       await NotificationHelper.scheduleAlarm(
@@ -333,15 +326,54 @@ class AddAlarmController extends GetxController {
 
 
 
-  // Fetch alarms from the database
+  /// **Fetch Alarms from Database**
   Future<void> fetchAlarmsFromDatabase() async {
     final dbHelper = DBHelperAlarm();
     try {
       alarms.value = await dbHelper.fetchAlarms();
+      // alarms.refresh();
+
+      for (var alarm in alarms) {
+        if (alarm.isToggled.value) {
+          DateTime nextAlarmTime = calculateNextAlarmTime(alarm, DateTime.now());
+          await NotificationHelper.scheduleAlarm(
+            id: alarm.id!,
+            title: "Alarm",
+            body: alarm.label,
+            scheduledTime: nextAlarmTime,
+          );
+          print("Rescheduled Alarm for: $nextAlarmTime");
+        }
+      }
     } catch (e) {
       Get.snackbar("Error", "Failed to fetch alarms: $e", duration: const Duration(seconds: 2));
     }
   }
+
+  /// **Calculate the next valid alarm time**
+  DateTime calculateNextAlarmTime(Alarm alarm, DateTime now) {
+    DateTime alarmTime = DateTime(now.year, now.month, now.day, alarm.hour, alarm.minute);
+
+    // If the time is in the past, move to the next valid occurrence
+    if (alarmTime.isBefore(now)) {
+      alarmTime = alarmTime.add(const Duration(days: 1));
+    }
+
+    // If repeatDays exist, find the next valid day
+    while (!alarm.repeatDays.contains(_dayOfWeek(alarmTime))) {
+      alarmTime = alarmTime.add(const Duration(days: 1));
+    }
+
+    return alarmTime;
+  }
+
+  /// **Convert DateTime weekday to String (e.g., "Mon", "Tue")**
+  String _dayOfWeek(DateTime date) {
+    return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.weekday % 7];
+  }
+
+
+
   // Update alarms from the database
   Future<void> updateAlarmInDatabase(Alarm existingAlarm) async {
     final dbHelper = DBHelperAlarm();

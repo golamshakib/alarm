@@ -59,7 +59,7 @@ class Alarm {
     isVibrationEnabled: map['isVibrationEnabled'] == 1,
     snoozeDuration: map['snoozeDuration'],
     volume: map['volume'],
-    isToggled: (map['isToggled'] == 1.obs),
+    isToggled: map['isToggled'] == 1,
   );
 
 

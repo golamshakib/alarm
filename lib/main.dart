@@ -8,5 +8,6 @@ void main() async {
   await NotificationHelper.initializeNotifications();
   await NotificationHelper.requestNotificationPermissions(); // Request permissions
   await AuthService.init();
+
   runApp(const MyApp());
 }

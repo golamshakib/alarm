@@ -42,42 +42,29 @@ class PreviewScreen extends StatelessWidget {
                   onIconTap: () {},
                 ),
                 SizedBox(height: getHeight(24)),
-                Row(
-                  children: [
-                    Flexible(child: CustomText(text: title)),
-                    const CustomText(text: ' :'),
-                    SizedBox(width: getWidth(8)),
-                    Obx(() {
-                      return GestureDetector(
-                        onTap: controller.togglePlay,
-                        child: Icon(
-                          controller.isPlaying.value
-                              ? Icons.play_circle_fill_rounded
-                              : Icons.play_circle_outline_rounded,
-                          color: Colors.orange,
-                          size: 25,
-                        ),
-                      );
-                    }),
-                    SizedBox(width: getWidth(10)),
-                    // Obx(() {
-                    //   return controller.showExtraImage.value
-                    //       ? Image.asset(
-                    //     musicPath,
-                    //     height: getHeight(25),
-                    //     width: getWidth(75),
-                    //   )
-                    //       : const SizedBox();
-                    // }),
-                  ],
-                ),
+                Flexible(child: CustomText(text: title)),
+                const CustomText(text: ' :'),
+                SizedBox(width: getWidth(8)),
+                Obx(() {
+                  return GestureDetector(
+                    onTap: controller.togglePlay,
+                    child: Icon(
+                      controller.isPlaying.value
+                          ? Icons.play_circle_fill_rounded
+                          : Icons.play_circle_outline_rounded,
+                      color: Colors.orange,
+                      size: 25,
+                    ),
+                  );
+                }),
+                SizedBox(width: getWidth(10)),
                 SizedBox(height: getHeight(16)),
 
                 // Image Preview
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    imagePath,
+                    imagePath ,
                     width: double.infinity,
                     fit: BoxFit.contain,
                   ),

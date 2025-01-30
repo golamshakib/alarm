@@ -178,6 +178,7 @@ class CreateAlarmController extends GetxController {
       }
     } catch (e) {
       log("Error in recording: $e");
+      print("Error in recording: $e");
       recordingHoverMessage.value = "Error starting/stopping recording.";
     }
   }

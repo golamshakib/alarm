@@ -56,6 +56,7 @@ dependencies:
   sqflite: ^2.4.1
   flutter_local_notifications: ^18.0.1
   flutter_timezone: ^4.0.0
+  wakelock_plus: ^1.2.10
 
 
 

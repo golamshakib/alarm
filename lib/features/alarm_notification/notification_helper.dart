@@ -51,16 +51,18 @@ class NotificationHelper {
   /// **Request Notification Permissions (For Android 13+)**
   static Future<void> requestNotificationPermissions() async {
     final status = await Permission.notification.request();
+    final overlayStatus = await Permission.systemAlertWindow.request();
 
-    if (status.isDenied) {
-      print("User denied notification permissions.");
-    } else if (status.isPermanentlyDenied) {
+    if (status.isDenied || overlayStatus.isDenied) {
+      print("User denied notification or overlay permissions.");
+    } else if (status.isPermanentlyDenied || overlayStatus.isPermanentlyDenied) {
       print("User permanently denied notifications. Open settings to enable.");
       openAppSettings(); // Open settings if permanently denied
     } else {
-      print("Notification permissions granted!");
+      print("Notification and overlay permissions granted!");
     }
   }
+
 
   /// **Schedule a Full-Screen Alarm Notification**
   static Future<void> scheduleAlarm({

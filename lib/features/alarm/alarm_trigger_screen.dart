@@ -4,8 +4,10 @@ import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import '../add_alarm/controller/add_alarm_controller.dart';
 import '../add_alarm/data/alarm_model.dart';
 import '../alarm_notification/notification_helper.dart';
@@ -26,6 +28,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     _playAlarmSound(); // Manually play alarm sound
     _triggerVibration();
   }
@@ -234,6 +237,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   @override
   void dispose() {
     _audioPlayer.dispose();
+    WakelockPlus.disable(); // Allow screen to turn off when alarm is dismissed
     super.dispose();
   }
 }

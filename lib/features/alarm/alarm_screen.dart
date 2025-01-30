@@ -45,7 +45,7 @@ class AlarmScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(getWidth(16)),
+          padding: EdgeInsets.symmetric(vertical: getHeight(16), horizontal: getWidth(16)),
           child: Obx(() {
             if (addAlarmController.alarms.isEmpty) {
               return Center(
@@ -96,6 +96,7 @@ class AlarmScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    SizedBox(height: getHeight(16)),
                                     CustomText(
                                       text: controller.isSelectionMode.value
                                           ? '${controller.selectedAlarms.length} Item Selected'

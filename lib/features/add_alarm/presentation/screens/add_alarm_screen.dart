@@ -61,7 +61,6 @@ class AddAlarmScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 // App Bar
                 CustomAppbarWithLogo(
                   text: isEditMode ? 'Edit Alarm' : 'Add Alarm',

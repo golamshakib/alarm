@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -205,8 +206,8 @@ class AddAlarmController extends GetxController {
 
   /// S E T   B A C K G R O U N D
   var selectedBackground = "Cute Dog in bed".obs;
-  var selectedBackgroundImage = "assets/images/dog.png".obs;
-  var selectedMusicPath = ''.obs;
+  var selectedBackgroundImage = ImagePath.cat.obs;
+  var selectedMusicPath = 'assets/audio/iphone_alarm.mp3'.obs;
   var selectedRecordingPath = ''.obs;
 
   // Update background

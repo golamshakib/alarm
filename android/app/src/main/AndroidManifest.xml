@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Optional: Add this permission if you want to use bluetooth telephony device like headset/earbuds -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- Optional: Add this permission if you want to save your recordings in public folders -->
@@ -78,7 +79,6 @@
             android:showOnLockScreen="true"
             android:turnScreenOn="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>

@@ -145,11 +145,11 @@ class AlarmScreen extends StatelessWidget {
                         onLongPress: () {
                           controller.enableSelectionMode(index);
                         },
-                        onDoubleTap: () {
-                          Get.to(() => AlarmTriggerScreen(
-                            alarm: alarm,
-                          ));
-                        },
+                        // onDoubleTap: () {
+                        //   Get.to(() => AlarmTriggerScreen(
+                        //     alarm: alarm,
+                        //   ));
+                        // },
                         onTap: () {
                           if (controller.isSelectionMode.value) {
                             controller.toggleSelection(index);

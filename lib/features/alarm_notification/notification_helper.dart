@@ -37,10 +37,10 @@ class NotificationHelper {
           int alarmId = int.tryParse(response.payload!) ?? -1;
           if (alarmId != -1) {
             final alarm = alarmController.alarms.firstWhereOrNull((a) => a.id == alarmId);
-            if (alarm != null) {
+            if (alarm != null && alarm.isToggled.value) { // Ensure alarm is enabled
               Get.to(() => AlarmTriggerScreen(alarm: alarm));
             } else {
-              print("Alarm not found in database!");
+              print("Alarm not found or toggled off!");
             }
           }
         }

@@ -227,22 +227,35 @@ class AddAlarmScreen extends StatelessWidget {
                       SizedBox(height: getHeight(16)),
                       Obx(() {
                         final imagePath = controller.selectedBackgroundImage.value;
+
                         if (imagePath.isNotEmpty) {
+                          ImageProvider imageProvider;
+
+                          if (imagePath.startsWith("http") || imagePath.startsWith("https")) {
+                            // If it's a URL, use NetworkImage
+                            imageProvider = NetworkImage(imagePath);
+                          } else if (File(imagePath).existsSync()) {
+                            // If it's a local file, use FileImage
+                            imageProvider = FileImage(File(imagePath));
+                          } else {
+                            // If neither, use a fallback asset
+                            imageProvider = const AssetImage(ImagePath.cat);
+                          }
+
                           return Container(
                             height: getHeight(150),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               image: DecorationImage(
-                                image: File(imagePath).existsSync()
-                                    ? FileImage(File(imagePath)) // Use FileImage for local files
-                                    : const AssetImage(ImagePath.dog) as ImageProvider, // Fallback asset
+                                image: imageProvider,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           );
                         }
-                        return const SizedBox.shrink(); // If no imagePath, return an empty widget
+                        return const SizedBox.shrink(); // Return an empty widget if no imagePath
                       }),
+
 
                       SizedBox(height: getHeight(24)),
 

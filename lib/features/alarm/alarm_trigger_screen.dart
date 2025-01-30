@@ -30,11 +30,20 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     _triggerVibration();
   }
 
-  /// **Play Alarm Sound**
+  /// **Play Alarm Sound (Supports Network & Local Files)**
   Future<void> _playAlarmSound() async {
-    if (widget.alarm.musicPath.isNotEmpty) {
+    String musicPath = widget.alarm.musicPath;
+    if (musicPath.isNotEmpty) {
       try {
-        await _audioPlayer.setFilePath(widget.alarm.musicPath);
+        if (musicPath.startsWith("http") || musicPath.startsWith("https")) {
+          await _audioPlayer.setUrl(musicPath); // Play from URL
+        } else if (File(musicPath).existsSync()) {
+          await _audioPlayer.setFilePath(musicPath); // Play from local file
+        } else {
+          print("Error: Invalid music path");
+          return;
+        }
+
         await _audioPlayer.setLoopMode(LoopMode.one); // Keep playing until dismissed
         await _audioPlayer.play();
       } catch (e) {
@@ -86,13 +95,16 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine the image source
+    // Determine the image source (Supports Network & Local)
     String backgroundImage = widget.alarm.backgroundImage;
     ImageProvider imageProvider;
-    if (File(backgroundImage).existsSync()) {
-      imageProvider = FileImage(File(backgroundImage));
+
+    if (backgroundImage.startsWith("http") || backgroundImage.startsWith("https")) {
+      imageProvider = NetworkImage(backgroundImage); // Network image
+    } else if (File(backgroundImage).existsSync()) {
+      imageProvider = FileImage(File(backgroundImage)); // Local image
     } else {
-      imageProvider = AssetImage(backgroundImage);
+      imageProvider = const AssetImage("assets/default_alarm_image.png"); // Fallback asset image
     }
 
     return Scaffold(

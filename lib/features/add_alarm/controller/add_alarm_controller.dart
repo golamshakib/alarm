@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -226,43 +227,37 @@ class AddAlarmController extends GetxController {
   var isPlaying = false.obs; // Track playback state
   var currentlyPlayingIndex = (-1).obs; // Track the currently playing alarm
 
-  Future<void> togglePlayPause(int index) async {
-    if (currentlyPlayingIndex.value == index && isPlaying.value) {
-      // Pause the current playback
-      isPlaying.value = false; // Update UI immediately
-      await audioPlayer.pause();
-    } else {
-      // Play a new alarm's music
-      if (currentlyPlayingIndex.value != -1 && isPlaying.value) {
-        await audioPlayer.stop(); // Stop previous playback
-      }
-
-      final musicPath = alarms[index].musicPath;
-      final recordingPath = alarms[index].recordingPath;
-
-      String? filePathToPlay;
-
-      // Check which path is available to play
-      if (musicPath.isNotEmpty) {
-        filePathToPlay = musicPath;
-      } else if (recordingPath.isNotEmpty) {
-        filePathToPlay = recordingPath;
-      } else {
-        Get.snackbar("Error", "No audio file found for this alarm.", duration: const Duration(seconds: 2));
+  Future<void> togglePlayPause(int index, String musicPath) async {
+    try {
+      if (musicPath.isEmpty) {
+        Get.snackbar("Error", "No music file available.", duration: const Duration(seconds: 2));
         return;
       }
 
-      try {
-        currentlyPlayingIndex.value = index; // Update playing index
-        isPlaying.value = true; // Update UI immediately
-        await audioPlayer.setFilePath(filePathToPlay);
-        await audioPlayer.play();
-      } catch (e) {
-        // Handle errors (e.g., file not found)
+      if (currentlyPlayingIndex.value == index && isPlaying.value) {
+        await audioPlayer.pause();
         isPlaying.value = false;
         currentlyPlayingIndex.value = -1;
-        Get.snackbar("Error", "Failed to play audio: $e", duration: const Duration(seconds: 2));
+      } else {
+        await audioPlayer.stop();
+
+        if (musicPath.startsWith("http") || musicPath.startsWith("https")) {
+          // Play from network URL
+          await audioPlayer.setUrl(musicPath);
+        } else if (File(musicPath).existsSync()) {
+          // Play from local file
+          await audioPlayer.setFilePath(musicPath);
+        } else {
+          Get.snackbar("Error", "Invalid music file.", duration: const Duration(seconds: 2));
+          return;
+        }
+
+        currentlyPlayingIndex.value = index;
+        isPlaying.value = true;
+        await audioPlayer.play();
       }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to play music: $e", duration: const Duration(seconds: 2));
     }
   }
   /// E N D   M U S I C   P L A Y / P A U S E

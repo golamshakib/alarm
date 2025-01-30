@@ -161,143 +161,140 @@ class AlarmScreen extends StatelessWidget {
                             );
                           }
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: File(alarm.backgroundImage).existsSync()
-                                  ? FileImage(File(alarm.backgroundImage))
-                                  : const AssetImage(ImagePath.dog) as ImageProvider,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
+                        child: Container(decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: alarm.backgroundImage.startsWith("http") || alarm.backgroundImage.startsWith("https")
+                                ? NetworkImage(alarm.backgroundImage) // Use network image if it's a URL
+                                : File(alarm.backgroundImage).existsSync()
+                                ? FileImage(File(alarm.backgroundImage)) // Use FileImage for local files
+                                : const AssetImage(ImagePath.dog) as ImageProvider, // Fallback asset image
+                            fit: BoxFit.cover,
                           ),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  const Color(0xffFFF5E1),
-                                  const Color(0xffFFF5E1).withOpacity(0.0),
-                                ],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xffFFF5E1),
+                                    const Color(0xffFFF5E1).withOpacity(0.0),
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            addAlarmController.togglePlayPause(index); // Play/pause logic
-                                          },
-                                          child: Obx(() {
-                                            // Dynamically show play/pause icon
-                                            final isPlaying = addAlarmController.isPlaying.value &&
-                                                addAlarmController.currentlyPlayingIndex.value == index;
-                                            return Icon(
-                                              isPlaying
-                                                  ? Icons.play_circle_fill_rounded
-                                                  : Icons.play_circle_outline_rounded,
-                                              color: Colors.orange,
-                                              size: 25,
-                                            );
-                                          }),
-                                        ),
-                                        SizedBox(width: getWidth(12)),
-                                        GestureDetector(
-                                          onTap: () {
-                                            controller.toggleAlarm(index);
-                                          },
-                                          child: Obx(
-                                                () => AnimatedContainer(
-                                              duration:
-                                              const Duration(
-                                                  milliseconds: 300),
-                                              width: getWidth(37),
-                                              height: getHeight(21),
-                                              decoration: BoxDecoration(
-                                                color: alarm.isToggled.value
-                                                    ? const Color(0xffFFAB4C)
-                                                    : const Color(0xffA3B2C7)
-                                                    .withOpacity(0.3),
-                                                borderRadius:
-                                                BorderRadius.circular(30),
-                                              ),
-                                              child: AnimatedAlign(
-                                                duration: const Duration(
-                                                    milliseconds: 300),
-                                                alignment: alarm.isToggled.value
-                                                    ? Alignment.centerRight
-                                                    : Alignment.centerLeft,
-                                                child: Container(
-                                                  width: getWidth(18),
-                                                  height: getHeight(18),
-                                                  decoration:
-                                                  const BoxDecoration(
-                                                    color: Colors.white,
-                                                    shape: BoxShape.circle,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          // 🎵 Play Button (Supports Network & Local Music)
+                                          GestureDetector(
+                                            onTap: () {
+                                              addAlarmController.togglePlayPause(index, alarm.musicPath);
+                                            },
+                                            child: Obx(() {
+                                              final isPlaying = addAlarmController.isPlaying.value &&
+                                                  addAlarmController.currentlyPlayingIndex.value == index;
+                                              return Icon(
+                                                isPlaying
+                                                    ? Icons.play_circle_fill_rounded
+                                                    : Icons.play_circle_outline_rounded,
+                                                color: Colors.orange,
+                                                size: 25,
+                                              );
+                                            }),
+                                          ),
+                                          SizedBox(width: getWidth(12)),
+                                          GestureDetector(
+                                            onTap: () {
+                                              controller.toggleAlarm(index);
+                                            },
+                                            child: Obx(
+                                                  () => AnimatedContainer(
+                                                duration: const Duration(milliseconds: 300),
+                                                width: getWidth(37),
+                                                height: getHeight(21),
+                                                decoration: BoxDecoration(
+                                                  color: alarm.isToggled.value
+                                                      ? const Color(0xffFFAB4C)
+                                                      : const Color(0xffA3B2C7).withOpacity(0.3),
+                                                  borderRadius: BorderRadius.circular(30),
+                                                ),
+                                                child: AnimatedAlign(
+                                                  duration: const Duration(milliseconds: 300),
+                                                  alignment: alarm.isToggled.value
+                                                      ? Alignment.centerRight
+                                                      : Alignment.centerLeft,
+                                                  child: Container(
+                                                    width: getWidth(18),
+                                                    height: getHeight(18),
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    if (controller.isSelectionMode.value)
-                                      Checkbox(
-                                        value: isSelected,
-                                        activeColor: const Color(0xffFFAB4C),
-                                        side: const BorderSide(
-                                          width: 1,
-                                          color: Color(0xffFFAB4C),
-                                        ),
-                                        onChanged: (value) {
-                                          controller.toggleSelection(index);
-                                        },
+                                        ],
                                       ),
-                                  ],
-                                ),
-                                Text(
-                                  formatTime(alarm.hour, alarm.minute, alarm.isAm, addAlarmController.timeFormat.value),                                  style: TextStyle(
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: getWidth(36),
+                                      if (controller.isSelectionMode.value)
+                                        Checkbox(
+                                          value: isSelected,
+                                          activeColor: const Color(0xffFFAB4C),
+                                          side: const BorderSide(
+                                            width: 1,
+                                            color: Color(0xffFFAB4C),
+                                          ),
+                                          onChanged: (value) {
+                                            controller.toggleSelection(index);
+                                          },
+                                        ),
+                                    ],
                                   ),
-                                ),
-                                SizedBox(height: getHeight(15)),
-                                Row(
-                                  children: [
-                                    CustomText(
-                                      text: formatRepeatDays(alarm.repeatDays), fontSize: getWidth(14),
-                                      fontWeight: FontWeight.w400,
-                                      color: const Color(0xffA59F92),
+                                  Text(
+                                    formatTime(alarm.hour, alarm.minute, alarm.isAm, addAlarmController.timeFormat.value),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: getWidth(36),
                                     ),
-                                    Image.asset(
-                                      ImagePath.lineImage2,
-                                      height: getHeight(20),
-                                      width: getWidth(20),
-                                    ),
-                                    SizedBox(width: getWidth(8)),
-                                    Flexible(
-                                      child: CustomText(
-                                        text: alarm.label,
-                                        textOverflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: getHeight(15)),
+                                  Row(
+                                    children: [
+                                      CustomText(
+                                        text: formatRepeatDays(alarm.repeatDays),
                                         fontSize: getWidth(14),
                                         fontWeight: FontWeight.w400,
                                         color: const Color(0xffA59F92),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      Image.asset(
+                                        ImagePath.lineImage2,
+                                        height: getHeight(20),
+                                        width: getWidth(20),
+                                      ),
+                                      SizedBox(width: getWidth(8)),
+                                      Flexible(
+                                        child: CustomText(
+                                          text: alarm.label,
+                                          textOverflow: TextOverflow.ellipsis,
+                                          fontSize: getWidth(14),
+                                          fontWeight: FontWeight.w400,
+                                          color: const Color(0xffA59F92),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+
                         ),
                       );
                     },

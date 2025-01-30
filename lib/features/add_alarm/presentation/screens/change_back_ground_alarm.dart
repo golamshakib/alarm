@@ -20,7 +20,7 @@ class ChangeBackGroundAlarm extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
+          padding: EdgeInsets.symmetric(horizontal: getWidth(16), vertical: getHeight(16)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

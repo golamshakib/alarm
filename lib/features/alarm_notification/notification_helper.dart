@@ -80,7 +80,8 @@ class NotificationHelper {
       priority: Priority.high,
       fullScreenIntent: true,
       // sound: RawResourceAndroidNotificationSound('alarm_sound'), // Ensure `alarm_sound.mp3` exists in `res/raw/`
-      playSound: false,
+      playSound: true,
+      sound: null,
       enableVibration: true,
     );
 

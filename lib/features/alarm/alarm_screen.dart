@@ -225,17 +225,19 @@ class AlarmScreen extends StatelessWidget {
                                                       : const Color(0xffA3B2C7).withOpacity(0.3),
                                                   borderRadius: BorderRadius.circular(30),
                                                 ),
-                                                child: AnimatedAlign(
-                                                  duration: const Duration(milliseconds: 300),
-                                                  alignment: alarm.isToggled.value
-                                                      ? Alignment.centerRight
-                                                      : Alignment.centerLeft,
-                                                  child: Container(
-                                                    width: getWidth(18),
-                                                    height: getHeight(18),
-                                                    decoration: const BoxDecoration(
-                                                      color: Colors.white,
-                                                      shape: BoxShape.circle,
+                                                child: GestureDetector(
+                                                  child: AnimatedAlign(
+                                                    duration: const Duration(milliseconds: 300),
+                                                    alignment: alarm.isToggled.value
+                                                        ? Alignment.centerRight
+                                                        : Alignment.centerLeft,
+                                                    child: Container(
+                                                      width: getWidth(18),
+                                                      height: getHeight(18),
+                                                      decoration: const BoxDecoration(
+                                                        color: Colors.white,
+                                                        shape: BoxShape.circle,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),

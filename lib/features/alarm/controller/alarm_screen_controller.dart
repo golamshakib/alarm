@@ -3,15 +3,42 @@ import 'package:get/get.dart';
 
 import '../../../core/utils/helpers/db_helper_alarm.dart';
 import '../../add_alarm/controller/add_alarm_controller.dart';
+import '../../add_alarm/data/alarm_model.dart';
 
 class AlarmScreenController extends GetxController {
-
+  final DBHelperAlarm dbHelper = DBHelperAlarm();
   final AddAlarmController controller = Get.find<AddAlarmController>();
 
-// Alarm Screen Method
-  void toggleAlarm(int index) {
-    controller.alarms[index].isToggled.value = !controller.alarms[index].isToggled.value;
-    controller.alarms.refresh(); // Notify the UI to rebuild
+  /// **Toggle Alarm ON/OFF**
+  void toggleAlarm(int index) async {
+    try {
+      // Get the alarm object
+      Alarm alarm = controller.alarms[index];
+
+      // Toggle the value in memory
+      alarm.isToggled.value = !alarm.isToggled.value;
+
+      // 🔹 Update the database with the modified alarm
+      await dbHelper.updateAlarm(alarm);
+
+      // 🔹 Refresh the list from the database
+      fetchAlarms();
+
+      update(); // Ensure UI is refreshed
+    } catch (e) {
+      print("Error toggling alarm: $e");
+    }
+  }
+
+
+  /// **Fetch All Alarms from Database**
+  Future<void> fetchAlarms() async {
+    try {
+      List<Alarm> fetchedAlarms = await dbHelper.fetchAlarms();
+      controller.alarms.assignAll(fetchedAlarms);
+    } catch (e) {
+      print("Error fetching alarms: $e");
+    }
   }
 
 // Selection mode on the Alarm Screen

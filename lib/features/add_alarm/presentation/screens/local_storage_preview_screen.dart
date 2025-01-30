@@ -40,7 +40,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
+          padding: EdgeInsets.symmetric(horizontal: getWidth(16), vertical: getHeight(16)),
           child: SingleChildScrollView(
             child: Column(
               children: [

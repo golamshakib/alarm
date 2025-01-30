@@ -62,14 +62,14 @@ class DBHelperAlarm {
     });
   }
 
-  /// Update an existing alarm
+  /// **Update an existing alarm in the database**
   Future<int> updateAlarm(Alarm alarm) async {
     final db = await database;
-    return db.update(
+    return await db.update(
       'alarms',
-      alarm.toMap(),
+      alarm.toMap(), // Convert the Alarm object to a map
       where: 'id = ?',
-      whereArgs: [alarm.id],
+      whereArgs: [alarm.id], // Use the alarm ID to find and update it
     );
   }
 

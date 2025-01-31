@@ -78,7 +78,7 @@ class NotificationHelper {
       'alarm_channel_id',
       'Alarm Notifications',
       channelDescription: 'Notifications for alarms',
-      importance: Importance.high,
+      importance: Importance.max,
       priority: Priority.high,
       fullScreenIntent: true,
       // sound: RawResourceAndroidNotificationSound('alarm_sound'), // Ensure `alarm_sound.mp3` exists in `res/raw/`

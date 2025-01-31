@@ -168,7 +168,7 @@ class AlarmScreen extends StatelessWidget {
                                 ? NetworkImage(alarm.backgroundImage) // Use network image if it's a URL
                                 : File(alarm.backgroundImage).existsSync()
                                 ? FileImage(File(alarm.backgroundImage)) // Use FileImage for local files
-                                : const AssetImage(ImagePath.dog) as ImageProvider, // Fallback asset image
+                                : const AssetImage(ImagePath.cat) as ImageProvider, // Fallback asset image
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(10),

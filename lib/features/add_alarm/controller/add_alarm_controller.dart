@@ -216,7 +216,7 @@ class AddAlarmController extends GetxController {
   /// E N D   V O L U M E   S E C T I O N
 
   /// S E T   B A C K G R O U N D
-  var selectedBackground = "Cute Dog in bed".obs;
+  var selectedBackground = "Cute Dog".obs;
   var selectedBackgroundImage = ImagePath.cat.obs;
   var selectedMusicPath = 'assets/audio/iphone_alarm.mp3'.obs;
   var selectedRecordingPath = ''.obs;
@@ -311,17 +311,20 @@ class AddAlarmController extends GetxController {
       newAlarm.id = id; // Assign database ID
       alarms.add(newAlarm);
 
-      // Convert time into DateTime format
-      DateTime now = DateTime.now();
-      DateTime alarmTime;
+      // ✅ Get the next valid alarm time
+      DateTime alarmTime = getNextAlarmTime(newAlarm);
 
-      if (newAlarm.isAm && newAlarm.hour == 12) {
-        alarmTime = DateTime(now.year, now.month, now.day, 0, newAlarm.minute);
-      } else if (!newAlarm.isAm && newAlarm.hour < 12) {
-        alarmTime = DateTime(now.year, now.month, now.day, newAlarm.hour + 12, newAlarm.minute);
-      } else {
-        alarmTime = DateTime(now.year, now.month, now.day, newAlarm.hour, newAlarm.minute);
-      }
+      // ✅ Print Alarm Details
+      print("Scheduled Alarm Time: ${alarmTime.toLocal()}");
+      print("🚀 Alarm Saved!");
+      print("⏰ User Set Alarm Time: ${newAlarm.hour}:${newAlarm.minute} ${newAlarm.isAm ? "AM" : "PM"}");
+      print("📅 Repeat Days: ${newAlarm.repeatDays.isNotEmpty ? newAlarm.repeatDays.join(', ') : 'None'}");
+      print("📆 Alarm Scheduled for: ${alarmTime.toLocal()}");
+      print("🔔 Label: ${newAlarm.label}");
+      print("🎵 Sound Path: ${newAlarm.musicPath.isEmpty ? 'Default' : newAlarm.musicPath}");
+      print("📳 Vibration: ${newAlarm.isVibrationEnabled ? 'Enabled' : 'Disabled'}");
+      print("🔊 Volume: ${newAlarm.volume}");
+
 
       // Schedule notification (without sound)
       await NotificationHelper.scheduleAlarm(
@@ -335,9 +338,42 @@ class AddAlarmController extends GetxController {
 
       Get.snackbar("Success", "Alarm saved Successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to Save Alarm: $e", duration: const Duration(seconds: 5));
+      Get.snackbar("Error", "Failed to Save Alarm: $e", duration: const Duration(seconds: 2));
     }
   }
+
+  // getNextAlarmTime
+  DateTime getNextAlarmTime(Alarm alarm) {
+    DateTime now = DateTime.now();
+
+    // Convert user-set time to 24-hour format
+    int alarmHour = alarm.isAm ? (alarm.hour == 12 ? 0 : alarm.hour) : (alarm.hour == 12 ? 12 : alarm.hour + 12);
+    DateTime alarmDateTime = DateTime(now.year, now.month, now.day, alarmHour, alarm.minute);
+
+    // If the alarm time is already past today, move to the next valid day
+    if (alarmDateTime.isBefore(now)) {
+      alarmDateTime = alarmDateTime.add(Duration(days: 1));
+    }
+
+    // If the user has selected repeat days, find the next valid day
+    if (alarm.repeatDays.isNotEmpty) {
+      List<String> weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      int todayIndex = now.weekday - 1; // Monday is index 0
+
+      for (int i = 0; i < 7; i++) {
+        int nextDayIndex = (todayIndex + i) % 7;
+        if (alarm.repeatDays.contains(weekDays[nextDayIndex])) {
+          return alarmDateTime.add(Duration(days: i));
+
+        }
+      }
+    }
+
+    // If no repeat days, return the next valid alarm time
+    return alarmDateTime;
+  }
+
+
 
 
 

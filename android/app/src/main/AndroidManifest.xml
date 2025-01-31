@@ -53,6 +53,7 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         <!-- Receiver for handling boot (if you need the alarm to persist after reboot) -->
         <receiver android:name=".BootReceiver" android:enabled="true" android:exported="false">
@@ -71,6 +72,7 @@
             android:name=".NotificationService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false"/>
+
         <!-- Alarm Notification -->
         <activity
             android:name=".alarm.AlarmTriggerScreen"

@@ -210,7 +210,8 @@ class AddAlarmScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const CustomText(text: 'Background:'),
+                          CustomText(text: 'Background:', color: isEditMode ? AppColors.textGrey : AppColors.textPrimary,
+                          ),
                           InkWell(
                             onTap: isEditMode ? null : () {
                               Get.toNamed(AppRoute.changeBackgroundScreen);

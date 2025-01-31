@@ -1,3 +1,4 @@
+
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -45,11 +46,10 @@ class ChangeBackgroundController extends GetxController {
           Get.snackbar("Error", "Invalid response: data field missing.", duration: const Duration(seconds: 2));
         }
       } else {
-        Get.snackbar("Error", response.errorMessage ?? "Failed to fetch backgrounds.", duration: const Duration(seconds: 2));
+        Get.snackbar("Error", response.errorMessage, duration: const Duration(seconds: 2));
       }
     } catch (e) {
       Get.snackbar("Error", "An unexpected error occurred while fetching data.", duration: const Duration(seconds: 2));
-      print("Error fetching backgrounds: $e");
     }
   }
 
@@ -85,7 +85,6 @@ class ChangeBackgroundController extends GetxController {
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to play audio: $e", duration: const Duration(seconds: 2));
-      print("Audio play error: $e");
     } finally {
       isPlaying.refresh(); // Final UI refresh to ensure proper state
     }

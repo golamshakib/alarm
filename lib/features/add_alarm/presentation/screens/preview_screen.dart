@@ -9,9 +9,7 @@ import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/add_alarm_controller.dart';
-import '../../controller/change_back_ground_controller.dart';
 import '../../controller/preview_screen_controller.dart';
-import 'add_alarm_screen.dart';
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({

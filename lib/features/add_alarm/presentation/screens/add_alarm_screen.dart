@@ -20,7 +20,7 @@ class AddAlarmScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AddAlarmController controller = Get.put(AddAlarmController());
-    final settingsController = Get.find<SettingsController>();
+    final settingsController = Get.find<SettingsController>(); // Don't Remove this (Settings fetching the data)
     final arguments = Get.arguments;
 
     if (arguments != null) {

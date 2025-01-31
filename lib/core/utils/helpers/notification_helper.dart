@@ -1,12 +1,15 @@
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:get/get.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import '../add_alarm/controller/add_alarm_controller.dart';
-import '../add_alarm/data/alarm_model.dart';
-import '../alarm/alarm_trigger_screen.dart';
+import '../../../features/add_alarm/controller/add_alarm_controller.dart';
+import '../../../features/add_alarm/data/alarm_model.dart';
+import '../../../features/alarm/alarm_trigger_screen.dart';
 
 class NotificationHelper {
   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -19,13 +22,11 @@ class NotificationHelper {
     const AndroidInitializationSettings androidInitializationSettings =
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final InitializationSettings initializationSettings =
-    InitializationSettings(android: androidInitializationSettings);
+    final InitializationSettings initializationSettings = InitializationSettings(android: androidInitializationSettings);
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
-        print("Notification Clicked!");
 
         if (!Get.isRegistered<AddAlarmController>()) {
           Get.put(AddAlarmController());
@@ -54,12 +55,12 @@ class NotificationHelper {
     final overlayStatus = await Permission.systemAlertWindow.request();
 
     if (status.isDenied || overlayStatus.isDenied) {
-      print("User denied notification or overlay permissions.");
+      debugPrint("User denied notification or overlay permissions.");
     } else if (status.isPermanentlyDenied || overlayStatus.isPermanentlyDenied) {
-      print("User permanently denied notifications. Open settings to enable.");
+      log("User permanently denied notifications. Open settings to enable.");
       openAppSettings(); // Open settings if permanently denied
     } else {
-      print("Notification and overlay permissions granted!");
+      log("Notification and overlay permissions granted!");
     }
   }
 
@@ -108,7 +109,7 @@ class NotificationHelper {
   /// **Cancel a Scheduled Alarm Notification**
   static Future<void> cancelAlarm(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
-    print("Alarm with ID: $id has been canceled.");
+    log("Alarm with ID: $id has been canceled.");
   }
 
   /// **Snooze the Alarm (Re-Schedule After Snooze Duration)**
@@ -116,7 +117,7 @@ class NotificationHelper {
     // Calculate the new time for the snoozed alarm
     DateTime snoozeDuration = DateTime.now().add(Duration(minutes: alarm.snoozeDuration));
 
-    print("Snooze set for: $snoozeDuration");
+    log("Snooze set for: $snoozeDuration");
 
     await scheduleAlarm(
       id: alarm.id!,

@@ -4,14 +4,13 @@ import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import '../add_alarm/controller/add_alarm_controller.dart';
 import '../add_alarm/data/alarm_model.dart';
-import '../alarm_notification/notification_helper.dart';
+import '../../core/utils/helpers/notification_helper.dart';
 
 class AlarmTriggerScreen extends StatefulWidget {
   final Alarm alarm;
@@ -51,7 +50,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
         await _audioPlayer.setLoopMode(LoopMode.one); // Keep playing until dismissed
         await _audioPlayer.play();
       } catch (e) {
-        print("Error playing alarm sound: $e");
+        debugPrint("Error playing alarm sound: $e");
       }
     }
   }

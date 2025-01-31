@@ -1,4 +1,3 @@
-import 'package:alarm/core/common/widgets/custom_text.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/routes/app_routes.dart';
 import 'package:flutter/material.dart';

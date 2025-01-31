@@ -33,7 +33,6 @@ class DBHelperAlarm {
             backgroundTitle TEXT,
             backgroundImage TEXT,
             musicPath TEXT,
-            recordingPath TEXT,
             repeatDays TEXT,
             isVibrationEnabled INTEGER,
             snoozeDuration INTEGER,

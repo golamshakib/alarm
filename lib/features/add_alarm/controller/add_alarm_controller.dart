@@ -224,8 +224,8 @@ class AddAlarmController extends GetxController {
     selectedSnoozeDuration.value = prefs.getInt('snoozeDuration') ?? 5;
     isVibrationEnabled.value = prefs.getBool('isVibrationEnabled') ?? true;
     volume.value = prefs.getDouble('volume') ?? 0.5;
-    selectedBackground.value = prefs.getString('selectedBackground') ?? "Cute Dog in bed";
-    selectedBackgroundImage.value = prefs.getString('selectedBackgroundImage') ?? "assets/images/dog.png";
+    selectedBackground.value = prefs.getString('selectedBackground') ?? "Cute Dog";
+    selectedBackgroundImage.value = prefs.getString('selectedBackgroundImage') ?? ImagePath.cat;
     selectedMusicPath.value = prefs.getString('selectedMusicPath') ?? '';
   }
 

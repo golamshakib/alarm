@@ -39,11 +39,22 @@ class AddAlarmController extends GetxController {
     if (timeFormat.value == 24) {
       // Convert to 24-hour format
       if (!isAm.value) {
-        selectedHour.value += 12;
+        if (selectedHour.value < 12) {
+          selectedHour.value += 12; // Convert PM times
+        }
+      } else {
+        if (selectedHour.value == 12) {
+          selectedHour.value = 0; // Convert 12 AM to 0
+        }
       }
     } else {
       // Convert to 12-hour format
-      if (selectedHour.value > 12) {
+      if (selectedHour.value == 0) {
+        selectedHour.value = 12;
+        isAm.value = true; // Midnight is AM
+      } else if (selectedHour.value == 12) {
+        isAm.value = false; // Noon is PM
+      } else if (selectedHour.value > 12) {
         selectedHour.value -= 12;
         isAm.value = false;
       } else {

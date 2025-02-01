@@ -25,61 +25,61 @@ class NetworkCaller {
     }
   }
 
-  Future<ResponseData> postRequest(String endpoint,
-      {Map<String, dynamic>? body, String? token}) async {
-    log('POST Request: $endpoint');
-    log('Request Body: ${jsonEncode(body)}');
-
-    try {
-      final Response response = await post(
-        Uri.parse(endpoint),
-        headers: {
-          'Authorization': token ?? '',
-          'Content-type': 'application/json',
-        },
-        body: jsonEncode(body),
-      ).timeout(Duration(seconds: timeoutDuration));
-      return _handleResponse(response);
-    } catch (e) {
-      return _handleError(e);
-    }
-  }
-
-  Future<ResponseData> putRequest(String endpoint,
-      {Map<String, dynamic>? body, String? token}) async {
-    log('PUT Request: $endpoint');
-    log('Request Body: ${jsonEncode(body)}');
-
-    try {
-      final Response response = await put(
-        Uri.parse(endpoint),
-        headers: {
-          'Authorization': token ?? '',
-          'Content-type': 'application/json',
-        },
-        body: jsonEncode(body),
-      ).timeout(Duration(seconds: timeoutDuration));
-      return _handleResponse(response);
-    } catch (e) {
-      return _handleError(e);
-    }
-  }
-
-  Future<ResponseData> deleteRequest(String endpoint, String? token) async {
-    log('DELETE Request: $endpoint');
-    try {
-      final Response response = await delete(
-        Uri.parse(endpoint),
-        headers: {
-          'Authorization': token ?? '',
-          'Content-type': 'application/json',
-        },
-      ).timeout(Duration(seconds: timeoutDuration));
-      return _handleResponse(response);
-    } catch (e) {
-      return _handleError(e);
-    }
-  }
+  // Future<ResponseData> postRequest(String endpoint,
+  //     {Map<String, dynamic>? body, String? token}) async {
+  //   log('POST Request: $endpoint');
+  //   log('Request Body: ${jsonEncode(body)}');
+  //
+  //   try {
+  //     final Response response = await post(
+  //       Uri.parse(endpoint),
+  //       headers: {
+  //         'Authorization': token ?? '',
+  //         'Content-type': 'application/json',
+  //       },
+  //       body: jsonEncode(body),
+  //     ).timeout(Duration(seconds: timeoutDuration));
+  //     return _handleResponse(response);
+  //   } catch (e) {
+  //     return _handleError(e);
+  //   }
+  // }
+  //
+  // Future<ResponseData> putRequest(String endpoint,
+  //     {Map<String, dynamic>? body, String? token}) async {
+  //   log('PUT Request: $endpoint');
+  //   log('Request Body: ${jsonEncode(body)}');
+  //
+  //   try {
+  //     final Response response = await put(
+  //       Uri.parse(endpoint),
+  //       headers: {
+  //         'Authorization': token ?? '',
+  //         'Content-type': 'application/json',
+  //       },
+  //       body: jsonEncode(body),
+  //     ).timeout(Duration(seconds: timeoutDuration));
+  //     return _handleResponse(response);
+  //   } catch (e) {
+  //     return _handleError(e);
+  //   }
+  // }
+  //
+  // Future<ResponseData> deleteRequest(String endpoint, String? token) async {
+  //   log('DELETE Request: $endpoint');
+  //   try {
+  //     final Response response = await delete(
+  //       Uri.parse(endpoint),
+  //       headers: {
+  //         'Authorization': token ?? '',
+  //         'Content-type': 'application/json',
+  //       },
+  //     ).timeout(Duration(seconds: timeoutDuration));
+  //     return _handleResponse(response);
+  //   } catch (e) {
+  //     return _handleError(e);
+  //   }
+  // }
 
   // Handle the response from the server
   Future<ResponseData> _handleResponse(http.Response response) async {

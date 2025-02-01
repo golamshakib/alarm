@@ -18,8 +18,8 @@ class SaveBackgroundButtonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => controller.musicPath.value != null ||
-        controller.recordingPath.value != null
+    return Obx(() => controller.musicPath.value != null
+         // || controller.recordingPath.value != null
         ? GestureDetector(
       onTap: () async {
         // Call saveData with the provided ID

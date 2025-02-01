@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -7,37 +9,52 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:volume_controller/volume_controller.dart';
 
-import '../../../core/utils/helpers/db_helper_alarm.dart';
+
+import '../../../core/db_helpers/db_helper_alarm.dart';
+import '../../../core/services/notification_service.dart';
 import '../../settings/controller/settings_controller.dart';
+import '../data/alarm_model.dart';
 
 class AddAlarmController extends GetxController {
   final SettingsController settingsController = Get.find<SettingsController>();
 
   final labelController = TextEditingController();
 
-  // Time selection
+ /// -- T I M E   S E C T I O N --
   var selectedHour = 7.obs;
   var selectedMinute = 0.obs;
   var isAm = true.obs;
-  /// Track the current time format (12-hour or 24-hour)
+
+  // Track the current time format (12-hour or 24-hour)
   var timeFormat = 12.obs;
 
-  /// Fetch and apply the user's time format preference
+  // Fetch and apply the user's time format preference
   Future<void> loadTimeFormat() async {
     final prefs = await SharedPreferences.getInstance();
     timeFormat.value = prefs.getInt('timeFormat') ?? 12;
   }
 
-  /// Adjust the default selected time when time format changes
+  // Adjust the default selected time when time format changes
   void adjustTimeFormat() {
     if (timeFormat.value == 24) {
       // Convert to 24-hour format
       if (!isAm.value) {
-        selectedHour.value += 12;
+        if (selectedHour.value < 12) {
+          selectedHour.value += 12; // Convert PM times
+        }
+      } else {
+        if (selectedHour.value == 12) {
+          selectedHour.value = 0; // Convert 12 AM to 0
+        }
       }
     } else {
       // Convert to 12-hour format
-      if (selectedHour.value > 12) {
+      if (selectedHour.value == 0) {
+        selectedHour.value = 12;
+        isAm.value = true; // Midnight is AM
+      } else if (selectedHour.value == 12) {
+        isAm.value = false; // Noon is PM
+      } else if (selectedHour.value > 12) {
         selectedHour.value -= 12;
         isAm.value = false;
       } else {
@@ -53,6 +70,7 @@ class AddAlarmController extends GetxController {
     selectedMinute.value = now.minute;
     isAm.value = now.hour < 12;
   }
+  /// -- E N D  T I M E   S E C T I O N --
 
   @override
   void onInit() {
@@ -63,59 +81,29 @@ class AddAlarmController extends GetxController {
     setCurrentTime();
     timeFormat.value = settingsController.selectedTime.value;
 
-    /// Watch for changes in time format and adjust time accordingly
+    // Watch for changes in time format and adjust time accordingly
     ever(settingsController.selectedTime, (_) {
       timeFormat.value = settingsController.selectedTime.value;
       adjustTimeFormat();
     });
   }
-  /// Save screen state to `SharedPreferences`
-  Future<void> saveScreenPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('selectedHour', selectedHour.value);
-    await prefs.setInt('selectedMinute', selectedMinute.value);
-    await prefs.setBool('isAm', isAm.value);
-    await prefs.setString('label', label.value);
-    await prefs.setString('repeatDays', jsonEncode(repeatDays));
-    await prefs.setInt('snoozeDuration', selectedSnoozeDuration.value);
-    await prefs.setBool('isVibrationEnabled', isVibrationEnabled.value);
-    await prefs.setDouble('volume', volume.value);
-    await prefs.setString('selectedBackground', selectedBackground.value);
-    await prefs.setString('selectedBackgroundImage', selectedBackgroundImage.value);
-    await prefs.setString('selectedMusicPath', selectedMusicPath.value);
+
+  /// -- S E T   B A C K G R O U N D --
+  var selectedBackground = "Cute Dog".obs;
+  var selectedBackgroundImage = ImagePath.cat.obs;
+  var selectedMusicPath = 'assets/audio/iphone_alarm.mp3'.obs;
+  var selectedRecordingPath = ''.obs;
+
+  // Update background
+  void updateBackground(String title, String imagePath, String musicPath) {
+    selectedBackground.value = title;
+    selectedBackgroundImage.value = imagePath;
+    selectedMusicPath.value = musicPath;
+    saveScreenPreferences(); // Save preferences on background change
   }
+  /// -- E N D   S E T   B A C K G R O U N D --
 
-  /// Load screen state from `SharedPreferences`
-  Future<void> loadScreenPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    label.value = prefs.getString('label') ?? 'Morning Alarm';
-    final repeatDaysString = prefs.getString('repeatDays');
-    if (repeatDaysString != null) {
-      final Map<String, dynamic> repeatDaysMap = jsonDecode(repeatDaysString);
-      repeatDays.value = repeatDaysMap.map((key, value) => MapEntry(key, value as bool));
-    }
-    selectedSnoozeDuration.value = prefs.getInt('snoozeDuration') ?? 5;
-    isVibrationEnabled.value = prefs.getBool('isVibrationEnabled') ?? true;
-    volume.value = prefs.getDouble('volume') ?? 0.5;
-    selectedBackground.value = prefs.getString('selectedBackground') ?? "Cute Dog in bed";
-    selectedBackgroundImage.value = prefs.getString('selectedBackgroundImage') ?? "assets/images/dog.png";
-    selectedMusicPath.value = prefs.getString('selectedMusicPath') ?? '';
-  }
-
-
-
-  // Alarm label
-  var label = 'Morning Alarm'.obs;
-
-  // Update label value
-  void updateLabel(String text) {
-    label.value = text;
-    labelController.text = text;
-    saveScreenPreferences(); // Save preferences on label change
-  }
-
-  // Repeat days
+  /// -- R E P E A T   D A Y S --
   var repeatDays = {
     'Mon': false,
     'Tue': false,
@@ -132,17 +120,32 @@ class AddAlarmController extends GetxController {
     repeatDays.refresh();
     saveScreenPreferences(); // Save preferences on day toggle
   }
+  /// -- E N D   R E P E A T   D A Y S --
 
-  // Snooze duration
+
+  /// -- A L A R M   L A B E L   S E C T I O N --
+  var label = 'Morning Alarm'.obs;
+
+  // Update label value
+  void updateLabel(String text) {
+    label.value = text;
+    labelController.text = text;
+    saveScreenPreferences(); // Save preferences on label change
+  }
+  /// -- E N D   A L A R M   L A B E L   S E C T I O N --
+
+
+  /// -- S N O O Z E   D U R A T I O N --
   var selectedSnoozeDuration = 5.obs; // Default snooze duration (5 minutes)
-  final List<int> snoozeOptions = [5, 10, 15, 20, 25, 30];
+  final List<int> snoozeOptions = [1, 5, 10, 15, 20, 25, 30];
 
   void updateSnoozeDuration(int duration) {
     selectedSnoozeDuration.value = duration;
     saveScreenPreferences(); // Save preferences on snooze change
   }
+  /// -- S N O O Z E   D U R A T I O N --
 
-  // Vibration toggle
+  /// -- V I B R A T I O N   S E C T I O N --
   var isVibrationEnabled = true.obs;
   // Toggle vibration
   void toggleVibration() {
@@ -165,104 +168,127 @@ class AddAlarmController extends GetxController {
       Vibration.cancel();
     }
   }
+  /// -- E N D   V I B R A T I O N   S E C T I O N --
 
 
-  // Volume
+  /// -- V O L U M E   S E C T I O N --
   var volume = 0.5.obs; // Default volume set to 50%
   late VolumeController volumeController; // VolumeController instance
 
-  /// Initialize volume controller
+  // Initialize volume controller
   Future<void> initializeVolumeController() async {
-    // Initialize the VolumeController instance
-    volumeController = VolumeController.instance;
-
+    volumeController = VolumeController.instance; // Initialize the VolumeController instance
     // Add a listener for volume changes
     volumeController.addListener((double newVolume) {
       volume.value = newVolume; // Update the volume value
     });
-
     // Get the initial system volume
     volume.value = await volumeController.getVolume();
   }
 
-  /// Set device volume
+  // Set device volume
   Future<void> setDeviceVolume(double newVolume) async {
     volume.value = newVolume; // Update the volume value
     await volumeController.setVolume(newVolume); // Set the system volume
     saveScreenPreferences(); // Save the volume to preferences
   }
+  /// -- E N D   V O L U M E   S E C T I O N --
 
-  // Set Background
-  var selectedBackground = "Cute Dog in bed".obs;
-  var selectedBackgroundImage = "assets/images/dog.png".obs;
-  var selectedMusicPath = ''.obs;
-  var selectedRecordingPath = ''.obs;
 
-  // Update background
-  void updateBackground(String title, String imagePath, String musicPath) {
-    selectedBackground.value = title;
-    selectedBackgroundImage.value = imagePath;
-    selectedMusicPath.value = musicPath;
-    saveScreenPreferences(); // Save preferences on background change
+  /// -- S A V E   S C R E E N   S E T T I N G S --
+  Future<void> saveScreenPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('selectedHour', selectedHour.value);
+    await prefs.setInt('selectedMinute', selectedMinute.value);
+    await prefs.setBool('isAm', isAm.value);
+    await prefs.setString('label', label.value);
+    await prefs.setString('repeatDays', jsonEncode(repeatDays));
+    await prefs.setInt('snoozeDuration', selectedSnoozeDuration.value);
+    await prefs.setBool('isVibrationEnabled', isVibrationEnabled.value);
+    await prefs.setDouble('volume', volume.value);
+    await prefs.setString('selectedBackground', selectedBackground.value);
+    await prefs.setString('selectedBackgroundImage', selectedBackgroundImage.value);
+    await prefs.setString('selectedMusicPath', selectedMusicPath.value);
   }
+
+  // Load screen settings
+  Future<void> loadScreenPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    label.value = prefs.getString('label') ?? 'Morning Alarm';
+    final repeatDaysString = prefs.getString('repeatDays');
+    if (repeatDaysString != null) {
+      final Map<String, dynamic> repeatDaysMap = jsonDecode(repeatDaysString);
+      repeatDays.value = repeatDaysMap.map((key, value) => MapEntry(key, value as bool));
+    }
+    selectedSnoozeDuration.value = prefs.getInt('snoozeDuration') ?? 5;
+    isVibrationEnabled.value = prefs.getBool('isVibrationEnabled') ?? true;
+    volume.value = prefs.getDouble('volume') ?? 0.5;
+    selectedBackground.value = prefs.getString('selectedBackground') ?? "Cute Dog";
+    selectedBackgroundImage.value = prefs.getString('selectedBackgroundImage') ?? ImagePath.cat;
+    selectedMusicPath.value = prefs.getString('selectedMusicPath') ?? '';
+  }
+
+  /// -- E N D   S A V E   &   L O A D  S C R E E N   S E T T I N G S --
 
 
   // List of alarms
   var alarms = <Alarm>[].obs;
 
+  /// -- M U S I C   P L A Y / P A U S E --
+
   final audioPlayer = AudioPlayer(); // Audio player instance
   var isPlaying = false.obs; // Track playback state
   var currentlyPlayingIndex = (-1).obs; // Track the currently playing alarm
 
-  Future<void> togglePlayPause(int index) async {
-    if (currentlyPlayingIndex.value == index && isPlaying.value) {
-      // Pause the current playback
-      isPlaying.value = false; // Update UI immediately
-      await audioPlayer.pause();
-    } else {
-      // Play a new alarm's music
-      if (currentlyPlayingIndex.value != -1 && isPlaying.value) {
-        await audioPlayer.stop(); // Stop previous playback
-      }
-
-      final musicPath = alarms[index].musicPath;
-      final recordingPath = alarms[index].recordingPath;
-
-      String? filePathToPlay;
-
-      // Check which path is available to play
-      if (musicPath.isNotEmpty) {
-        filePathToPlay = musicPath;
-      } else if (recordingPath.isNotEmpty) {
-        filePathToPlay = recordingPath;
-      } else {
-        Get.snackbar("Error", "No audio file found for this alarm.");
+  Future<void> togglePlayPause(int index, String musicPath) async {
+    try {
+      if (musicPath.isEmpty) {
+        Get.snackbar("Error", "No music file available.", duration: const Duration(seconds: 2));
         return;
       }
 
-      try {
-        currentlyPlayingIndex.value = index; // Update playing index
-        isPlaying.value = true; // Update UI immediately
-        await audioPlayer.setFilePath(filePathToPlay);
-        await audioPlayer.play();
-      } catch (e) {
-        // Handle errors (e.g., file not found)
+      if (currentlyPlayingIndex.value == index && isPlaying.value) {
+        await audioPlayer.pause();
         isPlaying.value = false;
         currentlyPlayingIndex.value = -1;
-        Get.snackbar("Error", "Failed to play audio: $e");
+      } else {
+        await audioPlayer.stop();
+
+        if (musicPath.startsWith("http") || musicPath.startsWith("https")) {
+          // Play from network URL
+          await audioPlayer.setUrl(musicPath);
+        } else if (File(musicPath).existsSync()) {
+          // Play from local file
+          await audioPlayer.setFilePath(musicPath);
+        } else {
+          Get.snackbar("Error", "Invalid music file.", duration: const Duration(seconds: 2));
+          return;
+        }
+
+        currentlyPlayingIndex.value = index;
+        isPlaying.value = true;
+        await audioPlayer.play();
       }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to play music: $e", duration: const Duration(seconds: 2));
     }
   }
+  /// -- E N D   M U S I C   P L A Y / P A U S E --
 
-  // Stop Music
+
+  /// -- S T O P   M U S I C --
   Future<void> stopMusic() async {
     if (audioPlayer.playing) {
       await audioPlayer.stop(); // Stop the music playback
     }
     isPlaying.value = false; // Update the playback state
   }
+  /// -- E N D   S T O P   M U S I C --
 
-  /// Save an alarm to the SQLite database
+
+  /// --  D A T A B A S E   S E R V I C E S --
+  // Save alarm to Database
   Future<void> saveAlarmToDatabase() async {
     final dbHelper = DBHelperAlarm();
     final newAlarm = Alarm(
@@ -272,8 +298,8 @@ class AddAlarmController extends GetxController {
       label: label.value.isEmpty ? 'Morning Alarm' : label.value,
       backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
-      musicPath: selectedMusicPath.value,
-      recordingPath: selectedRecordingPath.value,
+      musicPath: selectedMusicPath.value, // Custom sound path from database
+      // recordingPath: selectedRecordingPath.value,
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
           .map((entry) => entry.key)
@@ -281,27 +307,85 @@ class AddAlarmController extends GetxController {
       isVibrationEnabled: isVibrationEnabled.value,
       snoozeDuration: selectedSnoozeDuration.value,
       volume: volume.value,
+      isToggled: true,
     );
+
     try {
       final id = await dbHelper.insertAlarm(newAlarm);
-      newAlarm.id = id; // Assign the database ID to the alarm
+      newAlarm.id = id; // Assign database ID
       alarms.add(newAlarm);
-      Get.snackbar("Success", "Alarm saved successfully!");
+
+      // ✅ Get the next valid alarm time
+      DateTime alarmTime = getNextAlarmTime(newAlarm);
+
+      // ✅ Print Alarm Details
+      debugPrint("Scheduled Alarm Time: ${alarmTime.toLocal()}");
+      debugPrint("🚀 Alarm Saved!");
+      debugPrint("⏰ User Set Alarm Time: ${newAlarm.hour}:${newAlarm.minute} ${newAlarm.isAm ? "AM" : "PM"}");
+      debugPrint("📅 Repeat Days: ${newAlarm.repeatDays.isNotEmpty ? newAlarm.repeatDays.join(', ') : 'None'}");
+      debugPrint("📆 Alarm Scheduled for: ${alarmTime.toLocal()}");
+      debugPrint("🔔 Label: ${newAlarm.label}");
+      debugPrint("🎵 Sound Path: ${newAlarm.musicPath.isEmpty ? 'Default' : newAlarm.musicPath}");
+      debugPrint("📳 Vibration: ${newAlarm.isVibrationEnabled ? 'Enabled' : 'Disabled'}");
+      debugPrint("🔊 Volume: ${newAlarm.volume}");
+
+      // Schedule notification
+      await NotificationService.scheduleAlarm(
+        id: id,
+        title: "Alarm",
+        body: newAlarm.label,
+        // imagePath: newAlarm.backgroundImage,
+        // soundPath: newAlarm.musicPath, // This will be used in AlarmTriggerScreen
+        scheduledTime: alarmTime,
+      );
+
+      Get.snackbar("Success", "Alarm saved Successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to save alarm: $e");
+      Get.snackbar("Error", "Failed to Save Alarm: $e", duration: const Duration(seconds: 2));
     }
   }
 
-  /// Fetch alarms from the SQLite database
+  // getNextAlarmTime
+  DateTime getNextAlarmTime(Alarm alarm) {
+    DateTime now = DateTime.now();
+
+    // Convert user-set time to 24-hour format
+    int alarmHour = alarm.isAm ? (alarm.hour == 12 ? 0 : alarm.hour) : (alarm.hour == 12 ? 12 : alarm.hour + 12);
+    DateTime alarmDateTime = DateTime(now.year, now.month, now.day, alarmHour, alarm.minute);
+
+    // If the alarm time is already past today, move to the next valid day
+    if (alarmDateTime.isBefore(now)) {
+      alarmDateTime = alarmDateTime.add(const Duration(days: 1));
+    }
+
+    // If the user has selected repeat days, find the next valid day
+    if (alarm.repeatDays.isNotEmpty) {
+      List<String> weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      int todayIndex = now.weekday - 1; // Monday is index 0
+
+      for (int i = 0; i < 7; i++) {
+        int nextDayIndex = (todayIndex + i) % 7;
+        if (alarm.repeatDays.contains(weekDays[nextDayIndex])) {
+          return alarmDateTime.add(Duration(days: i));
+
+        }
+      }
+    }
+    // If no repeat days, return the next valid alarm time
+    return alarmDateTime;
+  }
+
+   ///** Fetch Alarm From Database
   Future<void> fetchAlarmsFromDatabase() async {
     final dbHelper = DBHelperAlarm();
     try {
       alarms.value = await dbHelper.fetchAlarms();
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch alarms: $e");
+      Get.snackbar("Error", "Failed to fetch alarms: $e", duration: const Duration(seconds: 2));
     }
   }
 
+  ///** Update Alarm In Database
   Future<void> updateAlarmInDatabase(Alarm existingAlarm) async {
     final dbHelper = DBHelperAlarm();
     final updatedAlarm = Alarm(
@@ -313,7 +397,7 @@ class AddAlarmController extends GetxController {
       backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
       musicPath: selectedMusicPath.value,
-      recordingPath: selectedRecordingPath.value,
+      // recordingPath: selectedRecordingPath.value,
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
           .map((entry) => entry.key)
@@ -325,26 +409,26 @@ class AddAlarmController extends GetxController {
     try {
       await dbHelper.updateAlarm(updatedAlarm); // Update the alarm in the database
       fetchAlarmsFromDatabase(); // Refresh the list of alarms
-      Get.snackbar("Success", "Alarm updated successfully!");
+      Get.snackbar("Success", "Alarm updated successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to update alarm: $e");
+      Get.snackbar("Error", "Failed to update alarm: $e", duration: const Duration(seconds: 2));
     }
   }
 
-
-  /// Delete an alarm from the SQLite database
+  ///** Delete an alarm from the SQLite database
   Future<void> deleteAlarmFromDatabase(int id) async {
     final dbHelper = DBHelperAlarm();
     try {
       await dbHelper.deleteAlarm(id);
       alarms.removeWhere((alarm) => alarm.id == id);
-      Get.snackbar("Success", "Alarm deleted successfully!");
+      Get.snackbar("Success", "Alarm deleted successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to delete alarm: $e");
+      Get.snackbar("Error", "Failed to delete alarm: $e", duration: const Duration(seconds: 2));
     }
   }
+  /// -- E N D   D A T A B A S E   S E R V I C E S --
 
-  // Reset fields after saving
+  /// -- Reset fields after saving --
   void resetFields() {
     selectedHour.value = 1;
     selectedMinute.value = 0;
@@ -354,59 +438,6 @@ class AddAlarmController extends GetxController {
     selectedSnoozeDuration.value = 5;
     isVibrationEnabled.value = false;
     volume.value = 0.5;
-  }
-
-
-  // Alarm Screen Method
-  void toggleAlarm(int index) {
-    alarms[index].isToggled.value = !alarms[index].isToggled.value;
-    alarms.refresh(); // Notify the UI to rebuild
-  }
-
-  // Selection mode on the Alarm Screen
-  var isSelectionMode = false.obs;
-  var selectedAlarms = <int>[].obs;
-
-  // Enable selection mode
-  void enableSelectionMode(int index) {
-    isSelectionMode.value = true;
-    selectedAlarms.add(index);
-  }
-
-  // Toggle selection
-  void toggleSelection(int index) {
-    if (selectedAlarms.contains(index)) {
-      selectedAlarms.remove(index);
-    } else {
-      selectedAlarms.add(index);
-    }
-  }
-
-  // Exit selection mode
-  void exitSelectionMode() {
-    isSelectionMode.value = false;
-    selectedAlarms.clear();
-  }
-
-  // Delete selected alarms
-  Future<void> deleteSelectedAlarms() async {
-    final dbHelper = DBHelperAlarm(); // Instantiate the database helper
-
-    // Loop through selected alarms and delete them from the database
-    for (int index in selectedAlarms) {
-      final alarm = alarms[index]; // Get the alarm at the selected index
-      if (alarm.id != null) {
-        await dbHelper.deleteAlarm(alarm.id!); // Delete the alarm from the database
-      }
-    }
-
-    // Remove the alarms from the local list
-    alarms.removeWhere((alarm) => selectedAlarms.contains(alarms.indexOf(alarm)));
-
-    // Exit selection mode and clear the selection
-    exitSelectionMode();
-
-    Get.snackbar("Success", "Selected alarms deleted successfully!");
   }
 
 
@@ -427,79 +458,5 @@ class AddAlarmController extends GetxController {
   }
 }
 
-// Alarm model
-// Alarm model
-class Alarm {
-  int? id; // Nullable for database ID
-  int hour;
-  int minute;
-  bool isAm;
-  String label;
-  String backgroundTitle;
-  String backgroundImage;
-  String musicPath;
-  String recordingPath;
-  List<String> repeatDays;
-  bool isVibrationEnabled;
-  int snoozeDuration; // New field for snooze duration
-  double volume; // New field for volume
-  RxBool isToggled;
 
-  Alarm({
-    this.id,
-    required this.hour,
-    required this.minute,
-    required this.isAm,
-    required this.label,
-    required this.backgroundTitle,
-    required this.backgroundImage,
-    required this.musicPath,
-    required this.recordingPath,
-    required this.repeatDays,
-    this.isVibrationEnabled = false,
-    this.snoozeDuration = 5, // Default snooze duration is 5 minutes
-    this.volume = 0.5, // Default volume is 50%
-    bool isToggled = false,
-  }) : isToggled = isToggled.obs;
-
-  /// Convert Alarm object to a Map for SQLite
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'hour': hour,
-      'minute': minute,
-      'isAm': isAm ? 1 : 0, // Store bool as int
-      'label': label,
-      'backgroundTitle': backgroundTitle,
-      'backgroundImage': backgroundImage,
-      'musicPath': musicPath,
-      'recordingPath': recordingPath,
-      'repeatDays': repeatDays.join(','), // Convert list to comma-separated string
-      'isVibrationEnabled': isVibrationEnabled ? 1 : 0,
-      'snoozeDuration': snoozeDuration,
-      'volume': volume,
-      'isToggled': isToggled.value ? 1 : 0, // Store RxBool as int
-    };
-  }
-
-  /// Create Alarm object from Map
-  factory Alarm.fromMap(Map<String, dynamic> map) {
-    return Alarm(
-      id: map['id'],
-      hour: map['hour'],
-      minute: map['minute'],
-      isAm: map['isAm'] == 1,
-      label: map['label'],
-      backgroundTitle: map['backgroundTitle'],
-      backgroundImage: map['backgroundImage'],
-      musicPath: map['musicPath'],
-      recordingPath: map['recordingPath'],
-      repeatDays: (map['repeatDays'] as String).split(','),
-      isVibrationEnabled: map['isVibrationEnabled'] == 1,
-      snoozeDuration: map['snoozeDuration'],
-      volume: map['volume'],
-      isToggled: map['isToggled'] == 1,
-    );
-  }
-}
 

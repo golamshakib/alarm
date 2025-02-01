@@ -7,10 +7,9 @@ import '../../../../core/common/widgets/custom_appbar_with_logo.dart';
 import '../../../../core/utils/constants/app_colors.dart';
 import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
+import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/add_alarm_controller.dart';
-import '../../controller/change_back_ground_controller.dart';
 import '../../controller/preview_screen_controller.dart';
-import 'add_alarm_screen.dart';
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({
@@ -26,14 +25,16 @@ class PreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(PreviewScreenController()); // Initialize controller
+    final controller =
+        Get.put(PreviewScreenController()); // Initialize controller
 
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
+          padding: EdgeInsets.symmetric(horizontal: getWidth(16), vertical: getHeight(16)),
           child: SingleChildScrollView(
             child: Column(
+              mainAxisSize: MainAxisSize.min, // Prevents infinite height error
               children: [
                 CustomAppbarWithLogo(
                   text: "Preview",
@@ -42,56 +43,63 @@ class PreviewScreen extends StatelessWidget {
                   onIconTap: () {},
                 ),
                 SizedBox(height: getHeight(24)),
+
+                // Wrap Flexible in a SizedBox
                 Row(
                   children: [
-                    CustomText(text: title),
-                    const CustomText(text: ':'),
+                    Flexible(
+                      child: CustomText(
+                        text: title,
+                        textOverflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const CustomText(text: ' :'),
                     SizedBox(width: getWidth(8)),
-                    Obx(() {
-                      return GestureDetector(
-                        onTap: controller.togglePlay,
-                        child: Icon(
+                    GestureDetector(
+                      onTap: () => controller.togglePlay(musicPath),
+                      child: Obx(
+                        () => Icon(
                           controller.isPlaying.value
                               ? Icons.play_circle_fill_rounded
                               : Icons.play_circle_outline_rounded,
                           color: Colors.orange,
                           size: 25,
                         ),
-                      );
-                    }),
-                    SizedBox(width: getWidth(10)),
-                    // Obx(() {
-                    //   return controller.showExtraImage.value
-                    //       ? Image.asset(
-                    //     musicPath,
-                    //     height: getHeight(25),
-                    //     width: getWidth(75),
-                    //   )
-                    //       : const SizedBox();
-                    // }),
+                      ),
+                    ),
                   ],
                 ),
-                SizedBox(height: getHeight(16)),
+                SizedBox(height: getHeight(24)),
 
-                // Image Preview
+                // Image Preview - Ensure it has proper constraints
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    imagePath,
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.network(imagePath,
+                      width: double.infinity,
+                      height: getHeight(200), // Ensure finite height
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      ImagePath.cat,
+                      fit: BoxFit.contain,
+                    );
+                  }),
                 ),
                 SizedBox(height: getHeight(20)),
 
                 GestureDetector(
                   onTap: () {
-                    // Set the background image and title in AddAlarmController
+                    controller.stopMusic();
                     final addAlarmController = Get.find<AddAlarmController>();
                     addAlarmController.selectedBackground.value = title;
                     addAlarmController.selectedBackgroundImage.value = imagePath;
-                    Get.snackbar("Success", "Successfully Change the background");
-                    Get.back();
+                    addAlarmController.selectedMusicPath.value = musicPath; // Pass music path
+                    Get.toNamed(AppRoute.navBarScreen, arguments: {
+                      'title': title,
+                      'imagePath': imagePath,
+                      'musicPath': musicPath,
+                    });
+                    Get.snackbar("Success", "Background set successfully!", duration: const Duration(seconds: 2));
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: getHeight(12)),

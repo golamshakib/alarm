@@ -20,14 +20,14 @@ class AddAlarmScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AddAlarmController controller = Get.put(AddAlarmController());
-    final settingsController = Get.find<SettingsController>();
+    final settingsController = Get.find<SettingsController>(); // Don't Remove this (Settings fetching the data)
     final arguments = Get.arguments;
 
     if (arguments != null) {
       controller.selectedBackground.value = arguments['title'] ?? '';
       controller.selectedBackgroundImage.value = arguments['imagePath'] ?? '';
       controller.selectedMusicPath.value = arguments['musicPath'] ?? '';
-      controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
+      // controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
     }
 
     final isEditMode = arguments?['isEditMode'] ?? false;
@@ -46,7 +46,7 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedBackground.value = alarm.backgroundTitle;
       controller.selectedBackgroundImage.value = alarm.backgroundImage;
       controller.selectedMusicPath.value = alarm.musicPath;
-      controller.selectedRecordingPath.value = alarm.recordingPath;
+      // controller.selectedRecordingPath.value = alarm.recordingPath;
       controller.selectedSnoozeDuration.value = alarm.snoozeDuration;
       controller.isVibrationEnabled.value = alarm.isVibrationEnabled;
       controller.volume.value = alarm.volume;
@@ -61,7 +61,6 @@ class AddAlarmScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 // App Bar
                 CustomAppbarWithLogo(
                   text: isEditMode ? 'Edit Alarm' : 'Add Alarm',
@@ -211,14 +210,20 @@ class AddAlarmScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const CustomText(text: 'Background:'),
+                          CustomText(text: 'Background:', color: isEditMode ? AppColors.textGrey : AppColors.textPrimary,
+                          ),
                           InkWell(
                             onTap: isEditMode ? null : () {
                               Get.toNamed(AppRoute.changeBackgroundScreen);
                             },
                             child: Obx(() {
-                              return TextWithArrow(
-                                text: controller.selectedBackground.value,
+                              return ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: AppSizes.width * 0.5
+                                ),
+                                child: TextWithArrow(
+                                  text: controller.selectedBackground.value,
+                                ),
                               );
                             }),
                           ),
@@ -227,22 +232,35 @@ class AddAlarmScreen extends StatelessWidget {
                       SizedBox(height: getHeight(16)),
                       Obx(() {
                         final imagePath = controller.selectedBackgroundImage.value;
+
                         if (imagePath.isNotEmpty) {
+                          ImageProvider imageProvider;
+
+                          if (imagePath.startsWith("http") || imagePath.startsWith("https")) {
+                            // If it's a URL, use NetworkImage
+                            imageProvider = NetworkImage(imagePath);
+                          } else if (File(imagePath).existsSync()) {
+                            // If it's a local file, use FileImage
+                            imageProvider = FileImage(File(imagePath));
+                          } else {
+                            // If neither, use a fallback asset
+                            imageProvider = const AssetImage(ImagePath.cat);
+                          }
+
                           return Container(
                             height: getHeight(150),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               image: DecorationImage(
-                                image: File(imagePath).existsSync()
-                                    ? FileImage(File(imagePath)) // Use FileImage for local files
-                                    : const AssetImage(ImagePath.dog) as ImageProvider, // Fallback asset
+                                image: imageProvider,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           );
                         }
-                        return const SizedBox.shrink(); // If no imagePath, return an empty widget
+                        return const SizedBox.shrink(); // Return an empty widget if no imagePath
                       }),
+
 
                       SizedBox(height: getHeight(24)),
 
@@ -289,10 +307,15 @@ class AddAlarmScreen extends StatelessWidget {
                             onTap: () {
                               _showLabelPopup(context, controller);
                             },
-                            child: Obx(() => TextWithArrow(
-                              text: controller.label.value.isNotEmpty
-                                  ? controller.label.value
-                                  : "Morning Alarm",
+                            child: Obx(() => ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: AppSizes.width * 0.5,
+                              ),
+                              child: TextWithArrow(
+                                text: controller.label.value.isNotEmpty
+                                    ? controller.label.value
+                                    : "Morning Alarm",
+                              ),
                             )),
                           ),
                         ],

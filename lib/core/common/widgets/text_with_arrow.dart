@@ -27,14 +27,17 @@ class TextWithArrow extends StatelessWidget {
       onTap: onTap,
       child:
       Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // CustomText Widget
-          CustomText(
-            text: text ?? '',
-            fontSize: fontSize ?? getWidth(14),
-            textOverflow: TextOverflow.ellipsis,
-            color: AppColors.textGrey,
-            fontWeight: fontWeight ?? FontWeight.w400
+          Flexible(
+            child: CustomText(
+              text: text ?? '',
+              fontSize: fontSize ?? getWidth(14),
+              textOverflow: TextOverflow.ellipsis,
+              color: AppColors.textGrey,
+              fontWeight: fontWeight ?? FontWeight.w400
+            ),
           ),
           SizedBox(width: getWidth(8)),
           // Arrow Icon

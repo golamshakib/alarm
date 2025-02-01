@@ -217,8 +217,13 @@ class AddAlarmScreen extends StatelessWidget {
                               Get.toNamed(AppRoute.changeBackgroundScreen);
                             },
                             child: Obx(() {
-                              return TextWithArrow(
-                                text: controller.selectedBackground.value,
+                              return ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: AppSizes.width * 0.5
+                                ),
+                                child: TextWithArrow(
+                                  text: controller.selectedBackground.value,
+                                ),
                               );
                             }),
                           ),
@@ -302,10 +307,15 @@ class AddAlarmScreen extends StatelessWidget {
                             onTap: () {
                               _showLabelPopup(context, controller);
                             },
-                            child: Obx(() => TextWithArrow(
-                              text: controller.label.value.isNotEmpty
-                                  ? controller.label.value
-                                  : "Morning Alarm",
+                            child: Obx(() => ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: AppSizes.width * 0.5,
+                              ),
+                              child: TextWithArrow(
+                                text: controller.label.value.isNotEmpty
+                                    ? controller.label.value
+                                    : "Morning Alarm",
+                              ),
                             )),
                           ),
                         ],

@@ -80,11 +80,11 @@ class NotificationService {
       channelDescription: 'Notifications for alarms',
       importance: Importance.max,
       priority: Priority.high,
-      fullScreenIntent: true, // ✅ Ensures alarm appears on lock screen
+      fullScreenIntent: true,
       playSound: true,
       enableVibration: true,
-      visibility: NotificationVisibility.public,  // ✅ Allows it to be seen on lock screen
-      category: AndroidNotificationCategory.alarm,  // ✅ Makes it a proper alarm notification
+      visibility: NotificationVisibility.public,
+      category: AndroidNotificationCategory.alarm,
     );
 
     final NotificationDetails notificationDetails =
@@ -144,11 +144,11 @@ class NotificationService {
       channelDescription: 'Notifications for snoozed alarms',
       importance: Importance.max,
       priority: Priority.high,
-      fullScreenIntent: true, // ✅ Ensures alarm appears on lock screen
+      fullScreenIntent: true,
       playSound: true,
       enableVibration: true,
-      visibility: NotificationVisibility.public,  // ✅ Allows it to be seen on lock screen
-      category: AndroidNotificationCategory.alarm,  // ✅ Makes it a proper alarm notification
+      visibility: NotificationVisibility.public,
+      category: AndroidNotificationCategory.alarm,
     );
 
     final NotificationDetails notificationDetails =

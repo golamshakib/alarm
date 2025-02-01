@@ -75,13 +75,15 @@
 
         <!-- Alarm Notification -->
         <activity
-            android:name=".alarm.AlarmTriggerScreen"
+            android:name=".features.alarm.AlarmTriggerScreen"
             android:exported="true"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
-            android:showOnLockScreen="true"
-            android:turnScreenOn="true">
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:launchMode="singleTop">
             <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 

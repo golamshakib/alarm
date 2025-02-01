@@ -1,8 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Optional: Add this permission if you want to use bluetooth telephony device like headset/earbuds -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <!-- Optional: Add this permission if you want to save your recordings in public folders -->
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -55,25 +53,12 @@
             android:value="2" />
 
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
-        <!-- Receiver for handling boot (if you need the alarm to persist after reboot) -->
-        <receiver android:name=".BootReceiver" android:enabled="true" android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </receiver>
+
         <service
             android:name="androidx.core.app.JobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false"/>
 
-        <!-- Notification Service -->
-        <service
-            android:name=".NotificationService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false"/>
-
-        <!-- Alarm Notification -->
         <activity
             android:name=".features.alarm.AlarmTriggerScreen"
             android:exported="true"

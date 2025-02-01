@@ -58,7 +58,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   /// **Trigger Vibration if Enabled**
   Future<void> _triggerVibration() async {
     if (widget.alarm.isVibrationEnabled) {
-      Vibration.vibrate(pattern: [500, 1000, 500, 1000], repeat: 2);
+      Vibration.vibrate(pattern: [500, 1000, 500, 1000], repeat: 3);
     }
   }
 

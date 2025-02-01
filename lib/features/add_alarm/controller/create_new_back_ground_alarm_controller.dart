@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../../core/utils/helpers/db_helper_local_music.dart';
+import '../../../core/db_helpers/db_helper_local_background.dart';
 import '../../../routes/app_routes.dart';
 
 class CreateAlarmController extends GetxController {

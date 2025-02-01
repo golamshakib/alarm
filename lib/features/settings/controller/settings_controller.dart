@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/utils/helpers/db_helper_alarm.dart';
+import '../../../core/db_helpers/db_helper_alarm.dart';
 import '../../add_alarm/controller/add_alarm_controller.dart';
 
 class SettingsController extends GetxController {

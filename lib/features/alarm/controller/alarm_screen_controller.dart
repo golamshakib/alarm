@@ -2,10 +2,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
-import '../../../core/utils/helpers/db_helper_alarm.dart';
+import '../../../core/db_helpers/db_helper_alarm.dart';
 import '../../add_alarm/controller/add_alarm_controller.dart';
 import '../../add_alarm/data/alarm_model.dart';
-import '../../../core/utils/helpers/notification_helper.dart';
+import '../../../core/services/notification_service.dart';
 
 class AlarmScreenController extends GetxController {
   final DBHelperAlarm dbHelper = DBHelperAlarm();
@@ -25,12 +25,12 @@ class AlarmScreenController extends GetxController {
 
       // 🔹 If the alarm is OFF, cancel the scheduled notification
       if (!alarm.isToggled.value) {
-        await NotificationHelper.cancelAlarm(alarm.id!);
+        await NotificationService.cancelAlarm(alarm.id!);
         debugPrint("Notification for alarm ID ${alarm.id} has been canceled.");
       } else {
         // 🔹 If the alarm is ON, schedule the notification
         DateTime scheduledTime = getNextAlarmTime(alarm);
-        await NotificationHelper.scheduleAlarm(
+        await NotificationService.scheduleAlarm(
           id: alarm.id!,
           title: "Alarm",
           body: alarm.label,

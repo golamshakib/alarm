@@ -10,7 +10,7 @@ import '../../../../core/common/widgets/custom_text.dart';
 import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
-import '../../../../core/utils/helpers/db_helper_local_music.dart';
+import '../../../../core/db_helpers/db_helper_local_background.dart';
 import '../../../../routes/app_routes.dart';
 import '../../controller/create_new_back_ground_alarm_controller.dart';
 

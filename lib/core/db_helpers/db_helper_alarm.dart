@@ -1,6 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../../features/add_alarm/data/alarm_model.dart';
+import '../../features/add_alarm/data/alarm_model.dart';
 
 class DBHelperAlarm {
   static final DBHelperAlarm _instance = DBHelperAlarm._internal();

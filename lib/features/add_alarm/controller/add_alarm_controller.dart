@@ -10,8 +10,8 @@ import 'package:vibration/vibration.dart';
 import 'package:volume_controller/volume_controller.dart';
 
 
-import '../../../core/utils/helpers/db_helper_alarm.dart';
-import '../../../core/utils/helpers/notification_helper.dart';
+import '../../../core/db_helpers/db_helper_alarm.dart';
+import '../../../core/services/notification_service.dart';
 import '../../settings/controller/settings_controller.dart';
 import '../data/alarm_model.dart';
 
@@ -330,7 +330,7 @@ class AddAlarmController extends GetxController {
       debugPrint("🔊 Volume: ${newAlarm.volume}");
 
       // Schedule notification
-      await NotificationHelper.scheduleAlarm(
+      await NotificationService.scheduleAlarm(
         id: id,
         title: "Alarm",
         body: newAlarm.label,

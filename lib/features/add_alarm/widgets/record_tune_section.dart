@@ -4,7 +4,7 @@
 // import '../../../core/common/widgets/custom_text.dart';
 // import '../../../core/utils/constants/app_sizes.dart';
 // import '../../../core/utils/constants/icon_path.dart';
-// import '../controller/create_new_back_ground_alarm_controller.dart';
+// import '../controller/create_new_back_ground_screen_controller.dart';
 //
 // class RecordTuneSection extends StatelessWidget {
 //   const RecordTuneSection({

@@ -5,7 +5,7 @@
 // import 'package:get/get.dart';
 //
 // import '../../../core/utils/constants/app_sizes.dart';
-// import '../controller/create_new_back_ground_alarm_controller.dart';
+// import '../controller/create_new_back_ground_screen_controller.dart';
 //
 // class WaveFormSection extends StatelessWidget {
 //   const WaveFormSection({

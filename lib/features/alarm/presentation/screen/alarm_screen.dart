@@ -8,8 +8,8 @@ import 'package:alarm/features/add_alarm/controller/add_alarm_controller.dart';
 import 'package:alarm/features/alarm/controller/alarm_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../core/common/widgets/custom_text.dart';
-import '../add_alarm/presentation/screens/add_alarm_screen.dart';
+import '../../../../core/common/widgets/custom_text.dart';
+import '../../../add_alarm/presentation/screens/add_alarm_screen.dart';
 import 'package:alarm/features/settings/controller/settings_controller.dart';
 
 class AlarmScreen extends StatelessWidget {

@@ -298,8 +298,9 @@ class AddAlarmController extends GetxController {
       label: label.value.isEmpty ? 'Morning Alarm' : label.value,
       backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
-      musicPath: selectedMusicPath.value, // Custom sound path from database
-      // recordingPath: selectedRecordingPath.value,
+      musicPath: selectedMusicPath.value.isNotEmpty == true
+          ? selectedMusicPath.value
+          : "assets/audio/iphone_alarm.mp3",
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
           .map((entry) => entry.key)

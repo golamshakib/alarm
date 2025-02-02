@@ -8,7 +8,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../../features/add_alarm/controller/add_alarm_controller.dart';
 import '../../features/add_alarm/data/alarm_model.dart';
-import '../../features/alarm/alarm_trigger_screen.dart';
+import '../../features/alarm/presentation/screen/alarm_trigger_screen.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

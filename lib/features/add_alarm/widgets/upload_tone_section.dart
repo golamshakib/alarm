@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../core/common/widgets/custom_text.dart';
 import '../../../core/utils/constants/app_sizes.dart';
-import '../controller/create_new_back_ground_alarm_controller.dart';
+import '../controller/create_new_back_ground_screen_controller.dart';
 
 class UploadToneSection extends StatelessWidget {
   const UploadToneSection({
@@ -12,7 +12,7 @@ class UploadToneSection extends StatelessWidget {
     required this.controller,
   });
 
-  final CreateAlarmController controller;
+  final CreateNewBackgroundController controller;
 
   @override
   Widget build(BuildContext context) {

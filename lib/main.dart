@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'app.dart';
-import 'core/services/Auth_service.dart';
 import 'core/services/notification_service.dart';
 
 void main() async {

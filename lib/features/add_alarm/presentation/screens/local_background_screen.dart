@@ -12,14 +12,14 @@ import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../../../core/db_helpers/db_helper_local_background.dart';
 import '../../../../routes/app_routes.dart';
-import '../../controller/create_new_back_ground_alarm_controller.dart';
+import '../../controller/create_new_back_ground_screen_controller.dart';
 
 class LocalBackgroundScreen extends StatelessWidget {
   const LocalBackgroundScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final CreateAlarmController createAlarmController = Get.put(CreateAlarmController());
+    final CreateNewBackgroundController createAlarmController = Get.put(CreateNewBackgroundController());
     final DBHelperMusic dbHelper = DBHelperMusic();
 
     return Scaffold(
@@ -194,7 +194,7 @@ class PlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CreateAlarmController createAlarmController = Get.find<CreateAlarmController>();
+    final CreateNewBackgroundController createAlarmController = Get.find<CreateNewBackgroundController>();
 
     return GestureDetector(
       onTap: () {

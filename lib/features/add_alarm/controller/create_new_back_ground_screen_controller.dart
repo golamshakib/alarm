@@ -10,7 +10,7 @@ import 'package:just_audio/just_audio.dart';
 import '../../../core/db_helpers/db_helper_local_background.dart';
 import '../../../routes/app_routes.dart';
 
-class CreateAlarmController extends GetxController {
+class CreateNewBackgroundController extends GetxController {
   ImagePicker picker = ImagePicker();
   Rx<String> labelText = ''.obs; // Store label text
 

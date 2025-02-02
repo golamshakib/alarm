@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../core/common/widgets/custom_text.dart';
 import '../../../core/utils/constants/app_colors.dart';
 import '../../../core/utils/constants/app_sizes.dart';
-import '../controller/create_new_back_ground_alarm_controller.dart';
+import '../controller/create_new_back_ground_screen_controller.dart';
 
 class SaveBackgroundButtonSection extends StatelessWidget {
   const SaveBackgroundButtonSection({
@@ -13,7 +13,7 @@ class SaveBackgroundButtonSection extends StatelessWidget {
     this.id,
   });
 
-  final CreateAlarmController controller;
+  final CreateNewBackgroundController controller;
   final int? id;
 
   @override

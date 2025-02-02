@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:widgets_easier/widgets_easier.dart';
 import 'dart:io';
 
-import '../../controller/create_new_back_ground_alarm_controller.dart';
+import '../../controller/create_new_back_ground_screen_controller.dart';
 import '../../widgets/save_background_button_section.dart';
 import '../../widgets/upload_background_image_section.dart';
 import '../../widgets/upload_tone_section.dart';
@@ -28,7 +28,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
     final String? musicPath = arguments?['musicPath'];
     // final String? recordingPath = arguments?['recordingPath'];
 
-    final CreateAlarmController controller = Get.put(CreateAlarmController());
+    final CreateNewBackgroundController controller = Get.put(CreateNewBackgroundController());
 
     // Pre-fill the fields if arguments are provided
     if (title != null) controller.labelText.value = title;

@@ -5,11 +5,11 @@ import 'package:just_audio/just_audio.dart';
 import '../../../core/models/response_data.dart';
 import '../../../core/services/network_caller.dart';
 import '../../../core/utils/constants/api_constants.dart';
-import 'create_new_back_ground_alarm_controller.dart';
+import 'create_new_back_ground_screen_controller.dart';
 
 
-class ChangeBackgroundController extends GetxController {
-  final CreateAlarmController createAlarmController = Get.find<CreateAlarmController>();
+class ChangeBackgroundScreenController extends GetxController {
+  final CreateNewBackgroundController createAlarmController = Get.find<CreateNewBackgroundController>();
   final NetworkCaller networkCaller = NetworkCaller();
   var items = <Map<String, dynamic>>[].obs;
   final player = AudioPlayer();

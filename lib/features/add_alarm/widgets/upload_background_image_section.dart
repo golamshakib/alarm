@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/common/widgets/custom_text.dart';
 import '../../../core/utils/constants/app_sizes.dart';
-import '../controller/create_new_back_ground_alarm_controller.dart';
+import '../controller/create_new_back_ground_screen_controller.dart';
 
 class UploadBackgroundImageSection extends StatelessWidget {
   const UploadBackgroundImageSection({
@@ -14,7 +14,7 @@ class UploadBackgroundImageSection extends StatelessWidget {
     required this.picker,
   });
 
-  final CreateAlarmController controller;
+  final CreateNewBackgroundController controller;
   final ImagePicker picker;
 
   @override

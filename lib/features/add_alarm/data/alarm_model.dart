@@ -5,7 +5,7 @@ class Alarm {
   int hour, minute;
   bool isAm;
   String label, backgroundTitle, backgroundImage, musicPath;
-  // String recordingPath;
+  String recordingPath;
   List<String> repeatDays;
   bool isVibrationEnabled;
   int snoozeDuration;
@@ -21,7 +21,7 @@ class Alarm {
     required this.backgroundTitle,
     required this.backgroundImage,
     required this.musicPath,
-    // required this.recordingPath,
+    required this.recordingPath,
     required this.repeatDays,
     this.isVibrationEnabled = true,
     this.snoozeDuration = 5,
@@ -38,7 +38,7 @@ class Alarm {
     'backgroundTitle': backgroundTitle,
     'backgroundImage': backgroundImage,
     'musicPath': musicPath,
-    // 'recordingPath': recordingPath,
+    'recordingPath': recordingPath,
     'repeatDays': repeatDays.join(','),
     'isVibrationEnabled': isVibrationEnabled ? 1 : 0,
     'snoozeDuration': snoozeDuration,
@@ -55,7 +55,7 @@ class Alarm {
     backgroundTitle: map['backgroundTitle'],
     backgroundImage: map['backgroundImage'],
     musicPath: map['musicPath'],
-    // recordingPath: map['recordingPath'],
+    recordingPath: map['recordingPath'],
     repeatDays: (map['repeatDays'] as String).split(','),
     isVibrationEnabled: map['isVibrationEnabled'] == 1,
     snoozeDuration: map['snoozeDuration'],

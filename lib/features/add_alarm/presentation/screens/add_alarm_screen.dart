@@ -27,7 +27,7 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedBackground.value = arguments['title'] ?? '';
       controller.selectedBackgroundImage.value = arguments['imagePath'] ?? '';
       controller.selectedMusicPath.value = arguments['musicPath'] ?? '';
-      // controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
+      controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
     }
 
     final isEditMode = arguments?['isEditMode'] ?? false;
@@ -46,7 +46,7 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedBackground.value = alarm.backgroundTitle;
       controller.selectedBackgroundImage.value = alarm.backgroundImage;
       controller.selectedMusicPath.value = alarm.musicPath;
-      // controller.selectedRecordingPath.value = alarm.recordingPath;
+      controller.selectedRecordingPath.value = alarm.recordingPath;
       controller.selectedSnoozeDuration.value = alarm.snoozeDuration;
       controller.isVibrationEnabled.value = alarm.isVibrationEnabled;
       controller.volume.value = alarm.volume;

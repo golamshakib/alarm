@@ -9,10 +9,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:widgets_easier/widgets_easier.dart';
 import 'dart:io';
 
-import '../../controller/create_new_back_ground_alarm_controller.dart';
+import '../../controller/create_new_back_ground_screen_controller.dart';
+import '../../widgets/record_tune_section.dart';
 import '../../widgets/save_background_button_section.dart';
 import '../../widgets/upload_background_image_section.dart';
 import '../../widgets/upload_tone_section.dart';
+import '../../widgets/wave_form_section.dart';
 
 class CreateNewBackgroundScreen extends StatelessWidget {
   const CreateNewBackgroundScreen({super.key});
@@ -26,15 +28,15 @@ class CreateNewBackgroundScreen extends StatelessWidget {
     final String? title = arguments?['title'];
     final String? imagePath = arguments?['imagePath'];
     final String? musicPath = arguments?['musicPath'];
-    // final String? recordingPath = arguments?['recordingPath'];
+    final String? recordingPath = arguments?['recordingPath'];
 
-    final CreateAlarmController controller = Get.put(CreateAlarmController());
+    final CreateNewBackgroundController controller = Get.put(CreateNewBackgroundController());
 
     // Pre-fill the fields if arguments are provided
     if (title != null) controller.labelText.value = title;
     if (imagePath != null) controller.imagePath.value = imagePath;
     if (musicPath != null) controller.musicPath.value = musicPath;
-    // if (recordingPath != null) controller.recordingPath.value = recordingPath;
+    if (recordingPath != null) controller.recordingPath.value = recordingPath;
 
     return Scaffold(
       body: SafeArea(
@@ -168,7 +170,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                             : "Pick an audio file",
                           child: GestureDetector(
                             onTap: controller.isMusicDisabled.value
-                                ? null // Disable interaction if isMusicDisabled is true
+                                ? null
                                 : () async {
                               controller.pickMusic();
                             },
@@ -266,16 +268,16 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                       SizedBox(height: getHeight(8)),
 
                       // Record Your Tune
-                      // Center(
-                      //     child: CustomText(
-                      //   text: "Or",
-                      //   color: const Color(0xffA59F92),
-                      //   fontSize: getWidth(14),
-                      // )),
+                      Center(
+                          child: CustomText(
+                        text: "Or",
+                        color: const Color(0xffA59F92),
+                        fontSize: getWidth(14),
+                      )),
 
                       const SizedBox(height: 16),
-                      // RecordTuneSection(controller: controller),
-                      // WaveFormSection(controller: controller),
+                      RecordTuneSection(controller: controller),
+                      WaveFormSection(controller: controller),
                     ],
                   ),
                 ),

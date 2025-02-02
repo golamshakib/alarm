@@ -12,7 +12,7 @@ import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../controller/add_alarm_controller.dart';
-import 'create_new_backgroud_alarm.dart';
+import 'create_new_backgroud_screen.dart';
 
 class LocalStoragePreviewScreen extends StatelessWidget {
   const LocalStoragePreviewScreen({

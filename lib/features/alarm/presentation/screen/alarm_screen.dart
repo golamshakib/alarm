@@ -8,8 +8,8 @@ import 'package:alarm/features/add_alarm/controller/add_alarm_controller.dart';
 import 'package:alarm/features/alarm/controller/alarm_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../core/common/widgets/custom_text.dart';
-import '../add_alarm/presentation/screens/add_alarm_screen.dart';
+import '../../../../core/common/widgets/custom_text.dart';
+import '../../../add_alarm/presentation/screens/add_alarm_screen.dart';
 import 'package:alarm/features/settings/controller/settings_controller.dart';
 
 class AlarmScreen extends StatelessWidget {
@@ -164,10 +164,10 @@ class AlarmScreen extends StatelessWidget {
                         child: Container(decoration: BoxDecoration(
                           image: DecorationImage(
                             image: alarm.backgroundImage.startsWith("http") || alarm.backgroundImage.startsWith("https")
-                                ? NetworkImage(alarm.backgroundImage) // Use network image if it's a URL
+                                ? NetworkImage(alarm.backgroundImage)
                                 : File(alarm.backgroundImage).existsSync()
-                                ? FileImage(File(alarm.backgroundImage)) // Use FileImage for local files
-                                : const AssetImage(ImagePath.cat) as ImageProvider, // Fallback asset image
+                                ? FileImage(File(alarm.backgroundImage))
+                                : const AssetImage(ImagePath.cat) as ImageProvider,
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(10),
@@ -192,7 +192,6 @@ class AlarmScreen extends StatelessWidget {
                                     children: [
                                       Row(
                                         children: [
-                                          // 🎵 Play Button (Supports Network & Local Music)
                                           GestureDetector(
                                             onTap: () {
                                               addAlarmController.togglePlayPause(index, alarm.musicPath);

@@ -2,8 +2,8 @@
 
 import 'package:get/get.dart';
 
-import '../../features/add_alarm/controller/change_back_ground_controller.dart';
-import '../../features/add_alarm/controller/create_new_back_ground_alarm_controller.dart';
+import '../../features/add_alarm/controller/change_back_ground_screen_controller.dart';
+import '../../features/add_alarm/controller/create_new_back_ground_screen_controller.dart';
 
 class ControllerBinder extends Bindings {
   @override
@@ -13,12 +13,12 @@ class ControllerBinder extends Bindings {
     //   fenix: true,
     // );
 
-    Get.lazyPut<ChangeBackgroundController>(
-          () => ChangeBackgroundController(),
+    Get.lazyPut<ChangeBackgroundScreenController>(
+          () => ChangeBackgroundScreenController(),
       fenix: true,
     );
-    Get.lazyPut<CreateAlarmController>(
-          () => CreateAlarmController(),
+    Get.lazyPut<CreateNewBackgroundController>(
+          () => CreateNewBackgroundController(),
       fenix: true,
     );
 

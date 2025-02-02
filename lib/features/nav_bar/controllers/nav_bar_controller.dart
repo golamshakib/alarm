@@ -1,5 +1,5 @@
 import 'package:alarm/core/utils/constants/icon_path.dart';
-import 'package:alarm/features/alarm/alarm_screen.dart';
+import 'package:alarm/features/alarm/presentation/screen/alarm_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

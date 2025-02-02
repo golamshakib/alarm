@@ -8,14 +8,14 @@ import '../../../../core/common/widgets/custom_text.dart';
 import '../../../../core/utils/constants/app_sizes.dart';
 import '../../../../core/utils/constants/image_path.dart';
 import '../../../../routes/app_routes.dart';
-import '../../controller/change_back_ground_controller.dart';
+import '../../controller/change_back_ground_screen_controller.dart';
 
-class ChangeBackGroundAlarm extends StatelessWidget {
-  const ChangeBackGroundAlarm({super.key});
+class ChangeBackGroundScreen extends StatelessWidget {
+  const ChangeBackGroundScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ChangeBackgroundController controller = Get.put(ChangeBackgroundController());
+    final ChangeBackgroundScreenController controller = Get.put(ChangeBackgroundScreenController());
 
     return Scaffold(
       body: SafeArea(

@@ -11,7 +11,6 @@ import 'package:volume_controller/volume_controller.dart';
 
 
 import '../../../core/db_helpers/db_helper_alarm.dart';
-import '../../../core/services/notification_service.dart';
 import '../../settings/controller/settings_controller.dart';
 import '../data/alarm_model.dart';
 
@@ -299,7 +298,7 @@ class AddAlarmController extends GetxController {
       backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
       musicPath: selectedMusicPath.value, // Custom sound path from database
-      // recordingPath: selectedRecordingPath.value,
+      recordingPath: selectedRecordingPath.value,
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
           .map((entry) => entry.key)
@@ -329,15 +328,6 @@ class AddAlarmController extends GetxController {
       debugPrint("📳 Vibration: ${newAlarm.isVibrationEnabled ? 'Enabled' : 'Disabled'}");
       debugPrint("🔊 Volume: ${newAlarm.volume}");
 
-      // Schedule notification
-      await NotificationService.scheduleAlarm(
-        id: id,
-        title: "Alarm",
-        body: newAlarm.label,
-        // imagePath: newAlarm.backgroundImage,
-        // soundPath: newAlarm.musicPath, // This will be used in AlarmTriggerScreen
-        scheduledTime: alarmTime,
-      );
 
       Get.snackbar("Success", "Alarm saved Successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
@@ -397,7 +387,7 @@ class AddAlarmController extends GetxController {
       backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
       musicPath: selectedMusicPath.value,
-      // recordingPath: selectedRecordingPath.value,
+      recordingPath: selectedRecordingPath.value,
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
           .map((entry) => entry.key)

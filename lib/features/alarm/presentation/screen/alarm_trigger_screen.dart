@@ -8,9 +8,9 @@ import 'package:get/get.dart';
 
 import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
-import '../add_alarm/controller/add_alarm_controller.dart';
-import '../add_alarm/data/alarm_model.dart';
-import '../../core/services/notification_service.dart';
+import '../../../add_alarm/controller/add_alarm_controller.dart';
+import '../../../add_alarm/data/alarm_model.dart';
+
 
 class AlarmTriggerScreen extends StatefulWidget {
   final Alarm alarm;
@@ -74,7 +74,6 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   void _snoozeAlarm() {
     _audioPlayer.stop();
     Vibration.cancel();
-    NotificationService.snoozeAlarm(alarm: widget.alarm);
     Get.back();
     // SystemNavigator.pop(); // Force close the app
   }

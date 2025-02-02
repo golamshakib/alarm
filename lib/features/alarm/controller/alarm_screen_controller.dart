@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import '../../../core/db_helpers/db_helper_alarm.dart';
 import '../../add_alarm/controller/add_alarm_controller.dart';
 import '../../add_alarm/data/alarm_model.dart';
-import '../../../core/services/notification_service.dart';
 
 class AlarmScreenController extends GetxController {
   final DBHelperAlarm dbHelper = DBHelperAlarm();
@@ -19,30 +18,10 @@ class AlarmScreenController extends GetxController {
 
       // Toggle the value in memory
       alarm.isToggled.value = !alarm.isToggled.value;
-
-      // 🔹 Update the database with the modified alarm state
       await dbHelper.updateAlarm(alarm);
-
-      // 🔹 If the alarm is OFF, cancel the scheduled notification
-      if (!alarm.isToggled.value) {
-        await NotificationService.cancelAlarm(alarm.id!);
-        debugPrint("Notification for alarm ID ${alarm.id} has been canceled.");
-      } else {
-        // 🔹 If the alarm is ON, schedule the notification
-        DateTime scheduledTime = getNextAlarmTime(alarm);
-        await NotificationService.scheduleAlarm(
-          id: alarm.id!,
-          title: "Alarm",
-          body: alarm.label,
-          scheduledTime: scheduledTime,
-        );
-        debugPrint("Notification for alarm ID ${alarm.id} has been scheduled.");
-      }
-
-      // 🔹 Refresh the list from the database
       fetchAlarms();
 
-      update(); // Ensure UI is refreshed
+      update();
     } catch (e) {
       debugPrint("Error toggling alarm: $e");
     }

@@ -21,7 +21,7 @@ class NotificationService {
     const AndroidInitializationSettings androidInitializationSettings =
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
     InitializationSettings(android: androidInitializationSettings);
 
     await flutterLocalNotificationsPlugin.initialize(
@@ -73,7 +73,7 @@ class NotificationService {
   }) async {
     final tz.TZDateTime scheduledDate = tz.TZDateTime.from(scheduledTime, tz.local);
 
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
     AndroidNotificationDetails(
       'alarm_channel_id',
       'Alarm Notifications',
@@ -137,7 +137,7 @@ class NotificationService {
     log("Snoozing alarm for: $snoozedDate");
 
     // Schedule the snoozed notification
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
     AndroidNotificationDetails(
       'snooze_alarm_channel',
       'Snoozed Alarm Notifications',

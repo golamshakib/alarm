@@ -198,18 +198,21 @@ class AddAlarmController extends GetxController {
   /// -- S A V E   S C R E E N   S E T T I N G S --
   Future<void> saveScreenPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('selectedHour', selectedHour.value);
-    await prefs.setInt('selectedMinute', selectedMinute.value);
-    await prefs.setBool('isAm', isAm.value);
-    await prefs.setString('label', label.value);
-    await prefs.setString('repeatDays', jsonEncode(repeatDays));
-    await prefs.setInt('snoozeDuration', selectedSnoozeDuration.value);
-    await prefs.setBool('isVibrationEnabled', isVibrationEnabled.value);
-    await prefs.setDouble('volume', volume.value);
-    await prefs.setString('selectedBackground', selectedBackground.value);
-    await prefs.setString('selectedBackgroundImage', selectedBackgroundImage.value);
-    await prefs.setString('selectedMusicPath', selectedMusicPath.value);
+    await Future.wait([
+      prefs.setInt('selectedHour', selectedHour.value),
+      prefs.setInt('selectedMinute', selectedMinute.value),
+      prefs.setBool('isAm', isAm.value),
+      prefs.setString('label', label.value),
+      prefs.setString('repeatDays', jsonEncode(repeatDays)),
+      prefs.setInt('snoozeDuration', selectedSnoozeDuration.value),
+      prefs.setBool('isVibrationEnabled', isVibrationEnabled.value),
+      prefs.setDouble('volume', volume.value),
+      prefs.setString('selectedBackground', selectedBackground.value),
+      prefs.setString('selectedBackgroundImage', selectedBackgroundImage.value),
+      prefs.setString('selectedMusicPath', selectedMusicPath.value),
+    ]);
   }
+
 
   // Load screen settings
   Future<void> loadScreenPreferences() async {

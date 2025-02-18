@@ -32,8 +32,6 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     _triggerVibration();
   }
 
-
-
   /// **Play Alarm Sound (Supports Network & Local Files)**
   Future<void> _playAlarmSound() async {
     String musicPath = widget.alarm.musicPath;
@@ -44,10 +42,11 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
         } else if (File(musicPath).existsSync()) {
           await _audioPlayer.setFilePath(musicPath); // Play from local file
         } else {
-         await _audioPlayer.setAsset('assets/audio/iphone_alarm.mp3');
+          await _audioPlayer.setAsset('assets/audio/iphone_alarm.mp3');
         }
 
-        await _audioPlayer.setLoopMode(LoopMode.one); // Keep playing until dismissed
+        await _audioPlayer
+            .setLoopMode(LoopMode.one); // Keep playing until dismissed
         await _audioPlayer.play();
       } catch (e) {
         debugPrint("Error playing alarm sound: $e");
@@ -104,7 +103,8 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     String backgroundImage = widget.alarm.backgroundImage;
     ImageProvider imageProvider;
 
-    if (backgroundImage.startsWith("http") || backgroundImage.startsWith("https")) {
+    if (backgroundImage.startsWith("http") ||
+        backgroundImage.startsWith("https")) {
       imageProvider = NetworkImage(backgroundImage); // Network image
     } else if (File(backgroundImage).existsSync()) {
       imageProvider = FileImage(File(backgroundImage)); // Local image
@@ -140,7 +140,8 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomText(
-                        text: formatTime(widget.alarm.hour, widget.alarm.minute, widget.alarm.isAm, controller.timeFormat.value),
+                        text: formatTime(widget.alarm.hour, widget.alarm.minute,
+                            widget.alarm.isAm, controller.timeFormat.value),
                         color: Colors.white,
                         fontSize: getWidth(40),
                         fontWeight: FontWeight.w300,

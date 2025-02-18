@@ -421,10 +421,38 @@ class AddAlarmController extends GetxController {
       snoozeDuration: selectedSnoozeDuration.value,
       volume: volume.value,
     );
+
+
     try {
       await dbHelper.updateAlarm(updatedAlarm);
       fetchAlarmsFromDatabase();
-      Get.snackbar("Success", "Alarm updated successfully!", duration: const Duration(seconds: 2));
+      DateTime alarmTime = getNextAlarmTime(updatedAlarm);
+
+      // Calculate remaining time
+      Duration remainingTime = alarmTime.difference(DateTime.now());
+
+      // Format remaining time
+      int hours = remainingTime.inHours;
+      int minutes = remainingTime.inMinutes % 60;
+
+      // Print Alarm Details
+      debugPrint("Updated Alarm Time: \${alarmTime.toLocal()}");
+      debugPrint("📆 Alarm Rescheduled for: \${alarmTime.toLocal()}");
+
+      // Schedule notification
+      await NotificationService.scheduleAlarm(
+        id: updatedAlarm.id!,
+        title: "Alarm",
+        body: updatedAlarm.label,
+        scheduledTime: alarmTime,
+      );
+
+      // Show snackbar with the remaining time
+      Get.snackbar(
+        "",
+        "Alarm updated and set for $hours hour and $minutes minute",
+        duration: const Duration(seconds: 2),
+      );
     } catch (e) {
       Get.snackbar("Error", "Failed to update alarm: $e", duration: const Duration(seconds: 2));
     }

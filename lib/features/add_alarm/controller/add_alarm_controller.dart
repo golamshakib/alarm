@@ -198,18 +198,21 @@ class AddAlarmController extends GetxController {
   /// -- S A V E   S C R E E N   S E T T I N G S --
   Future<void> saveScreenPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('selectedHour', selectedHour.value);
-    await prefs.setInt('selectedMinute', selectedMinute.value);
-    await prefs.setBool('isAm', isAm.value);
-    await prefs.setString('label', label.value);
-    await prefs.setString('repeatDays', jsonEncode(repeatDays));
-    await prefs.setInt('snoozeDuration', selectedSnoozeDuration.value);
-    await prefs.setBool('isVibrationEnabled', isVibrationEnabled.value);
-    await prefs.setDouble('volume', volume.value);
-    await prefs.setString('selectedBackground', selectedBackground.value);
-    await prefs.setString('selectedBackgroundImage', selectedBackgroundImage.value);
-    await prefs.setString('selectedMusicPath', selectedMusicPath.value);
+    await Future.wait([
+      prefs.setInt('selectedHour', selectedHour.value),
+      prefs.setInt('selectedMinute', selectedMinute.value),
+      prefs.setBool('isAm', isAm.value),
+      prefs.setString('label', label.value),
+      prefs.setString('repeatDays', jsonEncode(repeatDays)),
+      prefs.setInt('snoozeDuration', selectedSnoozeDuration.value),
+      prefs.setBool('isVibrationEnabled', isVibrationEnabled.value),
+      prefs.setDouble('volume', volume.value),
+      prefs.setString('selectedBackground', selectedBackground.value),
+      prefs.setString('selectedBackgroundImage', selectedBackgroundImage.value),
+      prefs.setString('selectedMusicPath', selectedMusicPath.value),
+    ]);
   }
+
 
   // Load screen settings
   Future<void> loadScreenPreferences() async {
@@ -319,6 +322,13 @@ class AddAlarmController extends GetxController {
       // ✅ Get the next valid alarm time
       DateTime alarmTime = getNextAlarmTime(newAlarm);
 
+      // Calculate remaining time
+      Duration remainingTime = alarmTime.difference(DateTime.now());
+
+      // Format remaining time
+      int hours = remainingTime.inHours;
+      int minutes = remainingTime.inMinutes % 60;
+
       // ✅ Print Alarm Details
       debugPrint("Scheduled Alarm Time: ${alarmTime.toLocal()}");
       debugPrint("🚀 Alarm Saved!");
@@ -336,11 +346,15 @@ class AddAlarmController extends GetxController {
         title: "Alarm",
         body: newAlarm.label,
         // imagePath: newAlarm.backgroundImage,
-        // soundPath: newAlarm.musicPath, // This will be used in AlarmTriggerScreen
+        // soundPath: newAlarm.musicPath,
         scheduledTime: alarmTime,
       );
 
-      Get.snackbar("Success", "Alarm saved Successfully!", duration: const Duration(seconds: 2));
+      Get.snackbar(
+        "",
+        "Alarm set for $hours hour and $minutes minute",
+        duration: const Duration(seconds: 2),
+      );
     } catch (e) {
       Get.snackbar("Error", "Failed to Save Alarm: $e", duration: const Duration(seconds: 2));
     }
@@ -390,7 +404,7 @@ class AddAlarmController extends GetxController {
   Future<void> updateAlarmInDatabase(Alarm existingAlarm) async {
     final dbHelper = DBHelperAlarm();
     final updatedAlarm = Alarm(
-      id: existingAlarm.id, // Retain the existing alarm's ID
+      id: existingAlarm.id,
       hour: selectedHour.value,
       minute: selectedMinute.value,
       isAm: isAm.value,
@@ -408,8 +422,8 @@ class AddAlarmController extends GetxController {
       volume: volume.value,
     );
     try {
-      await dbHelper.updateAlarm(updatedAlarm); // Update the alarm in the database
-      fetchAlarmsFromDatabase(); // Refresh the list of alarms
+      await dbHelper.updateAlarm(updatedAlarm);
+      fetchAlarmsFromDatabase();
       Get.snackbar("Success", "Alarm updated successfully!", duration: const Duration(seconds: 2));
     } catch (e) {
       Get.snackbar("Error", "Failed to update alarm: $e", duration: const Duration(seconds: 2));
@@ -452,8 +466,8 @@ class AddAlarmController extends GetxController {
 
   @override
   void onClose() {
-    stopMusic(); // Stop music playback
-    audioPlayer.dispose(); // Dispose of the audio player when the controller is closed
+    stopMusic();
+    audioPlayer.dispose();
     volumeController.removeListener();
     super.onClose();
   }

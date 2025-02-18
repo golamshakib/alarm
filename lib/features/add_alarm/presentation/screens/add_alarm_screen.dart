@@ -7,12 +7,15 @@ import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/icon_path.dart';
 import 'package:alarm/core/utils/constants/image_path.dart';
+import 'package:alarm/features/add_alarm/widgets/time_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../settings/controller/settings_controller.dart';
 import '../../controller/add_alarm_controller.dart';
+import '../helper_method/label_popup.dart';
+import '../helper_method/snooze_popup.dart';
 
 class AddAlarmScreen extends StatelessWidget {
   const AddAlarmScreen({super.key});
@@ -31,7 +34,7 @@ class AddAlarmScreen extends StatelessWidget {
     }
 
     final isEditMode = arguments?['isEditMode'] ?? false;
-    final alarm = arguments?['alarm']; // Get alarm if in edit mode
+    final alarm = arguments?['alarm'];
 
     if (isEditMode && alarm != null) {
       // Prepopulate fields with the existing alarm's data
@@ -39,7 +42,7 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedMinute.value = alarm.minute;
       controller.isAm.value = alarm.isAm;
       controller.label.value = alarm.label;
-      controller.repeatDays.updateAll((key, value) => false); // Reset and update repeat days
+      controller.repeatDays.updateAll((key, value) => false);
       for (var day in alarm.repeatDays) {
         controller.repeatDays[day] = true;
       }
@@ -67,10 +70,10 @@ class AddAlarmScreen extends StatelessWidget {
                   iconPath: IconPath.check,
                   onIconTap: () {
                     if (isEditMode) {
-                      controller.updateAlarmInDatabase(alarm); // Update the existing alarm
+                      controller.updateAlarmInDatabase(alarm);
                       Get.back();
                     } else {
-                      controller.saveAlarmToDatabase(); // Save a new alarm
+                      controller.saveAlarmToDatabase();
                     }
                     controller.saveScreenPreferences();
                   },
@@ -79,122 +82,13 @@ class AddAlarmScreen extends StatelessWidget {
 
                 // Time Picker
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  margin: EdgeInsets.symmetric(vertical: getHeight(16)),
                   decoration: BoxDecoration(
                     color: AppColors.lightYellowContainer,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.all(16),
-                  child: SizedBox(
-                    height: getHeight(60),
-                    child: Row(
-                      mainAxisAlignment: controller.timeFormat.value == 24 ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Hour Dropdown (Reactive to time format)
-                        Flexible(
-                          child: Obx(() {
-                            final is24Hour = controller.timeFormat.value == 24;
-                            return DropdownButton<int>(
-                              value: controller.selectedHour.value,
-                              items: List.generate(
-                                is24Hour ? 24 : 12,
-                                    (index) {
-                                  return DropdownMenuItem(
-                                    value: is24Hour ? index : index + 1,
-                                    child: Text(
-                                      is24Hour ? index.toString() : (index + 1).toString(),
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  controller.selectedHour.value = value;
-                                }
-                              },
-                              dropdownColor: AppColors.lightYellowContainer,
-                              menuMaxHeight: getHeight(250),
-                            );
-                          }),
-                        ),
-
-                        // Minute Dropdown
-                        Flexible(
-                          child: Obx(() => DropdownButton<int>(
-                            value: controller.selectedMinute.value,
-                            items: List.generate(60, (index) {
-                              return DropdownMenuItem(
-                                value: index,
-                                child: Text(
-                                  index.toString().padLeft(2, '0'),
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              );
-                            }),
-                            onChanged: (value) {
-                              if (value != null) {
-                                controller.selectedMinute.value = value;
-                              }
-                            },
-                            dropdownColor: AppColors.lightYellowContainer,
-                            menuMaxHeight: getHeight(250),
-                          )),
-                        ),
-
-                        // AM/PM Dropdown (Reactive to 12-hour format)
-                        Flexible(
-                          child: Obx(() {
-                            final is24Hour = controller.timeFormat.value == 24;
-                            if (!is24Hour) {
-                              return DropdownButton<bool>(
-                                value: controller.isAm.value,
-                                items: [
-                                  DropdownMenuItem(
-                                    value: true,
-                                    child: Text(
-                                      "AM",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: false,
-                                    child: Text(
-                                      "PM",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    controller.isAm.value = value;
-                                  }
-                                },
-                                dropdownColor: AppColors.lightYellowContainer,
-                                menuMaxHeight: getHeight(150),
-                              );
-                            }
-
-                            // Return an empty widget for 24-hour format
-                            return const SizedBox.shrink();
-                          }),
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: TimePickerUI(controller: controller),
                 ),
 
                 // Background Section
@@ -258,7 +152,7 @@ class AddAlarmScreen extends StatelessWidget {
                             ),
                           );
                         }
-                        return const SizedBox.shrink(); // Return an empty widget if no imagePath
+                        return const SizedBox.shrink();
                       }),
 
 
@@ -305,7 +199,7 @@ class AddAlarmScreen extends StatelessWidget {
                           const CustomText(text: 'Label:'),
                           GestureDetector(
                             onTap: () {
-                              _showLabelPopup(context, controller);
+                              showLabelPopup(context, controller);
                             },
                             child: Obx(() => ConstrainedBox(
                               constraints: BoxConstraints(
@@ -329,7 +223,7 @@ class AddAlarmScreen extends StatelessWidget {
                         children: [
                           const CustomText(text: 'Snooze:'),
                           GestureDetector(
-                            onTap: () => _showSnoozePopup(context, controller),
+                            onTap: () => showSnoozePopup(context, controller),
                             child: Obx(() => TextWithArrow(
                               text:
                               '${controller.selectedSnoozeDuration.value} Minute',
@@ -404,7 +298,6 @@ class AddAlarmScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 SizedBox(height: getHeight(24)),
               ],
             ),
@@ -413,196 +306,4 @@ class AddAlarmScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-void _showLabelPopup(BuildContext context, AddAlarmController controller) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const CustomText(text: 'Label:'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: getWidth(10)),
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                controller: controller.labelController,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    Get.back();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: getHeight(10)),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffFFFFFF),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Center(
-                      child: CustomText(
-                        text: 'Cancel',
-                        color: AppColors.textYellow,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: getWidth(10)),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    controller
-                        .updateLabel(controller.labelController.text.trim());
-                    Get.back();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: getHeight(10)),
-                    decoration: BoxDecoration(
-                      color: AppColors.yellow,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Center(
-                      child: CustomText(
-                        text: 'Done',
-                        color: AppColors.textWhite,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
-    },
-  );
-}
-
-void _showSnoozePopup(BuildContext context, AddAlarmController controller) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.all(16),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CustomText(text: 'Snooze:'),
-            SizedBox(height: getHeight(10)),
-
-            Obx(() {
-              return Column(
-                children: controller.snoozeOptions.map((option) {
-                  final isSelected =
-                      controller.selectedSnoozeDuration.value == option;
-
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: CustomText(
-                            text: '$option Minute',
-                            fontSize: getWidth(14),
-                            fontWeight: FontWeight.w400,
-                            color: isSelected
-                                ? AppColors.textYellow
-                                : AppColors.textGrey,
-                          ),
-                        ),
-                      ),
-                      Radio<int>(
-                        value: option,
-                        groupValue: controller.selectedSnoozeDuration.value,
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.updateSnoozeDuration(value);
-                          }
-                        },
-                        activeColor: AppColors.yellow,
-                      ),
-                    ],
-                  );
-                }).toList(),
-              );
-            }),
-
-            // Bottom Buttons
-            SizedBox(height: getHeight(16)),
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: getHeight(10)),
-                      decoration: BoxDecoration(
-                        color: const Color(0xffFFFFFF),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Center(
-                        child: CustomText(
-                          text: 'Cancel',
-                          color: AppColors.textYellow,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: getWidth(10)),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: getHeight(10)),
-                      decoration: BoxDecoration(
-                        color: AppColors.yellow,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Center(
-                        child: CustomText(
-                          text: 'Done',
-                          color: AppColors.textWhite,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: getHeight(6)),
-          ],
-        ),
-      );
-    },
-  );
 }

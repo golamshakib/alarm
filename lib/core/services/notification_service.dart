@@ -21,7 +21,7 @@ class NotificationService {
     const AndroidInitializationSettings androidInitializationSettings =
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
     InitializationSettings(android: androidInitializationSettings);
 
     await flutterLocalNotificationsPlugin.initialize(
@@ -73,7 +73,7 @@ class NotificationService {
   }) async {
     final tz.TZDateTime scheduledDate = tz.TZDateTime.from(scheduledTime, tz.local);
 
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
     AndroidNotificationDetails(
       'alarm_channel_id',
       'Alarm Notifications',
@@ -87,7 +87,7 @@ class NotificationService {
       category: AndroidNotificationCategory.alarm,
     );
 
-    final NotificationDetails notificationDetails =
+    const NotificationDetails notificationDetails =
     NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await flutterLocalNotificationsPlugin.zonedSchedule(

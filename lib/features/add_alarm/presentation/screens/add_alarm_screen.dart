@@ -23,7 +23,8 @@ class AddAlarmScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AddAlarmController controller = Get.put(AddAlarmController());
-    final settingsController = Get.find<SettingsController>(); // Don't Remove this (Settings fetching the data)
+    final settingsController = Get.find<
+        SettingsController>(); // Don't Remove this (Settings fetching the data)
     final arguments = Get.arguments;
 
     if (arguments != null) {
@@ -55,12 +56,12 @@ class AddAlarmScreen extends StatelessWidget {
       controller.volume.value = alarm.volume;
     }
 
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: getWidth(16), vertical: getHeight(16)),
+            padding: EdgeInsets.symmetric(
+                horizontal: getWidth(16), vertical: getHeight(16)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -69,10 +70,13 @@ class AddAlarmScreen extends StatelessWidget {
                   text: isEditMode ? 'Edit Alarm' : 'Add Alarm',
                   iconPath: IconPath.check,
                   onIconTap: () {
+                    int alarmTime =
+                        DateTime.now().millisecondsSinceEpoch + 60000;
                     if (isEditMode) {
                       controller.updateAlarmInDatabase(alarm);
                       Get.back();
                     } else {
+                      controller.setAlarmNative(alarmTime);
                       controller.saveAlarmToDatabase();
                     }
                     controller.saveScreenPreferences();
@@ -104,17 +108,23 @@ class AddAlarmScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText(text: 'Background:', color: isEditMode ? AppColors.textGrey : AppColors.textPrimary,
+                          CustomText(
+                            text: 'Background:',
+                            color: isEditMode
+                                ? AppColors.textGrey
+                                : AppColors.textPrimary,
                           ),
                           InkWell(
-                            onTap: isEditMode ? null : () {
-                              Get.toNamed(AppRoute.changeBackgroundScreen);
-                            },
+                            onTap: isEditMode
+                                ? null
+                                : () {
+                                    Get.toNamed(
+                                        AppRoute.changeBackgroundScreen);
+                                  },
                             child: Obx(() {
                               return ConstrainedBox(
                                 constraints: BoxConstraints(
-                                  maxWidth: AppSizes.width * 0.5
-                                ),
+                                    maxWidth: AppSizes.width * 0.5),
                                 child: TextWithArrow(
                                   text: controller.selectedBackground.value,
                                 ),
@@ -125,12 +135,14 @@ class AddAlarmScreen extends StatelessWidget {
                       ),
                       SizedBox(height: getHeight(16)),
                       Obx(() {
-                        final imagePath = controller.selectedBackgroundImage.value;
+                        final imagePath =
+                            controller.selectedBackgroundImage.value;
 
                         if (imagePath.isNotEmpty) {
                           ImageProvider imageProvider;
 
-                          if (imagePath.startsWith("http") || imagePath.startsWith("https")) {
+                          if (imagePath.startsWith("http") ||
+                              imagePath.startsWith("https")) {
                             // If it's a URL, use NetworkImage
                             imageProvider = NetworkImage(imagePath);
                           } else if (File(imagePath).existsSync()) {
@@ -154,7 +166,6 @@ class AddAlarmScreen extends StatelessWidget {
                         }
                         return const SizedBox.shrink();
                       }),
-
 
                       SizedBox(height: getHeight(24)),
 
@@ -202,15 +213,15 @@ class AddAlarmScreen extends StatelessWidget {
                               showLabelPopup(context, controller);
                             },
                             child: Obx(() => ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: AppSizes.width * 0.5,
-                              ),
-                              child: TextWithArrow(
-                                text: controller.label.value.isNotEmpty
-                                    ? controller.label.value
-                                    : "Morning Alarm",
-                              ),
-                            )),
+                                  constraints: BoxConstraints(
+                                    maxWidth: AppSizes.width * 0.5,
+                                  ),
+                                  child: TextWithArrow(
+                                    text: controller.label.value.isNotEmpty
+                                        ? controller.label.value
+                                        : "Morning Alarm",
+                                  ),
+                                )),
                           ),
                         ],
                       ),
@@ -225,9 +236,9 @@ class AddAlarmScreen extends StatelessWidget {
                           GestureDetector(
                             onTap: () => showSnoozePopup(context, controller),
                             child: Obx(() => TextWithArrow(
-                              text:
-                              '${controller.selectedSnoozeDuration.value} Minute',
-                            )),
+                                  text:
+                                      '${controller.selectedSnoozeDuration.value} Minute',
+                                )),
                           ),
                         ],
                       ),
@@ -239,36 +250,35 @@ class AddAlarmScreen extends StatelessWidget {
                         children: [
                           const CustomText(text: 'Vibration:'),
                           Obx(() => GestureDetector(
-                            onTap: controller.toggleVibration,
-                            child: AnimatedContainer(
-                              duration:
-                              const Duration(milliseconds: 300),
-                              width: getWidth(37),
-                              height: getHeight(21),
-                              decoration: BoxDecoration(
-                                color: controller.isVibrationEnabled.value
-                                    ? const Color(0xffFFAB4C)
-                                    : const Color(0xffA3B2C7)
-                                    .withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: AnimatedAlign(
-                                duration: const Duration(milliseconds: 300),
-                                alignment:
-                                controller.isVibrationEnabled.value
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                                child: Container(
-                                  width: getWidth(18),
-                                  height: getHeight(18),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
+                                onTap: controller.toggleVibration,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: getWidth(37),
+                                  height: getHeight(21),
+                                  decoration: BoxDecoration(
+                                    color: controller.isVibrationEnabled.value
+                                        ? const Color(0xffFFAB4C)
+                                        : const Color(0xffA3B2C7)
+                                            .withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: AnimatedAlign(
+                                    duration: const Duration(milliseconds: 300),
+                                    alignment:
+                                        controller.isVibrationEnabled.value
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
+                                    child: Container(
+                                      width: getWidth(18),
+                                      height: getHeight(18),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          )),
+                              )),
                         ],
                       ),
 

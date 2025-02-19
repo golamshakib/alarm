@@ -20,6 +20,7 @@
         android:label="alarm"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+
         android:usesCleartextTraffic="true"
         android:allowBackup="true">
         <activity
@@ -71,6 +72,8 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <receiver android:name=".AlarmReceiver" android:exported="false"/>
+
 
     </application>
     <!-- Required to query activities that can process text, see:

@@ -1,5 +1,83 @@
 package com.example.alarm
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.annotation.NonNull
+import com.example.alarm.AlarmReceiver
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
 
-class MainActivity: FlutterActivity()
+class MainActivity: FlutterActivity() {
+    private val CHANNEL = "alarm_channel"
+
+    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "setAlarm" -> {
+                    val time = call.argument<Long>("time")
+                    if (time != null) {
+                        setAlarm(time)
+                        result.success("Alarm set for $time")
+                    } else {
+                        result.error("INVALID_ARGUMENT", "Time is required", null)
+                    }
+                }
+                "snoozeAlarm" -> {
+                    val snoozeTime = call.argument<Long>("time")
+                    if (snoozeTime != null) {
+                        snoozeAlarm(snoozeTime)
+                        result.success("Alarm snoozed for $snoozeTime")
+                    } else {
+                        result.error("INVALID_ARGUMENT", "Time is required", null)
+                    }
+                }
+                "cancelAlarm" -> {
+                    cancelAlarm()
+                    result.success("Alarm canceled")
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun setAlarm(timeInMillis: Long) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
+        }
+    }
+
+    private fun snoozeAlarm(timeInMillis: Long) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val snoozeTime = System.currentTimeMillis() + timeInMillis // Snooze time from current time
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent)
+    }
+
+    private fun cancelAlarm() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        alarmManager.cancel(pendingIntent)
+    }
+}

@@ -8,7 +8,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:volume_controller/volume_controller.dart';
-
+import 'package:flutter/services.dart';
 import '../../../core/db_helpers/db_helper_alarm.dart';
 import '../../../core/services/notification_service.dart';
 import '../../settings/controller/settings_controller.dart';
@@ -296,6 +296,17 @@ class AddAlarmController extends GetxController {
   }
 
   /// -- E N D   S T O P   M U S I C --
+  static const MethodChannel _channel = MethodChannel('alarm_channel');
+
+  /// Set an alarm at the given time (in milliseconds since epoch)
+  Future<void> setAlarmNative(int timeInMillis) async {
+    try {
+      await _channel.invokeMethod('setAlarm', {'time': timeInMillis});
+      debugPrint("============>>>>Native Alarm Set");
+    } on PlatformException catch (e) {
+      debugPrint("Failed to set alarm: ${e.message}");
+    }
+  }
 
   /// --  D A T A B A S E   S E R V I C E S --
   // Save alarm to Database

@@ -310,6 +310,8 @@ class AddAlarmController extends GetxController {
 
   /// --  D A T A B A S E   S E R V I C E S --
   // Save alarm to Database
+
+  /// -- S E T   A L A R M   N A T I V E
   Future<void> saveAlarmToDatabase() async {
     final dbHelper = DBHelperAlarm();
     final newAlarm = Alarm(

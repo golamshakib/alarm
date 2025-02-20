@@ -25,17 +25,17 @@ class AlarmScreenController extends GetxController {
 
       // 🔹 If the alarm is OFF, cancel the scheduled notification
       if (!alarm.isToggled.value) {
-        await NotificationService.cancelAlarm(alarm.id!);
+        // await NotificationService.cancelAlarm(alarm.id!);
         debugPrint("Notification for alarm ID ${alarm.id} has been canceled.");
       } else {
         // 🔹 If the alarm is ON, schedule the notification
         DateTime scheduledTime = getNextAlarmTime(alarm);
-        await NotificationService.scheduleAlarm(
-          id: alarm.id!,
-          title: "Alarm",
-          body: alarm.label,
-          scheduledTime: scheduledTime,
-        );
+        // await NotificationService.scheduleAlarm(
+        //   id: alarm.id!,
+        //   title: "Alarm",
+        //   body: alarm.label,
+        //   scheduledTime: scheduledTime,
+        // );
         debugPrint("Notification for alarm ID ${alarm.id} has been scheduled.");
       }
 

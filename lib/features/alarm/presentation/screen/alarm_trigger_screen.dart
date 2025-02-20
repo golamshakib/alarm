@@ -73,7 +73,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   void _snoozeAlarm() {
     _audioPlayer.stop();
     Vibration.cancel();
-    NotificationService.snoozeAlarm(alarm: widget.alarm);
+    // NotificationService.snoozeAlarm(alarm: widget.alarm);
     Get.back();
     // SystemNavigator.pop(); // Force close the app
   }

@@ -16,8 +16,10 @@ import android.app.NotificationManager
 import android.content.Context.VIBRATOR_SERVICE
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.app.Notification
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+
 
 class AlarmReceiver : BroadcastReceiver() {
     private val CHANNEL_ID = "alarm_channel_id"
@@ -107,6 +109,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(CHANNEL_ID, "Alarm Channel", NotificationManager.IMPORTANCE_HIGH)
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             notificationManager.createNotificationChannel(channel)
         }
 

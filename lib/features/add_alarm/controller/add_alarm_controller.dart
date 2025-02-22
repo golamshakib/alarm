@@ -308,19 +308,6 @@ class AddAlarmController extends GetxController {
     }
   }
 
-  Future<void> snoozeAlarmNative(Alarm alarm) async {
-    // Convert snoozeDuration (in minutes) from your database to milliseconds
-    int snoozeDurationInMillis = alarm.snoozeDuration * 60000;
-    try {
-      await _channel.invokeMethod('snoozeAlarm', {'time': snoozeDurationInMillis});
-      debugPrint("Native Alarm snoozed for $snoozeDurationInMillis ms");
-    } on PlatformException catch (e) {
-      debugPrint("Failed to snooze alarm: ${e.message}");
-    }
-  }
-
-
-
   /// --  D A T A B A S E   S E R V I C E S --
   // Save alarm to Database
 
@@ -466,8 +453,11 @@ class AddAlarmController extends GetxController {
 
     try {
       await dbHelper.updateAlarm(updatedAlarm);
-      fetchAlarmsFromDatabase();
+      await fetchAlarmsFromDatabase();
       DateTime alarmTime = getNextAlarmTime(updatedAlarm);
+      int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
+
+      await setAlarmNative(alarmTimeInMillis);
 
       // Calculate remaining time
       Duration remainingTime = alarmTime.difference(DateTime.now());

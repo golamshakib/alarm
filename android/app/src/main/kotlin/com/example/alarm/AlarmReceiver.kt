@@ -28,12 +28,18 @@ class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            "SNOOZE_ALARM" -> snoozeAlarm(context)
+            "SNOOZE_ALARM" -> {
+                // Retrieve snooze duration from the intent extras; default to 1 minute if missing.
+                val snoozeDuration = intent.getLongExtra("time", 60000)
+                snoozeAlarm(context, snoozeDuration)
+            }
             "STOP_ALARM" -> stopAlarm(context)
             else -> {
                 playAlarmSound(context)
                 vibratePhone(context)
-                showNotification(context)
+                // Retrieve snooze duration if set; default to 1 minute.
+                val snoozeDuration = intent.getLongExtra("snoozeDuration", 60000)
+                showNotification(context, snoozeDuration)
             }
         }
     }
@@ -41,7 +47,7 @@ class AlarmReceiver : BroadcastReceiver() {
     private fun playAlarmSound(context: Context) {
         try {
             val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-            ringtone = RingtoneManager.getRingtone(context, ringtoneUri) // Store the ringtone globally
+            ringtone = RingtoneManager.getRingtone(context, ringtoneUri)
             ringtone?.play()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -61,40 +67,42 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun snoozeAlarm(context: Context) {
+    // This method now accepts the snooze duration.
+    private fun snoozeAlarm(context: Context, timeInMillis: Long) {
         stopAlarmSound(context) // Stop the sound before snoozing
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
+        val snoozeIntent = Intent(context, AlarmReceiver::class.java)
+        // (Note: You don’t need to re-set the action here because MainActivity already set it.)
         val pendingIntent = PendingIntent.getBroadcast(
-            context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            context, 0, snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
-        val snoozeTime = System.currentTimeMillis() + 60000 // 1 minute snooze
+        val snoozeTime = System.currentTimeMillis() + timeInMillis
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent)
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(0) // Dismiss notification
+        notificationManager.cancel(0)
 
-        Toast.makeText(context, "Alarm Snoozed for 1 minute", Toast.LENGTH_SHORT).show()
+        // Convert milliseconds to minutes for the Toast.
+        val snoozeMinutes = timeInMillis / 60000
+        Toast.makeText(context, "Alarm Snoozed for $snoozeMinutes minute(s)", Toast.LENGTH_SHORT).show()
     }
 
     private fun stopAlarm(context: Context) {
-        stopAlarmSound(context) // Stop sound and vibration
-
+        stopAlarmSound(context)
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(0) // Dismiss notification
-
+        notificationManager.cancel(0)
         Toast.makeText(context, "Alarm Stopped", Toast.LENGTH_SHORT).show()
     }
 
     private fun stopAlarmSound(context: Context) {
-        ringtone?.stop() // Stop the sound
+        ringtone?.stop()
         val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        vibrator?.cancel() // Stop vibration
+        vibrator?.cancel()
     }
 
     @SuppressLint("MissingPermission")
-    private fun showNotification(context: Context) {
+    private fun showNotification(context: Context, snoozeDuration: Long) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -102,14 +110,20 @@ class AlarmReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply { action = "SNOOZE_ALARM" }
+        // Build the snooze Intent with the snoozeDuration passed as extra.
+        val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
+            action = "SNOOZE_ALARM"
+            putExtra("time", snoozeDuration)
+        }
         val snoozePendingIntent = PendingIntent.getBroadcast(
-            context, 0, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            context, 0, snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val stopIntent = Intent(context, AlarmReceiver::class.java).apply { action = "STOP_ALARM" }
         val stopPendingIntent = PendingIntent.getBroadcast(
-            context, 1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            context, 1, stopIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)

@@ -14,6 +14,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../settings/controller/settings_controller.dart';
 import '../../controller/add_alarm_controller.dart';
+import '../../data/alarm_model.dart';
 import '../helper_method/label_popup.dart';
 import '../helper_method/snooze_popup.dart';
 
@@ -66,22 +67,45 @@ class AddAlarmScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // App Bar
+
                 CustomAppbarWithLogo(
                   text: isEditMode ? 'Edit Alarm' : 'Add Alarm',
                   iconPath: IconPath.check,
-                  onIconTap: () {
-                    int alarmTime =
-                        DateTime.now().millisecondsSinceEpoch + 60000;
+                  onIconTap: () async {
                     if (isEditMode) {
                       controller.updateAlarmInDatabase(alarm);
                       Get.back();
                     } else {
-                      controller.setAlarmNative(alarmTime);
-                      controller.saveAlarmToDatabase();
+                      await controller.saveAlarmToDatabase();
+
+                      Alarm newAlarm = controller.alarms.last;
+
+                      DateTime alarmTime = controller.getNextAlarmTime(newAlarm);
+                      int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
+                      await controller.setAlarmNative(alarmTimeInMillis);
+
                     }
                     controller.saveScreenPreferences();
                   },
                 ),
+
+
+                // CustomAppbarWithLogo(
+                //   text: isEditMode ? 'Edit Alarm' : 'Add Alarm',
+                //   iconPath: IconPath.check,
+                //   onIconTap: () {
+                //     int alarmTime =
+                //         DateTime.now().millisecondsSinceEpoch + 60000;
+                //     if (isEditMode) {
+                //       controller.updateAlarmInDatabase(alarm);
+                //       Get.back();
+                //     } else {
+                //       controller.setAlarmNative(alarmTime);
+                //       controller.saveAlarmToDatabase();
+                //     }
+                //     controller.saveScreenPreferences();
+                //   },
+                // ),
                 SizedBox(height: getHeight(16)),
 
                 // Time Picker

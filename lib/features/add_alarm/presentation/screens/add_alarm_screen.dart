@@ -82,7 +82,7 @@ class AddAlarmScreen extends StatelessWidget {
 
                       DateTime alarmTime = controller.getNextAlarmTime(newAlarm);
                       int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
-                      await controller.setAlarmNative(alarmTimeInMillis);
+                      await controller.setAlarmNative(alarmTimeInMillis, newAlarm.id!);
 
                     }
                     controller.saveScreenPreferences();

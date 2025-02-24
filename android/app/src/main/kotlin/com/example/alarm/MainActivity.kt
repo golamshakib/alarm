@@ -21,11 +21,12 @@ class MainActivity: FlutterActivity() {
             when (call.method) {
                 "setAlarm" -> {
                     val time = call.argument<Long>("time")
-                    if (time != null) {
-                        setAlarm(time)
-                        result.success("Alarm set for $time")
+                    val alarmId = call.argument<Int>("alarmId")
+                    if (time != null && alarmId != null) {
+                        setAlarm(time, alarmId)
+                        result.success("Alarm set for $time with alarmId $alarmId")
                     } else {
-                        result.error("INVALID_ARGUMENT", "Time is required", null)
+                        result.error("INVALID_ARGUMENT", "Time and alarmId are required", null)
                     }
                 }
                 "snoozeAlarm" -> {
@@ -48,8 +49,10 @@ class MainActivity: FlutterActivity() {
 
     // Override getInitialRoute() instead of provideInitialRoute()
     override fun getInitialRoute(): String? {
-        return if (intent.getBooleanExtra("showAlarmTrigger", false)) {
-            "/alarmTrigger"
+        val showTrigger = intent.getBooleanExtra("showAlarmTrigger", false)
+        val alarmId = intent.getIntExtra("alarmId", -1)
+        return if (showTrigger) {
+            if (alarmId != -1) "/alarmTrigger?alarmId=$alarmId" else "/alarmTrigger"
         } else {
             super.getInitialRoute()
         }
@@ -63,11 +66,13 @@ class MainActivity: FlutterActivity() {
     }
 
 
-    private fun setAlarm(timeInMillis: Long) {
+    private fun setAlarm(timeInMillis: Long, alarmId: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlarmReceiver::class.java)
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("alarmId", alarmId)
+        }
         val pendingIntent = PendingIntent.getBroadcast(
-            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            this, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

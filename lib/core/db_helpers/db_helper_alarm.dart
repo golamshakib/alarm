@@ -61,6 +61,17 @@ class DBHelperAlarm {
     });
   }
 
+  /// Fetch alarms from the database by Alarm Id
+  Future<Alarm?> getAlarm(int id) async {
+    final db = await database;
+    final maps = await db.query('alarms', where: 'id = ?', whereArgs: [id]);
+    if (maps.isNotEmpty) {
+      return Alarm.fromMap(maps.first);
+    }
+    return null;
+  }
+
+
   /// **Update an existing alarm in the database**
   Future<int> updateAlarm(Alarm alarm) async {
     final db = await database;

@@ -299,9 +299,9 @@ class AddAlarmController extends GetxController {
   static const MethodChannel _channel = MethodChannel('alarm_channel');
 
   /// Set an alarm at the given time (in milliseconds since epoch)
-  Future<void> setAlarmNative(int timeInMillis) async {
+  Future<void> setAlarmNative(int timeInMillis, int alarmId) async {
     try {
-      await _channel.invokeMethod('setAlarm', {'time': timeInMillis});
+      await _channel.invokeMethod('setAlarm', {'time': timeInMillis, 'alarmId': alarmId});
       debugPrint("============>>>>Native Alarm Set");
     } on PlatformException catch (e) {
       debugPrint("Failed to set alarm: ${e.message}");
@@ -457,7 +457,7 @@ class AddAlarmController extends GetxController {
       DateTime alarmTime = getNextAlarmTime(updatedAlarm);
       int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
 
-      await setAlarmNative(alarmTimeInMillis);
+      await setAlarmNative(alarmTimeInMillis, updatedAlarm.id!);
 
       // Calculate remaining time
       Duration remainingTime = alarmTime.difference(DateTime.now());

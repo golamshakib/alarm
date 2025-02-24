@@ -39,9 +39,13 @@ class AlarmReceiver : BroadcastReceiver() {
             else -> {
                 playAlarmSound(context)
                 vibratePhone(context)
+                // Retrieve the alarmId passed from the scheduling.
+                val alarmId = intent.getIntExtra("alarmId", -1)
+
                 val alarmIntent = Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     putExtra("showAlarmTrigger", true)
+                    putExtra("alarmId", alarmId)
                 }
                 context.startActivity(alarmIntent)
                 showNotification(context, intent.getLongExtra("snoozeDuration", 60000))

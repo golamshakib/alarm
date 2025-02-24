@@ -35,9 +35,10 @@ class AlarmReceiver : BroadcastReceiver() {
                 val snoozeDuration = intent.getLongExtra("time", 60000)
                 snoozeAlarm(context, snoozeDuration)
             }
+
             "STOP_ALARM" -> stopAlarm(context)
             else -> {
-                playAlarmSound(context)
+                // playAlarmSound(context)
                 vibratePhone(context)
                 // Retrieve the alarmId passed from the scheduling.
                 val alarmId = intent.getIntExtra("alarmId", -1)
@@ -89,17 +90,20 @@ class AlarmReceiver : BroadcastReceiver() {
         )
         val snoozeTime = System.currentTimeMillis() + timeInMillis
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent)
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(0)
 
         // Convert milliseconds to minutes for the Toast.
         val snoozeMinutes = timeInMillis / 60000
-        Toast.makeText(context, "Alarm Snoozed for $snoozeMinutes minute(s)", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Alarm Snoozed for $snoozeMinutes minute(s)", Toast.LENGTH_SHORT)
+            .show()
     }
 
     private fun stopAlarm(context: Context) {
         stopAlarmSound(context)
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(0)
         Toast.makeText(context, "Alarm Stopped", Toast.LENGTH_SHORT).show()
     }
@@ -112,10 +116,15 @@ class AlarmReceiver : BroadcastReceiver() {
 
     @Suppress("MissingPermission")
     private fun showNotification(context: Context, snoozeDuration: Long) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "Alarm Channel", android.app.NotificationManager.IMPORTANCE_HIGH)
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Alarm Channel",
+                android.app.NotificationManager.IMPORTANCE_HIGH
+            )
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             // Set the channel to allow full-screen notifications
             channel.setBypassDnd(true)
@@ -154,6 +163,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM) // Marks this as an alarm notification.
+            .setSound(null)
             // This will cause the alarm screen to open automatically.
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .addAction(android.R.drawable.ic_menu_add, "Snooze", snoozePendingIntent)

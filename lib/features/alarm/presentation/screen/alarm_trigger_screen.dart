@@ -4,6 +4,7 @@ import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'package:just_audio/just_audio.dart';
@@ -65,8 +66,8 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   void _dismissAlarm() {
     _audioPlayer.stop();
     Vibration.cancel();
-    Get.back();
-    // SystemNavigator.pop(); // Force close the app
+    // Get.back();
+    SystemNavigator.pop(); // Force close the app
   }
 
   /// **Snooze Alarm and Re-Schedule Notification**
@@ -74,8 +75,8 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     _audioPlayer.stop();
     Vibration.cancel();
     // NotificationService.snoozeAlarm(alarm: widget.alarm);
-    Get.back();
-    // SystemNavigator.pop(); // Force close the app
+    // Get.back();
+    SystemNavigator.pop(); // Force close the app
   }
 
   /// **Format Repeat Days**

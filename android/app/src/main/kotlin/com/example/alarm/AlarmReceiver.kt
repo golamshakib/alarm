@@ -39,9 +39,12 @@ class AlarmReceiver : BroadcastReceiver() {
             else -> {
                 playAlarmSound(context)
                 vibratePhone(context)
-                // Retrieve snooze duration if set; default to 1 minute.
-                val snoozeDuration = intent.getLongExtra("snoozeDuration", 60000)
-                showNotification(context, snoozeDuration)
+                val alarmIntent = Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    putExtra("showAlarmTrigger", true)
+                }
+                context.startActivity(alarmIntent)
+                showNotification(context, intent.getLongExtra("snoozeDuration", 60000))
             }
         }
     }
@@ -110,6 +113,8 @@ class AlarmReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(CHANNEL_ID, "Alarm Channel", android.app.NotificationManager.IMPORTANCE_HIGH)
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            // Set the channel to allow full-screen notifications
+            channel.setBypassDnd(true)
             notificationManager.createNotificationChannel(channel)
         }
 
@@ -119,7 +124,7 @@ class AlarmReceiver : BroadcastReceiver() {
             putExtra("showAlarmTrigger", true)
             // Optionally: pass additional alarm details (e.g., via JSON) if needed.
         }
-        val contentPendingIntent = PendingIntent.getActivity(
+        val fullScreenPendingIntent = PendingIntent.getActivity(
             context, 2, flutterIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -144,7 +149,9 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentText("Time to wake up!")
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(contentPendingIntent) // This launches the Flutter screen.
+            .setCategory(NotificationCompat.CATEGORY_ALARM) // Marks this as an alarm notification.
+            // This will cause the alarm screen to open automatically.
+            .setFullScreenIntent(fullScreenPendingIntent, true)
             .addAction(android.R.drawable.ic_menu_add, "Snooze", snoozePendingIntent)
             .addAction(android.R.drawable.ic_delete, "Stop", stopPendingIntent)
             .setAutoCancel(true)

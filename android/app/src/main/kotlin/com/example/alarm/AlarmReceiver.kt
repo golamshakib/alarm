@@ -103,17 +103,27 @@ class AlarmReceiver : BroadcastReceiver() {
         vibrator?.cancel()
     }
 
-    @SuppressLint("MissingPermission")
+    @Suppress("MissingPermission")
     private fun showNotification(context: Context, snoozeDuration: Long) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "Alarm Channel", NotificationManager.IMPORTANCE_HIGH)
+            val channel = NotificationChannel(CHANNEL_ID, "Alarm Channel", android.app.NotificationManager.IMPORTANCE_HIGH)
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Build the snooze Intent with the snoozeDuration passed as extra.
+        // Content Intent to launch MainActivity with the flag to show the alarm screen
+        val flutterIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("showAlarmTrigger", true)
+            // Optionally: pass additional alarm details (e.g., via JSON) if needed.
+        }
+        val contentPendingIntent = PendingIntent.getActivity(
+            context, 2, flutterIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
             action = "SNOOZE_ALARM"
             putExtra("time", snoozeDuration)
@@ -132,10 +142,11 @@ class AlarmReceiver : BroadcastReceiver() {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Alarm Triggered!")
             .setContentText("Time to wake up!")
-            .setSmallIcon(R.drawable.ic_dialog_alert)
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .addAction(R.drawable.ic_menu_add, "Snooze", snoozePendingIntent)
-            .addAction(R.drawable.ic_delete, "Stop", stopPendingIntent)
+            .setContentIntent(contentPendingIntent) // This launches the Flutter screen.
+            .addAction(android.R.drawable.ic_menu_add, "Snooze", snoozePendingIntent)
+            .addAction(android.R.drawable.ic_delete, "Stop", stopPendingIntent)
             .setAutoCancel(true)
             .build()
 

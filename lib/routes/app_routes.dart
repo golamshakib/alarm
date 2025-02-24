@@ -4,8 +4,10 @@ import 'package:alarm/features/splash_screen/presentation/screens/onboarding1.da
 import 'package:alarm/features/splash_screen/presentation/screens/onboarding2.dart';
 import 'package:get/get.dart';
 
+import '../features/add_alarm/data/alarm_model.dart';
 import '../features/add_alarm/presentation/screens/change_back_ground_screen.dart';
 import '../features/add_alarm/presentation/screens/create_new_background_screen.dart';
+import '../features/alarm/presentation/screen/alarm_trigger_screen.dart';
 import '../features/splash_screen/presentation/screens/onboarding3.dart';
 import '../features/splash_screen/presentation/screens/splash_screen.dart';
 
@@ -20,6 +22,9 @@ class AppRoute {
   static String createNewAlarmScreen = "/createNewAlarmScreen";
 
 
+  static const alarmTrigger = '/alarmTrigger';
+
+
   static List<GetPage> routes = [
     GetPage(name: init, page: () => const SplashScreen()),
     GetPage(name: onboarding1, page: () => const OnBoarding1Screen()),
@@ -30,5 +35,28 @@ class AppRoute {
     GetPage(name: changeBackgroundScreen, page: () => const ChangeBackGroundScreen()),
     GetPage(name: localBackgroundScreen, page: () => const LocalBackgroundScreen()),
     GetPage(name: createNewAlarmScreen, page: () => const CreateNewBackgroundScreen()),
+
+
+    GetPage(name: alarmTrigger, page: () {
+      // Retrieve alarm data if passed via Get.arguments.
+      final args = Get.arguments;
+      Alarm alarm;
+      if (args != null && args is Alarm) {
+        alarm = args;
+      } else {
+        // Create a dummy alarm instance if no data was passed.
+        alarm = Alarm(
+          hour: 7,
+          minute: 0,
+          isAm: true,
+          label: "Morning Alarm",
+          musicPath: 'assets/audio/iphone_alarm.mp3',
+          backgroundImage: '',
+          isVibrationEnabled: true,
+          repeatDays: [], backgroundTitle: 'Hello',
+        );
+      }
+      return AlarmTriggerScreen(alarm: alarm);
+    }),
   ];
 }

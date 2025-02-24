@@ -46,6 +46,23 @@ class MainActivity: FlutterActivity() {
         }
     }
 
+    // Override getInitialRoute() instead of provideInitialRoute()
+    override fun getInitialRoute(): String? {
+        return if (intent.getBooleanExtra("showAlarmTrigger", false)) {
+            "/alarmTrigger"
+        } else {
+            super.getInitialRoute()
+        }
+    }
+
+    // (Optional) If your app might already be running, you can also override onNewIntent:
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        // Optionally: use a MethodChannel to notify Flutter about the intent change
+    }
+
+
     private fun setAlarm(timeInMillis: Long) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)

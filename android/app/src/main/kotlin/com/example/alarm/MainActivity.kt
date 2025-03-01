@@ -12,12 +12,15 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity: FlutterActivity() {
+class MainActivity : FlutterActivity() {
     private val CHANNEL = "alarm_channel"
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            CHANNEL
+        ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "setAlarm" -> {
                     val time = call.argument<Long>("time")
@@ -29,6 +32,7 @@ class MainActivity: FlutterActivity() {
                         result.error("INVALID_ARGUMENT", "Time and alarmId are required", null)
                     }
                 }
+
                 "snoozeAlarm" -> {
                     val snoozeTime = call.argument<Long>("time")
                     if (snoozeTime != null) {
@@ -38,10 +42,17 @@ class MainActivity: FlutterActivity() {
                         result.error("INVALID_ARGUMENT", "Time is required", null)
                     }
                 }
+
                 "cancelAlarm" -> {
-                    cancelAlarm()
-                    result.success("Alarm canceled")
+                    val alarmId = call.argument<Int>("alarmId")
+                    if (alarmId != null) {
+                        cancelAlarm(alarmId)
+                        result.success("Alarm canceled with ID: $alarmId")
+                    } else {
+                        result.error("INVALID_ARGUMENT", "Alarm ID is required", null)
+                    }
                 }
+
                 else -> result.notImplemented()
             }
         }
@@ -66,17 +77,22 @@ class MainActivity: FlutterActivity() {
     }
 
 
-    private fun setAlarm(timeInMillis: Long, alarmId: Int) {
+    private fun setAlarm(timeInMillis: Long, alarmId: Int, repeatDays: List<String> =emptyList()) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java).apply {
             putExtra("alarmId", alarmId)
+            putStringArrayListExtra("repeatDays", ArrayList(repeatDays))
         }
         val pendingIntent = PendingIntent.getBroadcast(
             this, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                timeInMillis,
+                pendingIntent
+            )
         } else {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
         }
@@ -93,13 +109,14 @@ class MainActivity: FlutterActivity() {
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent)
     }
 
-    private fun cancelAlarm() {
+    private fun cancelAlarm(alarmId: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
-            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            this, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()  // Ensure the PendingIntent is removed completely
     }
 }

@@ -149,6 +149,7 @@ class AddAlarmController extends GetxController {
 
   /// -- V I B R A T I O N   S E C T I O N --
   var isVibrationEnabled = true.obs;
+
   // Toggle vibration
   void toggleVibration() {
     isVibrationEnabled.value = !isVibrationEnabled.value;
@@ -296,17 +297,38 @@ class AddAlarmController extends GetxController {
   }
 
   /// -- E N D   S T O P   M U S I C --
+
+
+  /// **Set an Alarm in Native Code**
+
   static const MethodChannel _channel = MethodChannel('alarm_channel');
 
   /// Set an alarm at the given time (in milliseconds since epoch)
-  Future<void> setAlarmNative(int timeInMillis, int alarmId) async {
+  Future<void> setAlarmNative(
+      int timeInMillis, int alarmId, List<String> repeatDays) async {
     try {
-      await _channel.invokeMethod('setAlarm', {'time': timeInMillis, 'alarmId': alarmId});
-      debugPrint("============>>>>Native Alarm Set");
+      await _channel.invokeMethod('setAlarm', {
+        'time': timeInMillis,
+        'alarmId': alarmId,
+        'repeatDays': repeatDays.isNotEmpty ? repeatDays : [],
+      });
+      debugPrint(
+          "============>>>>Native Alarm Set with Repeat Days: $repeatDays;");
     } on PlatformException catch (e) {
       debugPrint("Failed to set alarm: ${e.message}");
     }
   }
+
+  /// **Cancel an Alarm in Native Code**
+  Future<void> cancelAlarmNative(int alarmId) async {
+    try {
+      await _channel.invokeMethod('cancelAlarm', {'alarmId': alarmId});
+      debugPrint("Native Alarm Canceled for ID: $alarmId");
+    } on PlatformException catch (e) {
+      debugPrint("Failed to cancel alarm: ${e.message}");
+    }
+  }
+
 
   /// --  D A T A B A S E   S E R V I C E S --
   // Save alarm to Database
@@ -341,7 +363,6 @@ class AddAlarmController extends GetxController {
 
       // ✅ Get the next valid alarm time
       DateTime alarmTime = getNextAlarmTime(newAlarm);
-
 
       // Calculate remaining time
       Duration remainingTime = alarmTime.difference(DateTime.now());
@@ -457,7 +478,11 @@ class AddAlarmController extends GetxController {
       DateTime alarmTime = getNextAlarmTime(updatedAlarm);
       int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
 
-      await setAlarmNative(alarmTimeInMillis, updatedAlarm.id!);
+      await setAlarmNative(
+        alarmTimeInMillis,
+        updatedAlarm.id!,
+        updatedAlarm.repeatDays,
+      );
 
       // Calculate remaining time
       Duration remainingTime = alarmTime.difference(DateTime.now());

@@ -19,6 +19,9 @@ import android.os.Vibrator
 import android.app.Notification
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import java.util.Calendar
+import android.util.Log
+
 
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -29,30 +32,83 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        when (intent.action) {
-            "SNOOZE_ALARM" -> {
-                // Retrieve snooze duration from the intent extras; default to 1 minute if missing.
-                val snoozeDuration = intent.getLongExtra("time", 60000)
-                snoozeAlarm(context, snoozeDuration)
-            }
+        val alarmId = intent.getIntExtra("alarmId", -1)
+        val snoozeDuration = intent.getLongExtra("snoozeDuration", 60000) // Default 60 sec
+        val repeatDays = intent.getStringArrayListExtra("repeatDays") ?: emptyList()
 
-            "STOP_ALARM" -> stopAlarm(context)
-            else -> {
-                // playAlarmSound(context)
-                vibratePhone(context)
-                // Retrieve the alarmId passed from the scheduling.
-                val alarmId = intent.getIntExtra("alarmId", -1)
+        val sharedPreferences =
+            context.getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
+        val isToggledOn = sharedPreferences.getBoolean("alarm_toggle_$alarmId", true)
 
-                val alarmIntent = Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    putExtra("showAlarmTrigger", true)
+        if (!isToggledOn) {
+            return  // Don't trigger alarm if toggle is off
+        }
+
+        // Vibrate and start alarm trigger screen
+        vibratePhone(context)
+        val alarmIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("showAlarmTrigger", true)
+            putExtra("alarmId", alarmId)
+        }
+        context.startActivity(alarmIntent)
+
+        // Call showNotification with snoozeDuration
+        showNotification(context, snoozeDuration)
+
+        // Reschedule if repeating days exist
+        if (repeatDays.isNotEmpty()) {
+            scheduleNextRepeat(context, alarmId, repeatDays)
+        }
+    }
+
+    private fun scheduleNextRepeat(context: Context, alarmId: Int, repeatDays: List<String>) {
+        val now = Calendar.getInstance()
+        val nextAlarmTime = Calendar.getInstance()
+
+        for (i in 1..7) { // Check the next 7 days
+            nextAlarmTime.add(Calendar.DAY_OF_YEAR, 1)
+            val dayOfWeek = nextAlarmTime.get(Calendar.DAY_OF_WEEK)
+
+            val dayNames = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+            val nextDayName = dayNames[dayOfWeek - 1]
+
+            if (repeatDays.contains(nextDayName)) {
+                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val intent = Intent(context, AlarmReceiver::class.java).apply {
                     putExtra("alarmId", alarmId)
+                    putStringArrayListExtra("repeatDays", ArrayList(repeatDays))
                 }
-                context.startActivity(alarmIntent)
-                showNotification(context, intent.getLongExtra("snoozeDuration", 60000))
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    alarmId,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        nextAlarmTime.timeInMillis,
+                        pendingIntent
+                    )
+                } else {
+                    alarmManager.setExact(
+                        AlarmManager.RTC_WAKEUP,
+                        nextAlarmTime.timeInMillis,
+                        pendingIntent
+                    )
+                }
+
+                Log.d(
+                    "AlarmReceiver",
+                    "Next repeating alarm scheduled for $nextDayName at ${nextAlarmTime.time}"
+                )
+                break
             }
         }
     }
+
 
     private fun playAlarmSound(context: Context) {
         try {
@@ -115,7 +171,7 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     @Suppress("MissingPermission")
-    private fun showNotification(context: Context, snoozeDuration: Long) {
+    private fun showNotification(context: Context, snoozeDuration: Long = 6000) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 

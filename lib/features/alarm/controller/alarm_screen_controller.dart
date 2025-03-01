@@ -17,36 +17,35 @@ class AlarmScreenController extends GetxController {
       // Get the alarm object
       Alarm alarm = controller.alarms[index];
 
-      // Toggle the value in memory
+      // Toggle the alarm ON/OFF
       alarm.isToggled.value = !alarm.isToggled.value;
 
-      // 🔹 Update the database with the modified alarm state
+      // 🔹 Update the database with the new state
       await dbHelper.updateAlarm(alarm);
 
-      // 🔹 If the alarm is OFF, cancel the scheduled notification
-      if (!alarm.isToggled.value) {
-        // await NotificationService.cancelAlarm(alarm.id!);
-        debugPrint("Notification for alarm ID ${alarm.id} has been canceled.");
+      if (alarm.isToggled.value) {
+        // 🔹 If the alarm is ON, schedule it for the next occurrence
+        DateTime nextAlarmTime = getNextAlarmTime(alarm);
+        int alarmTimeInMillis = nextAlarmTime.millisecondsSinceEpoch;
+
+        await controller.setAlarmNative(alarmTimeInMillis, alarm.id!, alarm.repeatDays);
+
+        debugPrint("Alarm ID ${alarm.id} is ON. Next occurrence: $nextAlarmTime");
       } else {
-        // 🔹 If the alarm is ON, schedule the notification
-        DateTime scheduledTime = getNextAlarmTime(alarm);
-        // await NotificationService.scheduleAlarm(
-        //   id: alarm.id!,
-        //   title: "Alarm",
-        //   body: alarm.label,
-        //   scheduledTime: scheduledTime,
-        // );
-        debugPrint("Notification for alarm ID ${alarm.id} has been scheduled.");
+        // 🔹 If the alarm is OFF, cancel all scheduled instances
+        await controller.cancelAlarmNative(alarm.id!);
+        debugPrint("Alarm ID ${alarm.id} is OFF and canceled.");
       }
 
-      // 🔹 Refresh the list from the database
+      // 🔹 Refresh alarms from the database
       fetchAlarms();
+      update(); // Ensure UI updates
 
-      update(); // Ensure UI is refreshed
     } catch (e) {
       debugPrint("Error toggling alarm: $e");
     }
   }
+
 
   /// **Get Next Alarm Time Based on Current Time**
   DateTime getNextAlarmTime(Alarm alarm) {

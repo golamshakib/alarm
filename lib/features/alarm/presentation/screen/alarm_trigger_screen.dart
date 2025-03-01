@@ -4,6 +4,7 @@ import 'package:alarm/core/utils/constants/app_colors.dart';
 import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'package:just_audio/just_audio.dart';
@@ -32,8 +33,6 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     _triggerVibration();
   }
 
-
-
   /// **Play Alarm Sound (Supports Network & Local Files)**
   Future<void> _playAlarmSound() async {
     String musicPath = widget.alarm.musicPath;
@@ -44,10 +43,11 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
         } else if (File(musicPath).existsSync()) {
           await _audioPlayer.setFilePath(musicPath); // Play from local file
         } else {
-         await _audioPlayer.setAsset('assets/audio/iphone_alarm.mp3');
+          await _audioPlayer.setAsset('assets/audio/iphone_alarm.mp3');
         }
 
-        await _audioPlayer.setLoopMode(LoopMode.one); // Keep playing until dismissed
+        await _audioPlayer
+            .setLoopMode(LoopMode.one); // Keep playing until dismissed
         await _audioPlayer.play();
       } catch (e) {
         debugPrint("Error playing alarm sound: $e");
@@ -55,10 +55,13 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     }
   }
 
-  /// **Trigger Vibration if Enabled**
+  /// **Trigger Continuous Vibration Until Dismissed**
   Future<void> _triggerVibration() async {
     if (widget.alarm.isVibrationEnabled) {
-      Vibration.vibrate(pattern: [500, 1000, 500, 1000, 500, 1000], repeat: 5);
+      bool? hasVibrator = await Vibration.hasVibrator();
+      if (hasVibrator == true) {
+        Vibration.vibrate(pattern: [500, 1000], repeat: 0); // Loop vibration
+      }
     }
   }
 
@@ -66,17 +69,31 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   void _dismissAlarm() {
     _audioPlayer.stop();
     Vibration.cancel();
-    Get.back();
-    // SystemNavigator.pop(); // Force close the app
+
+    debugPrint("Alarm ID ${widget.alarm.id} dismissed.");
+
+    SystemNavigator.pop();
   }
 
   /// **Snooze Alarm and Re-Schedule Notification**
-  void _snoozeAlarm() {
+  void _snoozeAlarm() async {
     _audioPlayer.stop();
     Vibration.cancel();
-    NotificationService.snoozeAlarm(alarm: widget.alarm);
-    Get.back();
-    // SystemNavigator.pop(); // Force close the app
+
+    // Retrieve snooze duration from the database (in minutes)
+    int snoozeTimeInMillis = widget.alarm.snoozeDuration * 60 * 1000; // Convert to milliseconds
+
+    // Get the next snooze time
+    DateTime snoozeTriggerTime = DateTime.now().add(Duration(milliseconds: snoozeTimeInMillis));
+    int snoozeTimeEpoch = snoozeTriggerTime.millisecondsSinceEpoch;
+
+    // Schedule the alarm in Native Code
+    await controller.setAlarmNative(snoozeTimeEpoch, widget.alarm.id!, []);
+
+    debugPrint("Alarm ID ${widget.alarm.id} snoozed for ${widget.alarm.snoozeDuration} minutes.");
+
+    // Close the alarm screen
+    SystemNavigator.pop();
   }
 
   /// **Format Repeat Days**
@@ -104,7 +121,8 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     String backgroundImage = widget.alarm.backgroundImage;
     ImageProvider imageProvider;
 
-    if (backgroundImage.startsWith("http") || backgroundImage.startsWith("https")) {
+    if (backgroundImage.startsWith("http") ||
+        backgroundImage.startsWith("https")) {
       imageProvider = NetworkImage(backgroundImage); // Network image
     } else if (File(backgroundImage).existsSync()) {
       imageProvider = FileImage(File(backgroundImage)); // Local image
@@ -140,7 +158,8 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomText(
-                        text: formatTime(widget.alarm.hour, widget.alarm.minute, widget.alarm.isAm, controller.timeFormat.value),
+                        text: formatTime(widget.alarm.hour, widget.alarm.minute,
+                            widget.alarm.isAm, controller.timeFormat.value),
                         color: Colors.white,
                         fontSize: getWidth(40),
                         fontWeight: FontWeight.w300,

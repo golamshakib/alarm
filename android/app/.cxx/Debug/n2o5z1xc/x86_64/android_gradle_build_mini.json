@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/smt/development/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/smt/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/smt/flutter_projects/projects/Alarm/alarm/android/app/.cxx/Debug/n2o5z1xc/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/smt/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/smt/flutter_projects/projects/Alarm/alarm/android/app/.cxx/Debug/n2o5z1xc/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

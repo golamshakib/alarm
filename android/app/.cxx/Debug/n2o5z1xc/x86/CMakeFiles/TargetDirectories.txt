@@ -1,0 +1,2 @@
+/Users/smt/flutter_projects/projects/Alarm/alarm/android/app/.cxx/Debug/n2o5z1xc/x86/CMakeFiles/edit_cache.dir
+/Users/smt/flutter_projects/projects/Alarm/alarm/android/app/.cxx/Debug/n2o5z1xc/x86/CMakeFiles/rebuild_cache.dir

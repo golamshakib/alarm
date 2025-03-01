@@ -21,8 +21,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import java.util.Calendar
 import android.util.Log
-
-
+import android.os.Handler
+import android.os.Looper
 
 class AlarmReceiver : BroadcastReceiver() {
     private val CHANNEL_ID = "alarm_channel_id"
@@ -33,7 +33,8 @@ class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val alarmId = intent.getIntExtra("alarmId", -1)
-        val snoozeDuration = intent.getLongExtra("snoozeDuration", 60000) // Default 60 sec
+        val action = intent.action
+        val snoozeDuration = intent.getLongExtra("snoozeDuration", 60000L) // Default 60 sec
         val repeatDays = intent.getStringArrayListExtra("repeatDays") ?: emptyList()
 
         val sharedPreferences =
@@ -43,22 +44,25 @@ class AlarmReceiver : BroadcastReceiver() {
         if (!isToggledOn) {
             return  // Don't trigger alarm if toggle is off
         }
+        when (action) {
+            "SNOOZE_ALARM" -> snoozeAlarm(context, alarmId, snoozeDuration)
+            "STOP_ALARM" -> stopAlarm(context)
+            else -> {
+                vibratePhone(context)
+                val alarmIntent = Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    putExtra("showAlarmTrigger", true)
+                    putExtra("alarmId", alarmId)
+                }
+                context.startActivity(alarmIntent)
 
-        // Vibrate and start alarm trigger screen
-        vibratePhone(context)
-        val alarmIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("showAlarmTrigger", true)
-            putExtra("alarmId", alarmId)
-        }
-        context.startActivity(alarmIntent)
+                // Call showNotification with snoozeDuration
+                showNotification(context, alarmId, snoozeDuration)
 
-        // Call showNotification with snoozeDuration
-        showNotification(context, snoozeDuration)
-
-        // Reschedule if repeating days exist
-        if (repeatDays.isNotEmpty()) {
-            scheduleNextRepeat(context, alarmId, repeatDays)
+                if (repeatDays.isNotEmpty()) {
+                    scheduleNextRepeat(context, alarmId, repeatDays)
+                }
+            }
         }
     }
 
@@ -134,26 +138,31 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     // This method now accepts the snooze duration.
-    private fun snoozeAlarm(context: Context, timeInMillis: Long) {
-        stopAlarmSound(context) // Stop the sound before snoozing
+    private fun snoozeAlarm(context: Context, alarmId: Int, snoozeDuration: Long = 60000L) {
+        stopAlarmSound(context) // Stop alarm sound & vibration
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val snoozeIntent = Intent(context, AlarmReceiver::class.java)
-        // (Note: You don’t need to re-set the action here because MainActivity already set it.)
+        val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
+            putExtra("alarmId", alarmId)
+            putExtra("snoozeDuration", snoozeDuration.toInt())
+        }
+
         val pendingIntent = PendingIntent.getBroadcast(
-            context, 0, snoozeIntent,
+            context, alarmId, snoozeIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val snoozeTime = System.currentTimeMillis() + timeInMillis
+        val snoozeTime = System.currentTimeMillis() + snoozeDuration
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent)
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(0)
 
-        // Convert milliseconds to minutes for the Toast.
-        val snoozeMinutes = timeInMillis / 60000
-        Toast.makeText(context, "Alarm Snoozed for $snoozeMinutes minute(s)", Toast.LENGTH_SHORT)
-            .show()
+        Toast.makeText(
+            context,
+            "Alarm Snoozed for ${snoozeDuration / 60000} minute(s)",
+            Toast.LENGTH_SHORT
+        ).show()
+        Log.d("AlarmReceiver", "Alarm ID $alarmId snoozed for ${snoozeDuration / 60000} minutes")
     }
 
     private fun stopAlarm(context: Context) {
@@ -171,7 +180,7 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     @Suppress("MissingPermission")
-    private fun showNotification(context: Context, snoozeDuration: Long = 6000) {
+    private fun showNotification(context: Context, alarmId: Int, snoozeDuration: Long = 60000L) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 
@@ -182,51 +191,69 @@ class AlarmReceiver : BroadcastReceiver() {
                 android.app.NotificationManager.IMPORTANCE_HIGH
             )
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            // Set the channel to allow full-screen notifications
             channel.setBypassDnd(true)
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Content Intent to launch MainActivity with the flag to show the alarm screen
+        // Retrieve Alarm Label from SharedPreferences or Intent
+        val sharedPreferences =
+            context.getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
+        val alarmLabel = sharedPreferences.getString("alarm_label_$alarmId", "Alarm Triggered")
+
+        // 🔹 Ensure label is not null (fallback to default)
+        val notificationText = if (!alarmLabel.isNullOrEmpty()) alarmLabel else "Time to wake up"
+
+        // Create an empty pending intent that does nothing when clicked
+        val emptyIntent = PendingIntent.getActivity(
+            context, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val flutterIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("showAlarmTrigger", true)
-            // Optionally: pass additional alarm details (e.g., via JSON) if needed.
+            putExtra("alarmId", alarmId)
         }
         val fullScreenPendingIntent = PendingIntent.getActivity(
-            context, 2, flutterIntent,
+            context, alarmId, flutterIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
-            action = "SNOOZE_ALARM"
-            putExtra("time", snoozeDuration)
-        }
-        val snoozePendingIntent = PendingIntent.getBroadcast(
-            context, 0, snoozeIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val stopIntent = Intent(context, AlarmReceiver::class.java).apply { action = "STOP_ALARM" }
-        val stopPendingIntent = PendingIntent.getBroadcast(
-            context, 1, stopIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+//        val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
+//            action = "SNOOZE_ALARM"
+//            putExtra("alarmId", alarmId)
+//            putExtra("snoozeDuration", snoozeDuration.toInt()) // Convert Long to Int
+//        }
+//        val snoozePendingIntent = PendingIntent.getBroadcast(
+//            context, alarmId + 1, snoozeIntent,
+//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//        )
+//
+//        val stopIntent = Intent(context, AlarmReceiver::class.java).apply {
+//            action = "STOP_ALARM"
+//            putExtra("alarmId", alarmId)
+//        }
+//        val stopPendingIntent = PendingIntent.getBroadcast(
+//            context, alarmId + 2, stopIntent,
+//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//        )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setContentTitle("Alarm Triggered!")
-            .setContentText("Time to wake up!")
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle("Alarm Triggered")
+            .setContentText(notificationText)
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm) // Android's default alarm icon
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM) // Marks this as an alarm notification.
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setSound(null)
-            // This will cause the alarm screen to open automatically.
             .setFullScreenIntent(fullScreenPendingIntent, true)
-            .addAction(android.R.drawable.ic_menu_add, "Snooze", snoozePendingIntent)
-            .addAction(android.R.drawable.ic_delete, "Stop", stopPendingIntent)
-            .setAutoCancel(true)
+            .setAutoCancel(false)
+            .setOngoing(false)  // Ensure it doesn't persist
+            .setContentIntent(emptyIntent)  // Prevent any action on tap
             .build()
 
-        NotificationManagerCompat.from(context).notify(0, notification)
+        NotificationManagerCompat.from(context).notify(alarmId, notification)
+        // **🔹 Remove notification after 2 seconds**
+        Handler(Looper.getMainLooper()).postDelayed({
+            notificationManager.cancel(alarmId) // Remove notification from panel
+        }, 2000)
     }
 }

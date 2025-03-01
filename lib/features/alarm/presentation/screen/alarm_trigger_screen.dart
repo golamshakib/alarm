@@ -55,10 +55,13 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     }
   }
 
-  /// **Trigger Vibration if Enabled**
+  /// **Trigger Continuous Vibration Until Dismissed**
   Future<void> _triggerVibration() async {
     if (widget.alarm.isVibrationEnabled) {
-      Vibration.vibrate(pattern: [500, 1000, 500, 1000, 500, 1000], repeat: 5);
+      bool? hasVibrator = await Vibration.hasVibrator();
+      if (hasVibrator == true) {
+        Vibration.vibrate(pattern: [500, 1000], repeat: 0); // Loop vibration
+      }
     }
   }
 
@@ -66,17 +69,31 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   void _dismissAlarm() {
     _audioPlayer.stop();
     Vibration.cancel();
-    // Get.back();
-    SystemNavigator.pop(); // Force close the app
+
+    debugPrint("Alarm ID ${widget.alarm.id} dismissed.");
+
+    SystemNavigator.pop();
   }
 
   /// **Snooze Alarm and Re-Schedule Notification**
-  void _snoozeAlarm() {
+  void _snoozeAlarm() async {
     _audioPlayer.stop();
     Vibration.cancel();
-    // NotificationService.snoozeAlarm(alarm: widget.alarm);
-    // Get.back();
-    SystemNavigator.pop(); // Force close the app
+
+    // Retrieve snooze duration from the database (in minutes)
+    int snoozeTimeInMillis = widget.alarm.snoozeDuration * 60 * 1000; // Convert to milliseconds
+
+    // Get the next snooze time
+    DateTime snoozeTriggerTime = DateTime.now().add(Duration(milliseconds: snoozeTimeInMillis));
+    int snoozeTimeEpoch = snoozeTriggerTime.millisecondsSinceEpoch;
+
+    // Schedule the alarm in Native Code
+    await controller.setAlarmNative(snoozeTimeEpoch, widget.alarm.id!, []);
+
+    debugPrint("Alarm ID ${widget.alarm.id} snoozed for ${widget.alarm.snoozeDuration} minutes.");
+
+    // Close the alarm screen
+    SystemNavigator.pop();
   }
 
   /// **Format Repeat Days**

@@ -31,7 +31,8 @@ class PreviewScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: getWidth(16), vertical: getHeight(16)),
+          padding: EdgeInsets.symmetric(
+              horizontal: getWidth(16), vertical: getHeight(16)),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min, // Prevents infinite height error
@@ -39,8 +40,14 @@ class PreviewScreen extends StatelessWidget {
                 CustomAppbarWithLogo(
                   text: "Preview",
                   showBackIcon: true,
+                  onBackTap: () async {
+                    controller.stopMusic();
+                    Get.back();
+                    },
                   iconPath: IconPath.editSquare,
-                  onIconTap: () {},
+                  onIconTap: () async {
+                    controller.stopMusic();
+                  },
                 ),
                 SizedBox(height: getHeight(24)),
 
@@ -92,14 +99,17 @@ class PreviewScreen extends StatelessWidget {
                     controller.stopMusic();
                     final addAlarmController = Get.find<AddAlarmController>();
                     addAlarmController.selectedBackground.value = title;
-                    addAlarmController.selectedBackgroundImage.value = imagePath;
-                    addAlarmController.selectedMusicPath.value = musicPath; // Pass music path
+                    addAlarmController.selectedBackgroundImage.value =
+                        imagePath;
+                    addAlarmController.selectedMusicPath.value =
+                        musicPath; // Pass music path
                     Get.toNamed(AppRoute.navBarScreen, arguments: {
                       'title': title,
                       'imagePath': imagePath,
                       'musicPath': musicPath,
                     });
-                    Get.snackbar("Success", "Background set successfully!", duration: const Duration(seconds: 2));
+                    Get.snackbar("Success", "Background set successfully!",
+                        duration: const Duration(seconds: 2));
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: getHeight(12)),

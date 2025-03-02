@@ -14,11 +14,6 @@ class ControllerBinder extends Bindings {
 
     Get.lazyPut<AddAlarmController>(() => AddAlarmController());
 
-    // Get.lazyPut<LogInController>(
-    //       () => LogInController(),
-    //   fenix: true,
-    // );
-
     Get.lazyPut<ChangeBackgroundScreenController>(
           () => ChangeBackgroundScreenController(),
       fenix: true,

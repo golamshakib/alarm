@@ -218,25 +218,6 @@ class AlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-//        val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
-//            action = "SNOOZE_ALARM"
-//            putExtra("alarmId", alarmId)
-//            putExtra("snoozeDuration", snoozeDuration.toInt()) // Convert Long to Int
-//        }
-//        val snoozePendingIntent = PendingIntent.getBroadcast(
-//            context, alarmId + 1, snoozeIntent,
-//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-//
-//        val stopIntent = Intent(context, AlarmReceiver::class.java).apply {
-//            action = "STOP_ALARM"
-//            putExtra("alarmId", alarmId)
-//        }
-//        val stopPendingIntent = PendingIntent.getBroadcast(
-//            context, alarmId + 2, stopIntent,
-//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Alarm Triggered")
             .setContentText(notificationText)

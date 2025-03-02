@@ -10,7 +10,6 @@ import 'package:vibration/vibration.dart';
 import 'package:volume_controller/volume_controller.dart';
 import 'package:flutter/services.dart';
 import '../../../core/db_helpers/db_helper_alarm.dart';
-import '../../../core/services/notification_service.dart';
 import '../../settings/controller/settings_controller.dart';
 import '../data/alarm_model.dart';
 

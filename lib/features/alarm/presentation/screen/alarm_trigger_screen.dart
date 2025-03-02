@@ -11,7 +11,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import '../../../add_alarm/controller/add_alarm_controller.dart';
 import '../../../add_alarm/data/alarm_model.dart';
-import '../../../../core/services/notification_service.dart';
 
 class AlarmTriggerScreen extends StatefulWidget {
   final Alarm alarm;

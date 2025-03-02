@@ -39,7 +39,6 @@ dependencies:
   http: ^1.1.0
   intl: ^0.18.1
   logger: ^2.0.1
-  url_launcher: ^6.1.12
   image_picker: ^0.8.7
   file_picker: ^8.1.7
   google_fonts: ^6.2.1
@@ -55,7 +54,7 @@ dependencies:
   volume_controller: ^3.1.0
   sqflite: ^2.4.1
   flutter_local_notifications: ^18.0.1
-  flutter_timezone: ^4.0.0
+#  flutter_timezone: ^4.0.0
 
 
   # Icons

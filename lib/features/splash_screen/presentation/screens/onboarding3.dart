@@ -3,13 +3,24 @@ import 'package:alarm/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/utils/constants/app_colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
+import '../../../nav_bar/presentation/screens/nav_bar.dart';
 
 class OnBoarding3Screen extends StatelessWidget {
   const OnBoarding3Screen({super.key});
+
+  void completeOnboarding() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstTime', false); // Mark onboarding as completed
+    bool storedValue = prefs.getBool('isFirstTime') ?? true;
+    debugPrint("Onboarding Completed. isFirstTime: $storedValue"); // Debug log
+
+    Get.offAll(() => const CreatorNavBar()); // Navigate to main app
+  }
 
   @override
   Widget build(BuildContext context) {

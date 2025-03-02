@@ -10,8 +10,9 @@ import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:alarm/features/add_alarm/widgets/time_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../nav_bar/controllers/nav_bar_controller.dart';
+import '../../../nav_bar/presentation/screens/nav_bar.dart';
 import '../../../settings/controller/settings_controller.dart';
 import '../../controller/add_alarm_controller.dart';
 import '../../data/alarm_model.dart';
@@ -26,6 +27,7 @@ class AddAlarmScreen extends StatelessWidget {
     final AddAlarmController controller = Get.put(AddAlarmController());
     final settingsController = Get.find<
         SettingsController>(); // Don't Remove this (Settings fetching the data)
+    final navController = Get.put(CreatorNavBarController());
     final arguments = Get.arguments;
 
     if (arguments != null) {
@@ -88,27 +90,15 @@ class AddAlarmScreen extends StatelessWidget {
                         newAlarm.id!,
                         newAlarm.repeatDays,
                       );
+                      controller.saveScreenPreferences();
+
+                      // ✅ Navigate back and switch to Alarm Screen
+                      navController.changeIndex(0); // Set the bottom nav to Alarm screen
+                      Get.offAll(() => const CreatorNavBar()); // Ensure smooth navigation
+
                     }
-                    controller.saveScreenPreferences();
                   },
                 ),
-
-                // CustomAppbarWithLogo(
-                //   text: isEditMode ? 'Edit Alarm' : 'Add Alarm',
-                //   iconPath: IconPath.check,
-                //   onIconTap: () {
-                //     int alarmTime =
-                //         DateTime.now().millisecondsSinceEpoch + 60000;
-                //     if (isEditMode) {
-                //       controller.updateAlarmInDatabase(alarm);
-                //       Get.back();
-                //     } else {
-                //       controller.setAlarmNative(alarmTime);
-                //       controller.saveAlarmToDatabase();
-                //     }
-                //     controller.saveScreenPreferences();
-                //   },
-                // ),
                 SizedBox(height: getHeight(16)),
 
                 // Time Picker
@@ -180,15 +170,28 @@ class AddAlarmScreen extends StatelessWidget {
                             imageProvider = const AssetImage(ImagePath.cat);
                           }
 
-                          return Container(
-                            height: getHeight(150),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
+                          return Stack(
+                            children: [
+                              Container(
+                                height: getHeight(150),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
+                              if (isEditMode) // Add grey overlay if in edit mode
+                                Container(
+                                  height: getHeight(150),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.grey.withValues(alpha: 0.7), // Semi-transparent grey overlay
+                                  ),
+                                ),
+                            ],
+
                           );
                         }
                         return const SizedBox.shrink();
@@ -286,7 +289,7 @@ class AddAlarmScreen extends StatelessWidget {
                                     color: controller.isVibrationEnabled.value
                                         ? const Color(0xffFFAB4C)
                                         : const Color(0xffA3B2C7)
-                                            .withOpacity(0.3),
+                                            .withValues(alpha: 0.3),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   child: AnimatedAlign(

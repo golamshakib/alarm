@@ -92,9 +92,9 @@ class AddAlarmScreen extends StatelessWidget {
                       );
                       controller.saveScreenPreferences();
 
-                      // ✅ Navigate back and switch to Alarm Screen
-                      navController.changeIndex(0); // Set the bottom nav to Alarm screen
-                      Get.offAll(() => const CreatorNavBar()); // Ensure smooth navigation
+                      // // ✅ Navigate back and switch to Alarm Screen
+                      // navController.changeIndex(0); // Set the bottom nav to Alarm screen
+                      // Get.offAll(() => const CreatorNavBar()); // Ensure smooth navigation
 
                     }
                   },

@@ -84,7 +84,7 @@ class ChangeBackgroundScreenController extends GetxController {
         await player.play();
       }
     } catch (e) {
-      Get.snackbar("Error", "Failed to play audio: $e", duration: const Duration(seconds: 2));
+      // Get.snackbar("Error", "Failed to play audio: $e", duration: const Duration(seconds: 2));
     } finally {
       isPlaying.refresh(); // Final UI refresh to ensure proper state
     }

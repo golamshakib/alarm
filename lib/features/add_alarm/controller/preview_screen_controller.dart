@@ -36,7 +36,7 @@ class PreviewScreenController extends GetxController {
         await audioPlayer.play();
       }
     } catch (e) {
-      Get.snackbar("Playback Error", "Could not play the audio file: $e", duration: const Duration(seconds: 2));
+      // Get.snackbar("Playback Error", "Could not play the audio file: $e", duration: const Duration(seconds: 2));
     }
   }
 

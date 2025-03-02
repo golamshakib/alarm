@@ -12,39 +12,73 @@ import '../../../../core/common/widgets/custom_text.dart';
 import '../../../add_alarm/presentation/screens/add_alarm_screen.dart';
 import 'package:alarm/features/settings/controller/settings_controller.dart';
 
-class AlarmScreen extends StatelessWidget {
+class AlarmScreen extends StatefulWidget {
   const AlarmScreen({super.key});
 
   @override
+  _AlarmScreenState createState() => _AlarmScreenState();
+}
+
+class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
+  late final SettingsController settingsController;
+  late final AddAlarmController addAlarmController;
+  late final AlarmScreenController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addObserver(this); // Listen for app lifecycle changes
+
+    settingsController = Get.put(SettingsController());
+    addAlarmController = Get.put(AddAlarmController());
+    controller = Get.put(AlarmScreenController());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance
+        .removeObserver(this); // Stop listening for lifecycle changes
+    addAlarmController
+        .stopMusic(); // Ensure music stops when screen is disposed
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      addAlarmController
+          .stopMusic(); // Stop music when app goes into background or tab switches
+    }
+  }
+
+  String formatRepeatDays(List<String> repeatDays) {
+    if (repeatDays.length == 7) {
+      return "Everyday"; // If all days are selected
+    } else if (repeatDays.isNotEmpty) {
+      return repeatDays
+          .join(', '); // Join the days with a comma if not all days are selected
+    }
+    return "No Repeat Days";
+  }
+
+// Format time based on the format setting
+  String formatTime(int hour, int minute, bool isAm, int timeFormat) {
+    if (timeFormat == 24) {
+      return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+    } else {
+      return "${hour > 12 ? hour - 12 : hour}:${minute.toString().padLeft(2, '0')} ${isAm ? 'AM' : 'PM'}";
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Initialize the SettingsController
-    final SettingsController settingsController = Get.put(SettingsController());
-    final AddAlarmController addAlarmController = Get.put(AddAlarmController());
-    final AlarmScreenController controller = Get.put(AlarmScreenController());
-
-    String formatRepeatDays(List<String> repeatDays) {
-      if (repeatDays.length == 7) {
-        return "Everyday";  // If all days are selected
-      } else if (repeatDays.isNotEmpty) {
-        return repeatDays.join(', ');  // Join the days with a comma if not all days are selected
-      }
-      return "No Repeat Days";
-    }
-
-    // Format time based on the format setting
-    String formatTime(int hour, int minute, bool isAm, int timeFormat) {
-      if (timeFormat == 24) {
-        return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
-      } else {
-        return "${hour > 12 ? hour - 12 : hour}:${minute.toString().padLeft(2, '0')} ${isAm ? 'AM' : 'PM'}";
-      }
-    }
-
-
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: getHeight(16), horizontal: getWidth(16)),
+          padding: EdgeInsets.symmetric(
+              vertical: getHeight(16), horizontal: getWidth(16)),
           child: Obx(() {
             if (addAlarmController.alarms.isEmpty) {
               return Center(
@@ -82,9 +116,9 @@ class AlarmScreen extends StatelessWidget {
                             Obx(() {
                               return controller.isSelectionMode.value
                                   ? IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: controller.exitSelectionMode,
-                              )
+                                      icon: const Icon(Icons.close),
+                                      onPressed: controller.exitSelectionMode,
+                                    )
                                   : const SizedBox.shrink();
                             }),
                             SizedBox(width: getWidth(12)),
@@ -138,165 +172,180 @@ class AlarmScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final alarm = addAlarmController.alarms[index];
                       final isSelected =
-                      controller.selectedAlarms.contains(index);
+                          controller.selectedAlarms.contains(index);
 
                       return GestureDetector(
                         onLongPress: () {
                           controller.enableSelectionMode(index);
                         },
-                        // onDoubleTap: () {
-                        //   Get.to(() => AlarmTriggerScreen(
-                        //     alarm: alarm,
-                        //   ));
-                        // },
                         onTap: () {
+                          addAlarmController
+                              .stopMusic(); // Stop music when navigating away
                           if (controller.isSelectionMode.value) {
                             controller.toggleSelection(index);
                           } else {
-                            Get.to(() => const AddAlarmScreen(),
-                              arguments: {
-                                'isEditMode': true, // Set flag to indicate editing
-                                'alarm': alarm, // Pass the alarm data to the edit screen
-                              },
-                            );
+                            Get.to(() => const AddAlarmScreen(), arguments: {
+                              'isEditMode': true,
+                              // Set flag to indicate editing
+                              'alarm': alarm,
+                              // Pass the alarm data to the edit screen
+                            });
                           }
                         },
-                        child: Container(decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: alarm.backgroundImage.startsWith("http") || alarm.backgroundImage.startsWith("https")
-                                ? NetworkImage(alarm.backgroundImage) // Use network image if it's a URL
-                                : File(alarm.backgroundImage).existsSync()
-                                ? FileImage(File(alarm.backgroundImage)) // Use FileImage for local files
-                                : const AssetImage(ImagePath.cat) as ImageProvider, // Fallback asset image
-                            fit: BoxFit.cover,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: alarm.backgroundImage.startsWith("http") ||
+                                      alarm.backgroundImage.startsWith("https")
+                                  ? NetworkImage(alarm
+                                      .backgroundImage) // Use network image if it's a URL
+                                  : File(alarm.backgroundImage).existsSync()
+                                      ? FileImage(File(alarm
+                                          .backgroundImage)) // Use FileImage for local files
+                                      : const AssetImage(ImagePath.cat)
+                                          as ImageProvider,
+                              // Fallback asset image
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    const Color(0xffFFF5E1),
-                                    const Color(0xffFFF5E1).withOpacity(0.0),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xffFFF5E1),
+                                  const Color(0xffFFF5E1).withOpacity(0.0),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          // 🎵 Play Button (Supports Network & Local Music)
-                                          GestureDetector(
-                                            onTap: () {
-                                              addAlarmController.togglePlayPause(index, alarm.musicPath);
-                                            },
-                                            child: Obx(() {
-                                              final isPlaying = addAlarmController.isPlaying.value &&
-                                                  addAlarmController.currentlyPlayingIndex.value == index;
-                                              return Icon(
-                                                isPlaying
-                                                    ? Icons.play_circle_fill_rounded
-                                                    : Icons.play_circle_outline_rounded,
-                                                color: Colors.orange,
-                                                size: 25,
-                                              );
-                                            }),
-                                          ),
-                                          SizedBox(width: getWidth(12)),
-                                          GestureDetector(
-                                            onTap: () {
-                                              controller.toggleAlarm(index);
-                                            },
-                                            child: Obx(
-                                                  () => AnimatedContainer(
-                                                duration: const Duration(milliseconds: 300),
-                                                width: getWidth(37),
-                                                height: getHeight(21),
-                                                decoration: BoxDecoration(
-                                                  color: alarm.isToggled.value
-                                                      ? const Color(0xffFFAB4C)
-                                                      : const Color(0xffA3B2C7).withOpacity(0.3),
-                                                  borderRadius: BorderRadius.circular(30),
-                                                ),
-                                                child: GestureDetector(
-                                                  child: AnimatedAlign(
-                                                    duration: const Duration(milliseconds: 300),
-                                                    alignment: alarm.isToggled.value
-                                                        ? Alignment.centerRight
-                                                        : Alignment.centerLeft,
-                                                    child: Container(
-                                                      width: getWidth(18),
-                                                      height: getHeight(18),
-                                                      decoration: const BoxDecoration(
-                                                        color: Colors.white,
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                    ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        // 🎵 Play Button (Supports Network & Local Music)
+                                        GestureDetector(
+                                          onTap: () {
+                                            addAlarmController.togglePlayPause(
+                                                index, alarm.musicPath);
+                                          },
+                                          child: Obx(() {
+                                            final isPlaying = addAlarmController
+                                                    .isPlaying.value &&
+                                                addAlarmController
+                                                        .currentlyPlayingIndex
+                                                        .value ==
+                                                    index;
+                                            return Icon(
+                                              isPlaying
+                                                  ? Icons.play_circle_fill_rounded
+                                                  : Icons.play_circle_outline_rounded,
+                                              color: Colors.orange,
+                                              size: 25,
+                                            );
+                                          }),
+                                        ),
+                                        SizedBox(width: getWidth(12)),
+                                        GestureDetector(
+                                          onTap: () {
+                                            controller.toggleAlarm(index);
+                                          },
+                                          child: Obx(
+                                            () => AnimatedContainer(
+                                              duration: const Duration(
+                                                  milliseconds: 300),
+                                              width: getWidth(37),
+                                              height: getHeight(21),
+                                              decoration: BoxDecoration(
+                                                color: alarm.isToggled.value
+                                                    ? const Color(0xffFFAB4C)
+                                                    : const Color(0xffA3B2C7)
+                                                        .withOpacity(0.3),
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                              ),
+                                              child: AnimatedAlign(
+                                                duration: const Duration(
+                                                    milliseconds: 300),
+                                                alignment: alarm.isToggled.value
+                                                    ? Alignment.centerRight
+                                                    : Alignment.centerLeft,
+                                                child: Container(
+                                                  width: getWidth(18),
+                                                  height: getHeight(18),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    color: Colors.white,
+                                                    shape: BoxShape.circle,
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                      if (controller.isSelectionMode.value)
-                                        Checkbox(
-                                          value: isSelected,
-                                          activeColor: const Color(0xffFFAB4C),
-                                          side: const BorderSide(
-                                            width: 1,
-                                            color: Color(0xffFFAB4C),
-                                          ),
-                                          onChanged: (value) {
-                                            controller.toggleSelection(index);
-                                          },
                                         ),
-                                    ],
-                                  ),
-                                  Text(
-                                    formatTime(alarm.hour, alarm.minute, alarm.isAm, addAlarmController.timeFormat.value),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: getWidth(36),
+                                      ],
                                     ),
+                                    if (controller.isSelectionMode.value)
+                                      Checkbox(
+                                        value: isSelected,
+                                        activeColor: const Color(0xffFFAB4C),
+                                        side: const BorderSide(
+                                          width: 1,
+                                          color: Color(0xffFFAB4C),
+                                        ),
+                                        onChanged: (value) {
+                                          controller.toggleSelection(index);
+                                        },
+                                      ),
+                                  ],
+                                ),
+                                Text(
+                                  formatTime(
+                                      alarm.hour,
+                                      alarm.minute,
+                                      alarm.isAm,
+                                      addAlarmController.timeFormat.value),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: getWidth(36),
                                   ),
-                                  SizedBox(height: getHeight(15)),
-                                  Row(
-                                    children: [
-                                      CustomText(
-                                        text: formatRepeatDays(alarm.repeatDays),
+                                ),
+                                SizedBox(height: getHeight(15)),
+                                Row(
+                                  children: [
+                                    CustomText(
+                                      text: formatRepeatDays(alarm.repeatDays),
+                                      fontSize: getWidth(14),
+                                      fontWeight: FontWeight.w400,
+                                      color: const Color(0xffA59F92),
+                                    ),
+                                    Image.asset(
+                                      ImagePath.lineImage2,
+                                      height: getHeight(20),
+                                      width: getWidth(20),
+                                    ),
+                                    SizedBox(width: getWidth(8)),
+                                    Flexible(
+                                      child: CustomText(
+                                        text: alarm.label,
+                                        textOverflow: TextOverflow.ellipsis,
                                         fontSize: getWidth(14),
                                         fontWeight: FontWeight.w400,
                                         color: const Color(0xffA59F92),
                                       ),
-                                      Image.asset(
-                                        ImagePath.lineImage2,
-                                        height: getHeight(20),
-                                        width: getWidth(20),
-                                      ),
-                                      SizedBox(width: getWidth(8)),
-                                      Flexible(
-                                        child: CustomText(
-                                          text: alarm.label,
-                                          textOverflow: TextOverflow.ellipsis,
-                                          fontSize: getWidth(14),
-                                          fontWeight: FontWeight.w400,
-                                          color: const Color(0xffA59F92),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-
+                          ),
                         ),
                       );
                     },

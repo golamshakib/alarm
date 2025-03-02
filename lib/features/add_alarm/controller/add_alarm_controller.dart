@@ -386,16 +386,6 @@ class AddAlarmController extends GetxController {
           "📳 Vibration: ${newAlarm.isVibrationEnabled ? 'Enabled' : 'Disabled'}");
       debugPrint("🔊 Volume: ${newAlarm.volume}");
 
-      // Schedule notification
-      // await NotificationService.scheduleAlarm(
-      //   id: id,
-      //   title: "Alarm",
-      //   body: newAlarm.label,
-      //   // imagePath: newAlarm.backgroundImage,
-      //   // soundPath: newAlarm.musicPath,
-      //   scheduledTime: alarmTime,
-      // );
-
       Get.snackbar(
         "",
         "Alarm set for $hours hour and $minutes minute",
@@ -494,14 +484,6 @@ class AddAlarmController extends GetxController {
       // Print Alarm Details
       debugPrint("Updated Alarm Time: \${alarmTime.toLocal()}");
       debugPrint("📆 Alarm Rescheduled for: \${alarmTime.toLocal()}");
-
-      // Schedule notification
-      // await NotificationService.scheduleAlarm(
-      //   id: updatedAlarm.id!,
-      //   title: "Alarm",
-      //   body: updatedAlarm.label,
-      //   scheduledTime: alarmTime,
-      // );
 
       // Show snackbar with the remaining time
       Get.snackbar(

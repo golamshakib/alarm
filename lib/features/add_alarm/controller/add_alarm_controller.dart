@@ -80,6 +80,7 @@ class AddAlarmController extends GetxController {
     setCurrentTime();
     timeFormat.value = settingsController.selectedTime.value;
 
+
     // Watch for changes in time format and adjust time accordingly
     ever(settingsController.selectedTime, (_) {
       timeFormat.value = settingsController.selectedTime.value;

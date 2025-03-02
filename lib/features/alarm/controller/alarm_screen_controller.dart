@@ -30,10 +30,12 @@ class AlarmScreenController extends GetxController {
         await controller.setAlarmNative(alarmTimeInMillis, alarm.id!, alarm.repeatDays);
 
         debugPrint("Alarm ID ${alarm.id} is ON. Next occurrence: $nextAlarmTime");
+
       } else {
         // 🔹 If the alarm is OFF, cancel all scheduled instances
         await controller.cancelAlarmNative(alarm.id!);
         debugPrint("Alarm ID ${alarm.id} is OFF and canceled.");
+
       }
 
       // 🔹 Refresh alarms from the database

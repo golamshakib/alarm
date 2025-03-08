@@ -3,14 +3,13 @@ import 'dart:io';
 
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
-import 'package:volume_controller/volume_controller.dart';
 import 'package:flutter/services.dart';
 import '../../../core/db_helpers/db_helper_alarm.dart';
-import '../../../core/services/notification_service.dart';
 import '../../settings/controller/settings_controller.dart';
 import '../data/alarm_model.dart';
 
@@ -75,11 +74,12 @@ class AddAlarmController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    initializeVolumeController(); // Initialize volume controller
+    loadSavedVolume(); // Initialize volume controller
     loadScreenPreferences(); // Load preferences on initialization
     fetchAlarmsFromDatabase();
     setCurrentTime();
     timeFormat.value = settingsController.selectedTime.value;
+
 
     // Watch for changes in time format and adjust time accordingly
     ever(settingsController.selectedTime, (_) {
@@ -175,27 +175,51 @@ class AddAlarmController extends GetxController {
   /// -- E N D   V I B R A T I O N   S E C T I O N --
 
   /// -- V O L U M E   S E C T I O N --
-  var volume = 0.5.obs; // Default volume set to 50%
-  late VolumeController volumeController; // VolumeController instance
+  ///
+  ///
+  var volume = 0.5.obs; // Independent volume variable
 
-  // Initialize volume controller
-  Future<void> initializeVolumeController() async {
-    volumeController =
-        VolumeController.instance; // Initialize the VolumeController instance
-    // Add a listener for volume changes
-    volumeController.addListener((double newVolume) {
-      volume.value = newVolume; // Update the volume value
-    });
-    // Get the initial system volume
-    volume.value = await volumeController.getVolume();
+
+  // Load the saved volume (optional)
+  Future<void> loadSavedVolume() async {
+    // Simulate loading from shared preferences or local storage
+    double savedVolume = 0.5; // Default value
+    volume.value = savedVolume;
   }
 
-  // Set device volume
-  Future<void> setDeviceVolume(double newVolume) async {
-    volume.value = newVolume; // Update the volume value
-    await volumeController.setVolume(newVolume); // Set the system volume
-    saveScreenPreferences(); // Save the volume to preferences
+  // Set volume (Only updates the app state, not the system volume)
+  void setAppVolume(double newVolume) {
+    volume.value = newVolume;
+    // Here, you can integrate it with an audio player
+    saveVolume(newVolume); // Save volume for persistence
   }
+
+  // Save volume (optional)
+  Future<void> saveVolume(double volume) async {
+    // Simulate saving to shared preferences or local storage
+  }
+
+  // var volume = 0.5.obs; // Default volume set to 50%
+  // late VolumeController volumeController; // VolumeController instance
+  //
+  // // Initialize volume controller
+  // Future<void> initializeVolumeController() async {
+  //   volumeController =
+  //       VolumeController.instance; // Initialize the VolumeController instance
+  //   // Add a listener for volume changes
+  //   volumeController.addListener((double newVolume) {
+  //     volume.value = newVolume; // Update the volume value
+  //   });
+  //   // Get the initial system volume
+  //   volume.value = await volumeController.getVolume();
+  // }
+  //
+  // // Set device volume
+  // Future<void> setDeviceVolume(double newVolume) async {
+  //   volume.value = newVolume; // Update the volume value
+  //   await volumeController.setVolume(newVolume); // Set the system volume
+  //   saveScreenPreferences(); // Save the volume to preferences
+  // }
 
   /// -- E N D   V O L U M E   S E C T I O N --
 
@@ -529,7 +553,6 @@ class AddAlarmController extends GetxController {
   void dispose() {
     labelController.dispose();
     audioPlayer.dispose();
-    volumeController.removeListener();
     super.dispose();
   }
 
@@ -537,7 +560,6 @@ class AddAlarmController extends GetxController {
   void onClose() {
     stopMusic();
     audioPlayer.dispose();
-    volumeController.removeListener();
     super.onClose();
   }
 }

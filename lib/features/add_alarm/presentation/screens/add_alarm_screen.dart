@@ -92,9 +92,9 @@ class AddAlarmScreen extends StatelessWidget {
                       );
                       controller.saveScreenPreferences();
 
-                      // ✅ Navigate back and switch to Alarm Screen
-                      navController.changeIndex(0); // Set the bottom nav to Alarm screen
-                      Get.offAll(() => const CreatorNavBar()); // Ensure smooth navigation
+                      // // ✅ Navigate back and switch to Alarm Screen
+                      // navController.changeIndex(0); // Set the bottom nav to Alarm screen
+                      // Get.offAll(() => const CreatorNavBar()); // Ensure smooth navigation
 
                     }
                   },
@@ -326,8 +326,8 @@ class AddAlarmScreen extends StatelessWidget {
                                 value: controller.volume.value,
                                 min: 0.0,
                                 max: 1.0,
-                                onChanged: (value) async {
-                                  await controller.setDeviceVolume(value);
+                                onChanged: (value) {
+                                  controller.setAppVolume(value); // Only updates local volume
                                 },
                                 activeColor: Colors.orange,
                               );

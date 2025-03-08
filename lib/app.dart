@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'core/bindings/controller_binder.dart';
 import 'core/utils/constants/app_sizes.dart';
-import 'core/utils/theme/theme.dart';
 
 
 class MyApp extends StatelessWidget {

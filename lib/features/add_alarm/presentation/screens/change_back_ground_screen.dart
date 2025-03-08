@@ -24,12 +24,18 @@ class ChangeBackGroundScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CustomAppbarWithLogo(
+              CustomAppbarWithLogo(
                 text: "Change background",
-                showBackIcon: true,),
+                showBackIcon: true,
+                onBackTap: () async {
+                  controller.stopMusic();
+                  Get.back();
+                },
+              ),
               SizedBox(height: getHeight(24)),
               InkWell(
                 onTap: (){
+                  controller.stopMusic();
                   Get.toNamed(AppRoute.localBackgroundScreen);
                 },
                 child: Row(

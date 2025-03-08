@@ -1,5 +1,4 @@
 import 'package:alarm/features/splash_screen/presentation/screens/onboarding1.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';

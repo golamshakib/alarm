@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import '../../../core/db_helpers/db_helper_alarm.dart';
 import '../../add_alarm/controller/add_alarm_controller.dart';
 import '../../add_alarm/data/alarm_model.dart';
-import '../../../core/services/notification_service.dart';
 
 class AlarmScreenController extends GetxController {
   final DBHelperAlarm dbHelper = DBHelperAlarm();
@@ -31,10 +30,12 @@ class AlarmScreenController extends GetxController {
         await controller.setAlarmNative(alarmTimeInMillis, alarm.id!, alarm.repeatDays);
 
         debugPrint("Alarm ID ${alarm.id} is ON. Next occurrence: $nextAlarmTime");
+
       } else {
         // 🔹 If the alarm is OFF, cancel all scheduled instances
         await controller.cancelAlarmNative(alarm.id!);
         debugPrint("Alarm ID ${alarm.id} is OFF and canceled.");
+
       }
 
       // 🔹 Refresh alarms from the database

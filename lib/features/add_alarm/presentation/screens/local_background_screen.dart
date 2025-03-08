@@ -32,6 +32,10 @@ class LocalBackgroundScreen extends StatelessWidget {
               CustomAppbarWithLogo(
                 text: "Change background",
                 showBackIcon: true,
+                  onBackTap: () async {
+                    createAlarmController.stopMusic();
+                    Get.back();
+                  },
                   iconPath: IconPath.addIconActive,
                   onIconTap: () async {
                     createAlarmController.stopMusic();

@@ -11,7 +11,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import '../../../add_alarm/controller/add_alarm_controller.dart';
 import '../../../add_alarm/data/alarm_model.dart';
-import '../../../../core/services/notification_service.dart';
 
 class AlarmTriggerScreen extends StatefulWidget {
   final Alarm alarm;
@@ -67,18 +66,16 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
 
   /// **Dismiss Alarm**
   void _dismissAlarm() {
-    _audioPlayer.stop();
-    Vibration.cancel();
+    _stopAlarmProcesses();
 
     debugPrint("Alarm ID ${widget.alarm.id} dismissed.");
 
-    SystemNavigator.pop();
+    _closeApp();
   }
 
   /// **Snooze Alarm and Re-Schedule Notification**
   void _snoozeAlarm() async {
-    _audioPlayer.stop();
-    Vibration.cancel();
+    _stopAlarmProcesses();
 
     // Retrieve snooze duration from the database (in minutes)
     int snoozeTimeInMillis = widget.alarm.snoozeDuration * 60 * 1000; // Convert to milliseconds
@@ -92,10 +89,34 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
 
     debugPrint("Alarm ID ${widget.alarm.id} snoozed for ${widget.alarm.snoozeDuration} minutes.");
 
-    // Close the alarm screen
-    SystemNavigator.pop();
+    _closeApp();
+  }
+  /// **Stop All Running Processes**
+  void _stopAlarmProcesses() {
+    _audioPlayer.stop();
+    Vibration.cancel();
   }
 
+  /// **Close the App Properly (Ensures No Background Activity)**
+  void _closeApp() {
+    if (Platform.isAndroid) {
+      _forceCloseAndroidApp();
+    } else if (Platform.isIOS) {
+      exit(0); // Force close for iOS (Apple discourages this)
+    }
+  }
+
+  /// **Forcefully Kill the App on Android**
+  void _forceCloseAndroidApp() {
+    SystemNavigator.pop(); // Closes the app normally
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      exit(0); // Completely kill the app
+    });
+
+    // This will remove the app from recent apps list (only works on rooted or specific Android versions)
+    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+  }
   /// **Format Repeat Days**
   String formatRepeatDays(List<String> repeatDays) {
     if (repeatDays.length == 7) {
@@ -103,7 +124,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     } else if (repeatDays.isNotEmpty) {
       return repeatDays.join(', ');
     }
-    return "No Repeat Days";
+    return "Today";
   }
 
   /// **Format Time Based on User Settings**

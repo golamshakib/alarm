@@ -50,7 +50,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                   iconPathColor: AppColors.yellow,
                   iconPath: IconPath.editSquare,
                   onIconTap: () {
-                    controller.stopMusic();
+                    controller.onClose();
                     Get.to(
                       () => const CreateNewBackgroundScreen(),
                       arguments: {

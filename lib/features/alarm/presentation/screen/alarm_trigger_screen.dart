@@ -99,24 +99,25 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
 
   /// **Close the App Properly (Ensures No Background Activity)**
   void _closeApp() {
+    const platform = MethodChannel("alarm_channel");
     if (Platform.isAndroid) {
-      _forceCloseAndroidApp();
-    } else if (Platform.isIOS) {
-      exit(0); // Force close for iOS (Apple discourages this)
+      platform.invokeMethod("closeApp"); // Call the Android function
+    } else {
+      exit(0); // Exit the app on iOS
     }
   }
 
-  /// **Forcefully Kill the App on Android**
-  void _forceCloseAndroidApp() {
-    SystemNavigator.pop(); // Closes the app normally
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      exit(0); // Completely kill the app
-    });
-
-    // This will remove the app from recent apps list (only works on rooted or specific Android versions)
-    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-  }
+  // /// **Forcefully Kill the App on Android**
+  // void _forceCloseAndroidApp() {
+  //   SystemNavigator.pop(); // Closes the app normally
+  //
+  //   Future.delayed(const Duration(milliseconds: 500), () {
+  //     exit(0); // Completely kill the app
+  //   });
+  //
+  //   // This will remove the app from recent apps list (only works on rooted or specific Android versions)
+  //   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+  // }
   /// **Format Repeat Days**
   String formatRepeatDays(List<String> repeatDays) {
     if (repeatDays.length == 7) {

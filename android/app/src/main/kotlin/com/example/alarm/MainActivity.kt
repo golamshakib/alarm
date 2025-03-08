@@ -6,6 +6,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
+import android.app.ActivityManager
+import android.os.Process
 import androidx.annotation.NonNull
 import com.example.alarm.AlarmReceiver
 import io.flutter.embedding.android.FlutterActivity
@@ -43,14 +46,9 @@ class MainActivity : FlutterActivity() {
                     }
                 }
 
-                "cancelAlarm" -> {
-                    val alarmId = call.argument<Int>("alarmId")
-                    if (alarmId != null) {
-                        cancelAlarm(alarmId)
-                        result.success("Alarm canceled with ID: $alarmId")
-                    } else {
-                        result.error("INVALID_ARGUMENT", "Alarm ID is required", null)
-                    }
+                "closeApp" -> {
+                    closeApp()
+                    result.success(null)
                 }
 
                 else -> result.notImplemented()
@@ -108,6 +106,24 @@ class MainActivity : FlutterActivity() {
         val snoozeTime = System.currentTimeMillis() + timeInMillis // Snooze time from current time
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent)
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Check if the app should close
+        if (intent.getBooleanExtra("closeApp", false)) {
+            closeApp()
+        }
+    }
+
+    private fun closeApp() {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (task in activityManager.appTasks) {
+            task.finishAndRemoveTask() // Fix for ambiguous `forEach` error
+        }
+        Process.killProcess(Process.myPid()) // Correct import is now added
+    }
+
 
     private fun cancelAlarm(alarmId: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager

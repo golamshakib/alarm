@@ -169,7 +169,14 @@ class AlarmReceiver : BroadcastReceiver() {
         stopAlarmSound(context)
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(0)
+        notificationManager.cancelAll()
+
+        // Kill the app process (Remove from recent apps)
+        val intent = Intent(context, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent.putExtra("closeApp", true)
+        context.startActivity(intent)
+
         Toast.makeText(context, "Alarm Stopped", Toast.LENGTH_SHORT).show()
     }
 

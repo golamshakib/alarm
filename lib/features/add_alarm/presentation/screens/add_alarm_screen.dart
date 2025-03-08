@@ -326,8 +326,8 @@ class AddAlarmScreen extends StatelessWidget {
                                 value: controller.volume.value,
                                 min: 0.0,
                                 max: 1.0,
-                                onChanged: (value) async {
-                                  await controller.setDeviceVolume(value);
+                                onChanged: (value) {
+                                  controller.setAppVolume(value); // Only updates local volume
                                 },
                                 activeColor: Colors.orange,
                               );

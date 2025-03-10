@@ -54,7 +54,7 @@ class DBHelperAlarm {
   /// Fetch all alarms from the database
   Future<List<Alarm>> fetchAlarms() async {
     final db = await database;
-    final maps = await db.query('alarms');
+    final List<Map<String, dynamic>> maps = await db.query('alarms');
 
     return List.generate(maps.length, (i) {
       return Alarm.fromMap(maps[i]);

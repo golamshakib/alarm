@@ -70,6 +70,14 @@ class AlarmScreenController extends GetxController {
   Future<void> fetchAlarms() async {
     try {
       List<Alarm> fetchedAlarms = await dbHelper.fetchAlarms();
+
+      // Ensure repeatDays is correctly formatted
+      for (var alarm in fetchedAlarms) {
+        if (alarm.repeatDays.isEmpty) {
+          alarm.repeatDays.assignAll(["Today"]); // Fallback to "Today" if empty
+        }
+      }
+
       controller.alarms.assignAll(fetchedAlarms);
       update(); // 🔹 Ensure UI updates after fetching
     } catch (e) {

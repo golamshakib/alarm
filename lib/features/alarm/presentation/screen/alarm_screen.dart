@@ -54,14 +54,11 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
   }
 
   String formatRepeatDays(List<String> repeatDays) {
-    if (repeatDays.length == 7) {
-      return "Everyday"; // If all days are selected
-    } else if (repeatDays.isNotEmpty) {
-      return repeatDays
-          .join(', '); // Join the days with a comma if not all days are selected
-    }
-    return "No Repeat Days";
+    if (repeatDays.isEmpty) return "Today"; // Default if empty
+    if (repeatDays.length == 7) return "Everyday"; // If all days are selected
+    return repeatDays.join(', '); // Otherwise, join with commas
   }
+
 
 // Format time based on the format setting
   String formatTime(int hour, int minute, bool isAm, int timeFormat) {

@@ -15,11 +15,16 @@ class OnBoarding3Screen extends StatelessWidget {
 
   void completeOnboarding() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isFirstTime', false); // Mark onboarding as completed
-    bool storedValue = prefs.getBool('isFirstTime') ?? true;
-    debugPrint("Onboarding Completed. isFirstTime: $storedValue"); // Debug log
 
-    Get.offAll(() => const CreatorNavBar()); // Navigate to main app
+    await prefs.setBool('isFirstTime', false); // Mark onboarding as completed
+
+    debugPrint("Onboarding Completed. isFirstTime set to: ${prefs.getBool('isFirstTime')}");
+
+    // Navigate to the main app
+    Get.offAll(() => const CreatorNavBar(),
+        transition: Transition.fade,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut);
   }
 
   @override
@@ -88,7 +93,7 @@ class OnBoarding3Screen extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
                         onTap: () {
-                          Get.toNamed(AppRoute.navBarScreen);
+                          completeOnboarding();
                         },
                         child: Padding(
                           padding: EdgeInsets.only(

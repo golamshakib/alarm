@@ -13,6 +13,7 @@ import '../../../../core/utils/constants/image_path.dart';
 import '../../../../core/db_helpers/db_helper_local_background.dart';
 import '../../../../routes/app_routes.dart';
 import '../../controller/create_new_back_ground_screen_controller.dart';
+import 'change_back_ground_screen.dart';
 
 class LocalBackgroundScreen extends StatelessWidget {
   const LocalBackgroundScreen({super.key});
@@ -70,16 +71,25 @@ class LocalBackgroundScreen extends StatelessWidget {
                             ),
                             onDismissed: (direction) async {
                               final confirmed = await showDeleteConfirmationPopup(context);
+
                               if (confirmed) {
                                 final id = item['id'];
-                                await dbHelper.deleteBackground(id);
-                                createAlarmController.items.removeAt(index);
-                                Get.snackbar("Success", "Background deleted successfully!",
-                                    duration: const Duration(seconds: 2));
+                                // Ensure the ID is not null before proceeding
+                                if (id != null) {
+                                  await dbHelper.deleteBackground(id); // Delete the background from DB
+                                  createAlarmController.items.removeAt(index); // Remove the item from list immediately
+                                  Get.snackbar("Success", "Background deleted successfully!", duration: const Duration(seconds: 2));
+                                  Get.offAll(const LocalBackgroundScreen());
+                                } else {
+                                  // If ID is null, show an error or handle it gracefully
+                                  Get.snackbar("Error", "Invalid background ID. Could not delete the item.", duration: const Duration(seconds: 2));
+                                }
                               } else {
-                                createAlarmController.items.refresh();
+                                // If the dismissal is canceled, we don't need to remove the item
+                                Get.offAll(const LocalBackgroundScreen());
                               }
                             },
+
                             child: GestureDetector(
                               onTap: () {
                                 createAlarmController.stopMusic();

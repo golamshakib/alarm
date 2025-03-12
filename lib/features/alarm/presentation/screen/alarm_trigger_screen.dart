@@ -131,11 +131,32 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   /// **Format Time Based on User Settings**
   String formatTime(int hour, int minute, bool isAm, int timeFormat) {
     if (timeFormat == 24) {
+      // 24-hour format, show time as is
       return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
     } else {
-      return "${hour > 12 ? hour - 12 : hour}:${minute.toString().padLeft(2, '0')} ${isAm ? 'AM' : 'PM'}";
+      // 12-hour format conversion
+      String period = 'AM';
+      int displayHour = hour;
+
+      if (hour == 0) {
+        displayHour = 12; // Midnight case (00:xx -> 12:xx AM)
+        period = 'AM';
+      } else if (hour == 12) {
+        displayHour = 12; // Noon case (12:xx -> 12:xx PM)
+        period = 'PM';
+      } else if (hour > 12) {
+        displayHour = hour - 12; // Convert PM times (13:xx -> 1:xx PM)
+        period = 'PM';
+      } else {
+        period = 'AM'; // AM times (1:xx -> 1:xx AM)
+      }
+
+      return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
     }
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -180,8 +201,12 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomText(
-                        text: formatTime(widget.alarm.hour, widget.alarm.minute,
-                            widget.alarm.isAm, controller.timeFormat.value),
+                        text: formatTime(
+                          widget.alarm.hour,
+                          widget.alarm.minute,
+                          widget.alarm.isAm,
+                          controller.timeFormat.value, // Pass the time format
+                        ),
                         color: Colors.white,
                         fontSize: getWidth(40),
                         fontWeight: FontWeight.w300,

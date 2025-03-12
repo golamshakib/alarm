@@ -69,6 +69,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -314,6 +315,8 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                     fontSize: getWidth(36),
                                   ),
                                 ),
+
+
                                 SizedBox(height: getHeight(15)),
                                 Row(
                                   children: [

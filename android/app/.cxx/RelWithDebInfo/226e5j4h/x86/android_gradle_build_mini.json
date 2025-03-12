@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/shakib/development/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/shakib/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/shakib/Documents/Shakib/Flutter_Project/Office_Projects/alarm/android/app/.cxx/RelWithDebInfo/226e5j4h/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/shakib/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/shakib/Documents/Shakib/Flutter_Project/Office_Projects/alarm/android/app/.cxx/RelWithDebInfo/226e5j4h/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

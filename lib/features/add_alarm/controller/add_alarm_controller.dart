@@ -360,8 +360,30 @@ class AddAlarmController extends GetxController {
   /// -- S E T   A L A R M   N A T I V E
   Future<void> saveAlarmToDatabase() async {
     final dbHelper = DBHelperAlarm();
+
+    // Adjust time based on format
+    int alarmHour = selectedHour.value;
+
+    // If using 24-hour format
+    if (timeFormat.value == 24) {
+      if (isAm.value && selectedHour.value == 12) {
+        alarmHour = 0; // Handle 12 AM as 00:00
+      } else if (!isAm.value && selectedHour.value < 12) {
+        alarmHour += 12; // Handle PM time
+      }
+    } else {
+      // If 12-hour format
+      if (selectedHour.value == 12 && !isAm.value) {
+        alarmHour = 12; // Keep noon as 12 PM
+      } else if (selectedHour.value == 12 && isAm.value) {
+        alarmHour = 0; // Midnight should be 00:00
+      } else if (!isAm.value) {
+        alarmHour += 12; // Convert PM times
+      }
+    }
+
     final newAlarm = Alarm(
-      hour: selectedHour.value,
+      hour: alarmHour,
       minute: selectedMinute.value,
       isAm: isAm.value,
       label: label.value.isEmpty ? 'Morning Alarm' : label.value,
@@ -425,12 +447,18 @@ class AddAlarmController extends GetxController {
   DateTime getNextAlarmTime(Alarm alarm) {
     DateTime now = DateTime.now();
 
-    // Convert user-set time to 24-hour format
-    int alarmHour = alarm.isAm
-        ? (alarm.hour == 12 ? 0 : alarm.hour)
-        : (alarm.hour == 12 ? 12 : alarm.hour + 12);
-    DateTime alarmDateTime =
-        DateTime(now.year, now.month, now.day, alarmHour, alarm.minute);
+    int alarmHour = alarm.hour;
+
+    // Adjust hour for 24-hour format
+    if (!alarm.isAm && alarm.hour < 12) {
+      alarmHour += 12; // PM times should be 12+ (e.g., 1 PM should be 13)
+    } else if (alarm.isAm && alarm.hour == 12) {
+      alarmHour = 0; // 12 AM should be 00:00 in 24-hour format
+    } else if (!alarm.isAm && alarm.hour == 12) {
+      alarmHour = 12; // Noon should stay 12:00 in 24-hour format
+    }
+
+    DateTime alarmDateTime = DateTime(now.year, now.month, now.day, alarmHour, alarm.minute);
 
     // If the alarm time is already past today, move to the next valid day
     if (alarmDateTime.isBefore(now)) {
@@ -449,9 +477,10 @@ class AddAlarmController extends GetxController {
         }
       }
     }
-    // If no repeat days, return the next valid alarm time
+
     return alarmDateTime;
   }
+
 
   ///** Fetch Alarm From Database
   Future<void> fetchAlarmsFromDatabase() async {

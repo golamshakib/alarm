@@ -409,6 +409,14 @@ class AddAlarmController extends GetxController {
 
       // ✅ Get the next valid alarm time
       DateTime alarmTime = getNextAlarmTime(newAlarm);
+      int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
+
+      await setAlarmNative(
+        alarmTimeInMillis,
+        newAlarm.id!,
+        newAlarm.repeatDays,
+      );
+
 
       // Calculate remaining time
       Duration remainingTime = alarmTime.difference(DateTime.now());
@@ -422,8 +430,7 @@ class AddAlarmController extends GetxController {
       debugPrint("🚀 Alarm Saved!");
       debugPrint(
           "⏰ User Set Alarm Time: ${newAlarm.hour}:${newAlarm.minute} ${newAlarm.isAm ? "AM" : "PM"}");
-      debugPrint(
-          "📅 Repeat Days: ${newAlarm.repeatDays.isNotEmpty ? newAlarm.repeatDays.join(', ') : 'None'}");
+      debugPrint("Alarm set for repeat days: ${newAlarm.repeatDays}");
       debugPrint("📆 Alarm Scheduled for: ${alarmTime.toLocal()}");
       debugPrint("🔔 Label: ${newAlarm.label}");
       debugPrint(

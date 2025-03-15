@@ -34,21 +34,23 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val alarmId = intent.getIntExtra("alarmId", -1)
         val action = intent.action
-        val snoozeDuration = intent.getLongExtra("snoozeDuration", 60000L) // Default 60 sec
+        val snoozeDuration = intent.getLongExtra("snoozeDuration", 60000L)
         val repeatDays = intent.getStringArrayListExtra("repeatDays") ?: emptyList()
 
-        val sharedPreferences =
-            context.getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
         val isToggledOn = sharedPreferences.getBoolean("alarm_toggle_$alarmId", true)
 
         if (!isToggledOn) {
-            return  // Don't trigger alarm if toggle is off
+            return
         }
+
         when (action) {
             "SNOOZE_ALARM" -> snoozeAlarm(context, alarmId, snoozeDuration)
             "STOP_ALARM" -> stopAlarm(context)
             else -> {
                 vibratePhone(context)
+
+                // Show the alarm trigger screen
                 val alarmIntent = Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     putExtra("showAlarmTrigger", true)
@@ -56,9 +58,9 @@ class AlarmReceiver : BroadcastReceiver() {
                 }
                 context.startActivity(alarmIntent)
 
-                // Call showNotification with snoozeDuration
                 showNotification(context, alarmId, snoozeDuration)
 
+                // Trigger the next repeat day
                 if (repeatDays.isNotEmpty()) {
                     scheduleNextRepeat(context, alarmId, repeatDays)
                 }
@@ -66,18 +68,22 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
+
     private fun scheduleNextRepeat(context: Context, alarmId: Int, repeatDays: List<String>) {
         val now = Calendar.getInstance()
         val nextAlarmTime = Calendar.getInstance()
 
-        for (i in 1..7) { // Check the next 7 days
+        // Set up repeat days (Sun, Mon, Tue, Wed, Thu, Fri, Sat)
+        val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+        // Iterate through the next 7 days to find the next repeat day
+        for (i in 1..7) {
             nextAlarmTime.add(Calendar.DAY_OF_YEAR, 1)
             val dayOfWeek = nextAlarmTime.get(Calendar.DAY_OF_WEEK)
-
-            val dayNames = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
             val nextDayName = dayNames[dayOfWeek - 1]
 
             if (repeatDays.contains(nextDayName)) {
+                // Schedule the alarm for the next repeat day
                 val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 val intent = Intent(context, AlarmReceiver::class.java).apply {
                     putExtra("alarmId", alarmId)
@@ -104,14 +110,12 @@ class AlarmReceiver : BroadcastReceiver() {
                     )
                 }
 
-                Log.d(
-                    "AlarmReceiver",
-                    "Next repeating alarm scheduled for $nextDayName at ${nextAlarmTime.time}"
-                )
+                Log.d("AlarmReceiver", "Next repeating alarm scheduled for $nextDayName at ${nextAlarmTime.time}")
                 break
             }
         }
     }
+
 
 
     private fun playAlarmSound(context: Context) {

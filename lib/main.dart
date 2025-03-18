@@ -7,5 +7,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await NotificationService.requestNotificationPermissions();
+
   runApp(const MyApp());
 }

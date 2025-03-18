@@ -366,19 +366,21 @@ class AddAlarmController extends GetxController {
 
     // If using 24-hour format
     if (timeFormat.value == 24) {
-      if (isAm.value && selectedHour.value == 12) {
-        alarmHour = 0; // Handle 12 AM as 00:00
+      if (selectedHour.value == 00 && isAm.value) {
+        alarmHour = 0; // Handle 12 AM as 00:00 (Midnight)
+      } else if (selectedHour.value == 12) {
+        alarmHour = 12; // Keep 12 PM as 12:00 (Noon)
       } else if (!isAm.value && selectedHour.value < 12) {
-        alarmHour += 12; // Handle PM time
+        alarmHour += 12; // Handle PM time (convert 1 PM to 13:00, 2 PM to 14:00, etc.)
       }
     } else {
       // If 12-hour format
       if (selectedHour.value == 12 && !isAm.value) {
-        alarmHour = 12; // Keep noon as 12 PM
+        alarmHour = 12; // Keep 12 PM as 12:00
       } else if (selectedHour.value == 12 && isAm.value) {
         alarmHour = 0; // Midnight should be 00:00
       } else if (!isAm.value) {
-        alarmHour += 12; // Convert PM times
+        alarmHour += 12; // Convert PM times (1 PM to 13:00, 2 PM to 14:00, etc.)
       }
     }
 
@@ -409,6 +411,14 @@ class AddAlarmController extends GetxController {
 
       // ✅ Get the next valid alarm time
       DateTime alarmTime = getNextAlarmTime(newAlarm);
+      int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
+
+      await setAlarmNative(
+        alarmTimeInMillis,
+        newAlarm.id!,
+        newAlarm.repeatDays,
+      );
+
 
       // Calculate remaining time
       Duration remainingTime = alarmTime.difference(DateTime.now());
@@ -422,8 +432,7 @@ class AddAlarmController extends GetxController {
       debugPrint("🚀 Alarm Saved!");
       debugPrint(
           "⏰ User Set Alarm Time: ${newAlarm.hour}:${newAlarm.minute} ${newAlarm.isAm ? "AM" : "PM"}");
-      debugPrint(
-          "📅 Repeat Days: ${newAlarm.repeatDays.isNotEmpty ? newAlarm.repeatDays.join(', ') : 'None'}");
+      debugPrint("Alarm set for repeat days: ${newAlarm.repeatDays}");
       debugPrint("📆 Alarm Scheduled for: ${alarmTime.toLocal()}");
       debugPrint("🔔 Label: ${newAlarm.label}");
       debugPrint(
@@ -452,7 +461,7 @@ class AddAlarmController extends GetxController {
     // Adjust hour for 24-hour format
     if (!alarm.isAm && alarm.hour < 12) {
       alarmHour += 12; // PM times should be 12+ (e.g., 1 PM should be 13)
-    } else if (alarm.isAm && alarm.hour == 12) {
+    } else if (alarm.isAm && alarm.hour == 00) {
       alarmHour = 0; // 12 AM should be 00:00 in 24-hour format
     } else if (!alarm.isAm && alarm.hour == 12) {
       alarmHour = 12; // Noon should stay 12:00 in 24-hour format
@@ -549,6 +558,31 @@ class AddAlarmController extends GetxController {
           duration: const Duration(seconds: 2));
     }
   }
+
+  /// **Handle alarm rescheduling after app restart**
+  Future<void> handleAlarmOnAppStart() async {
+    try {
+      // Fetch alarms from the database
+      final dbHelper = DBHelperAlarm();
+      List<Alarm> alarms = await dbHelper.fetchAlarms();
+
+      // Iterate over the alarms and reschedule each one
+      for (var alarm in alarms) {
+        DateTime alarmTime = getNextAlarmTime(alarm);
+        int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
+
+        // Set the alarm natively
+        await setAlarmNative(
+          alarmTimeInMillis,
+          alarm.id!,
+          alarm.repeatDays,
+        );
+      }
+    } catch (e) {
+      debugPrint("Failed to reschedule alarms: $e");
+    }
+  }
+
 
   ///** Delete an alarm from the SQLite database
   Future<void> deleteAlarmFromDatabase(int id) async {

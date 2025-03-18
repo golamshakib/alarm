@@ -79,14 +79,14 @@ class LocalBackgroundScreen extends StatelessWidget {
                                   await dbHelper.deleteBackground(id); // Delete the background from DB
                                   createAlarmController.items.removeAt(index); // Remove the item from list immediately
                                   Get.snackbar("Success", "Background deleted successfully!", duration: const Duration(seconds: 2));
-                                  Get.offAll(const LocalBackgroundScreen());
+                                  Get.off(const LocalBackgroundScreen());
                                 } else {
                                   // If ID is null, show an error or handle it gracefully
                                   Get.snackbar("Error", "Invalid background ID. Could not delete the item.", duration: const Duration(seconds: 2));
                                 }
                               } else {
                                 // If the dismissal is canceled, we don't need to remove the item
-                                Get.offAll(const LocalBackgroundScreen());
+                                Get.off(const ChangeBackGroundScreen());
                               }
                             },
 

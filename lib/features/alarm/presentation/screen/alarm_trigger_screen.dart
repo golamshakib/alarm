@@ -65,9 +65,18 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   }
 
   /// **Dismiss Alarm**
-  void _dismissAlarm() {
+  void _dismissAlarm()  async {
     _stopAlarmProcesses();
+    // Get the next valid alarm time (next repeat day)
+    DateTime nextRepeatTime = controller.getNextAlarmTime(widget.alarm);
+    int nextRepeatTimeInMillis = nextRepeatTime.millisecondsSinceEpoch;
 
+    // Reschedule the alarm using the native method
+    await controller.setAlarmNative(
+      nextRepeatTimeInMillis,
+      widget.alarm.id!,
+      widget.alarm.repeatDays,
+    );
     debugPrint("Alarm ID ${widget.alarm.id} dismissed.");
 
     _closeApp();
@@ -85,7 +94,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     int snoozeTimeEpoch = snoozeTriggerTime.millisecondsSinceEpoch;
 
     // Schedule the alarm in Native Code
-    await controller.setAlarmNative(snoozeTimeEpoch, widget.alarm.id!, []);
+    await controller.setAlarmNative(snoozeTimeEpoch, widget.alarm.id!, widget.alarm.repeatDays);
 
     debugPrint("Alarm ID ${widget.alarm.id} snoozed for ${widget.alarm.snoozeDuration} minutes.");
 

@@ -1,8 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:alarm/features/add_alarm/presentation/screens/local_background_screen.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/src/widgets/navigator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -14,17 +16,15 @@ class CreateNewBackgroundController extends GetxController {
   ImagePicker picker = ImagePicker();
   Rx<String> labelText = ''.obs; // Store label text
 
-
   /// -- P L A Y   M U S I C
 
   RxList<Map<String, dynamic>> items = <Map<String, dynamic>>[].obs;
   final AudioPlayer audioPlayer = AudioPlayer();
+
   // List<PlayerController> waveformControllers = []; // Create a PlayerController for each item
   RxBool isPlaying = false.obs;
   RxInt playingIndex = (-1).obs; // To track the currently playing item
   RxString musicHoverMessage = ''.obs;
-
-
 
   @override
   void onInit() {
@@ -99,7 +99,8 @@ class CreateNewBackgroundController extends GetxController {
         // waveformControllers[index].startPlayer();
       }
     } catch (e) {
-      musicHoverMessage.value = "Failed to play audio: $e"; // Update hover message
+      musicHoverMessage.value =
+          "Failed to play audio: $e"; // Update hover message
     }
   }
 
@@ -119,6 +120,7 @@ class CreateNewBackgroundController extends GetxController {
   /// -- S T A R T   R E C O R D I N G
 
   final PlayerController playerController = PlayerController();
+
   // final AudioRecorder audioRecorder = AudioRecorder();
   // RxBool isRecording = false.obs;
   // RxString recordingPath = ''.obs;
@@ -126,7 +128,6 @@ class CreateNewBackgroundController extends GetxController {
   // RxBool isMicDisabled = false.obs; // To disable the mic button
   RxBool isMusicDisabled = false.obs; // To disable the music button
   // RxString recordingHoverMessage = ''.obs;
-
 
   /// ✅ **Check & Request Permissions**
   // Future<void> checkPermissions() async {
@@ -162,7 +163,7 @@ class CreateNewBackgroundController extends GetxController {
   //   }
   // }
 
-   /// -- Start Recording
+  /// -- Start Recording
   // Future<void> toggleRecording() async {
   //   try {
   //     if (isMicDisabled.value) {
@@ -254,7 +255,6 @@ class CreateNewBackgroundController extends GetxController {
   // }
   /// -- E N D    P L A Y    R E C O R D I N G
 
-
   /// -- P I C K    I M A G E    A N D    M U S I C
 
   Rx<String?> imagePath = Rx<String?>(null); // Store image path
@@ -265,7 +265,8 @@ class CreateNewBackgroundController extends GetxController {
     final ImagePicker picker = ImagePicker();
 
     // Pick an image from the gallery
-    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       // Set the image path
@@ -282,7 +283,8 @@ class CreateNewBackgroundController extends GetxController {
 
   Future<void> pickMusic() async {
     if (isMusicDisabled.value) {
-      musicHoverMessage.value = "Recording is in progress or completed. Reset to enable music selection.";
+      musicHoverMessage.value =
+          "Recording is in progress or completed. Reset to enable music selection.";
       return;
     }
 
@@ -294,23 +296,28 @@ class CreateNewBackgroundController extends GetxController {
       musicPath.value = result.files.single.path;
       isMusicSelected.value = true; // Mark music as selected
       // isMicDisabled.value = true; // Disable the mic button
-      musicHoverMessage.value = "Music file selected successfully.";    }
+      musicHoverMessage.value = "Music file selected successfully.";
+    }
   }
 
   /// -- E N D   P I C K    I M A G E    A N D    M U S I C
 
   void saveData({int? id}) async {
     if (!isImageSelected.value) {
-      Get.snackbar("Error", "Please select an image before saving background.", duration: const Duration(seconds: 2));
+      Get.snackbar("Error", "Please select an image before saving background.",
+          duration: const Duration(seconds: 2));
       return;
     }
     if (!isMusicSelected.value) {
-      Get.snackbar("Error", "Please select a music file before saving background.", duration: const Duration(seconds: 2));
+      Get.snackbar(
+          "Error", "Please select a music file before saving background.",
+          duration: const Duration(seconds: 2));
       return;
     }
 
     final result = {
-      'title': labelText.value.isNotEmpty ? labelText.value : 'Background Title',
+      'title':
+          labelText.value.isNotEmpty ? labelText.value : 'Background Title',
       'imagePath': imagePath.value,
       'musicPath': musicPath.value,
       // 'recordingPath': recordingPath.value,
@@ -324,37 +331,44 @@ class CreateNewBackgroundController extends GetxController {
         // Update existing entry
         int rowsUpdated = await dbHelper.updateBackground(result, id);
         if (rowsUpdated > 0) {
-          Get.snackbar("Success", "Background updated successfully!", duration: const Duration(seconds: 2));
+          Get.snackbar("Success", "Background updated successfully!",
+              duration: const Duration(seconds: 2));
           // Update the local list
           int indexToUpdate =
-          items.indexWhere((element) => element['id'] == id);
+              items.indexWhere((element) => element['id'] == id);
           if (indexToUpdate != -1) {
             items[indexToUpdate] = {...result, 'id': id}; // Update local list
             items.refresh();
           }
         } else {
-          Get.snackbar("Error", "Failed to update background.", duration: const Duration(seconds: 2));
+          Get.snackbar("Error", "Failed to update background.",
+              duration: const Duration(seconds: 2));
         }
       } else {
         // Insert new entry
-       await dbHelper.insertBackground(result);
+        await dbHelper.insertBackground(result);
         // result['id'] = newId; // Add the ID to the result
         addItem(result); // Add the new item to the list
 
-       // waveformControllers.add(PlayerController()); // Add a controller for the new item
-        Get.snackbar("Success", "Background saved successfully!", duration: const Duration(seconds: 2));
+        // waveformControllers.add(PlayerController()); // Add a controller for the new item
+        Get.snackbar("Success", "Background saved successfully!",
+            duration: const Duration(seconds: 2));
       }
 
       resetFields(); // Reset fields
 
-        Get.offNamed(AppRoute.localBackgroundScreen, arguments: result);
-
+      Get.off(const LocalBackgroundScreen(), arguments: result);
+      // Get.offNamedUntil(
+      //     AppRoute.localBackgroundScreen,
+      //     (Route route) =>
+      //         route.settings.name == AppRoute.createNewBackgroundScreen,
+      //     arguments: result);
     } catch (e) {
       log('Error saving data: $e');
-      Get.snackbar("Error", "Failed to save background: $e", duration: const Duration(seconds: 2));
+      Get.snackbar("Error", "Failed to save background: $e",
+          duration: const Duration(seconds: 2));
     }
   }
-
 
   void resetFields() {
     labelText.value = ''; // Clear the label text

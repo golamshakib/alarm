@@ -4,28 +4,31 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import io.flutter.app.FlutterApplication
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.view.FlutterMain
+import io.flutter.plugin.common.MethodChannel
 
 class BootReceiver : BroadcastReceiver() {
+
+    // Define a method channel name that matches the one used in the Flutter app
+    private val CHANNEL = "alarm_channel"
+
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
             Log.d("BootReceiver", "Device Booted, Triggering Flutter Method...")
 
-            // Initialize the Flutter Engine
-            FlutterMain.startInitialization(context)
+            // Initialize the Flutter engine
             val flutterEngine = FlutterEngine(context)
 
-            // Start the Flutter engine
-            flutterEngine.startInitialization(context)
+            // Run the default entry point for the Flutter engine
+//            flutterEngine.dartExecutor.executeDartEntrypoint(
+//                flutterEngine.dartExecutor.dartEntrypoint
+//            )
 
-            // Call method on FlutterEngine
-            MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "alarm_channel")
+            // Call method on FlutterEngine using MethodChannel
+            MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
                 .invokeMethod("handleAlarmOnAppStart", null)
+
+            Log.d("BootReceiver", "Flutter Method Invoked Successfully")
         }
     }
 }

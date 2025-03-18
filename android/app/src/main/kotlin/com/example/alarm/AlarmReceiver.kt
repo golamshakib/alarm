@@ -68,55 +68,41 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-
     private fun scheduleNextRepeat(context: Context, alarmId: Int, repeatDays: List<String>) {
-        val now = Calendar.getInstance()
-        val nextAlarmTime = Calendar.getInstance()
+        val calendar = Calendar.getInstance()
 
-        // Set up repeat days (Sun, Mon, Tue, Wed, Thu, Fri, Sat)
-        val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-
-        // Iterate through the next 7 days to find the next repeat day
         for (i in 1..7) {
-            nextAlarmTime.add(Calendar.DAY_OF_YEAR, 1)
-            val dayOfWeek = nextAlarmTime.get(Calendar.DAY_OF_WEEK)
-            val nextDayName = dayNames[dayOfWeek - 1]
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+            val nextDayName = getDayName(dayOfWeek)
 
             if (repeatDays.contains(nextDayName)) {
-                // Schedule the alarm for the next repeat day
                 val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 val intent = Intent(context, AlarmReceiver::class.java).apply {
                     putExtra("alarmId", alarmId)
                     putStringArrayListExtra("repeatDays", ArrayList(repeatDays))
                 }
                 val pendingIntent = PendingIntent.getBroadcast(
-                    context,
-                    alarmId,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    context, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT
                 )
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        nextAlarmTime.timeInMillis,
-                        pendingIntent
-                    )
-                } else {
-                    alarmManager.setExact(
-                        AlarmManager.RTC_WAKEUP,
-                        nextAlarmTime.timeInMillis,
-                        pendingIntent
-                    )
-                }
-
-                Log.d("AlarmReceiver", "Next repeating alarm scheduled for $nextDayName at ${nextAlarmTime.time}")
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
                 break
             }
         }
     }
 
-
+    private fun getDayName(dayOfWeek: Int): String {
+        return when (dayOfWeek) {
+            Calendar.SUNDAY -> "Sun"
+            Calendar.MONDAY -> "Mon"
+            Calendar.TUESDAY -> "Tue"
+            Calendar.WEDNESDAY -> "Wed"
+            Calendar.THURSDAY -> "Thu"
+            Calendar.FRIDAY -> "Fri"
+            Calendar.SATURDAY -> "Sat"
+            else -> "Mon"
+        }
+    }
 
     private fun playAlarmSound(context: Context) {
         try {
@@ -141,7 +127,6 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    // This method now accepts the snooze duration.
     private fun snoozeAlarm(context: Context, alarmId: Int, snoozeDuration: Long = 60000L) {
         stopAlarmSound(context) // Stop alarm sound & vibration
 
@@ -211,7 +196,7 @@ class AlarmReceiver : BroadcastReceiver() {
             context.getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
         val alarmLabel = sharedPreferences.getString("alarm_label_$alarmId", "Alarm Triggered")
 
-        // 🔹 Ensure label is not null (fallback to default)
+        // Ensure label is not null (fallback to default)
         val notificationText = if (!alarmLabel.isNullOrEmpty()) alarmLabel else "Time to wake up"
 
         // Create an empty pending intent that does nothing when clicked
@@ -243,7 +228,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .build()
 
         NotificationManagerCompat.from(context).notify(alarmId, notification)
-        // **🔹 Remove notification after 2 seconds**
+        // Remove notification after 2 seconds
         Handler(Looper.getMainLooper()).postDelayed({
             notificationManager.cancel(alarmId) // Remove notification from panel
         }, 2000)

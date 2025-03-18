@@ -22,6 +22,7 @@ class AppRoute {
   static String changeBackgroundScreen = "/changeBackgroundScreen";
   static String localBackgroundScreen = "/localBackgroundScreen";
   static String createNewAlarmScreen = "/createNewAlarmScreen";
+  static String createNewBackgroundScreen = "/createNewBackgroundScreen";
 
 
   static const alarmTrigger = '/alarmTrigger';
@@ -37,6 +38,7 @@ class AppRoute {
     GetPage(name: changeBackgroundScreen, page: () => const ChangeBackGroundScreen()),
     GetPage(name: localBackgroundScreen, page: () => const LocalBackgroundScreen()),
     GetPage(name: createNewAlarmScreen, page: () => const CreateNewBackgroundScreen()),
+    GetPage(name: createNewBackgroundScreen, page: () => const CreateNewBackgroundScreen()),
 
 
     GetPage(

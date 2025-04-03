@@ -14,6 +14,8 @@ import com.example.alarm.AlarmReceiver
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugins.GeneratedPluginRegistrant
+
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "alarm_channel"
@@ -51,7 +53,15 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
-                else -> result.notImplemented()
+                "handleAlarmOnBoot" -> {
+                    // This method is invoked after device reboot or app start
+                    // Call Flutter method to reschedule alarms
+                    rescheduleAlarmsFromFlutter()
+                    result.success("Alarms Rescheduled")
+                }
+
+
+            else -> result.notImplemented()
             }
         }
     }
@@ -72,6 +82,13 @@ class MainActivity : FlutterActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         // Optionally: use a MethodChannel to notify Flutter about the intent change
+    }
+
+    // Communicate with Flutter to reschedule alarms
+    private fun rescheduleAlarmsFromFlutter() {
+        // Send method call to Flutter to fetch alarms and reschedule them
+        MethodChannel(flutterEngine!!.dartExecutor.binaryMessenger, "alarm_channel")
+            .invokeMethod("rescheduleAlarms", null)
     }
 
 

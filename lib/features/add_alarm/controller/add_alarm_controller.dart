@@ -86,6 +86,7 @@ class AddAlarmController extends GetxController {
       timeFormat.value = settingsController.selectedTime.value;
       adjustTimeFormat();
     });
+    handleAlarmOnAppStart();
   }
 
   /// -- S E T   B A C K G R O U N D --
@@ -576,10 +577,9 @@ class AddAlarmController extends GetxController {
     }
   }
 
-  /// **Handle alarm rescheduling after app restart**
+  // **Handle Alarm on App Start (for rescheduling alarms after app restart)**
   Future<void> handleAlarmOnAppStart() async {
     try {
-      // Fetch alarms from the database
       final dbHelper = DBHelperAlarm();
       List<Alarm> alarms = await dbHelper.fetchAlarms();
 
@@ -599,6 +599,7 @@ class AddAlarmController extends GetxController {
       debugPrint("Failed to reschedule alarms: $e");
     }
   }
+
 
 
   ///** Delete an alarm from the SQLite database

@@ -427,6 +427,18 @@ class AddAlarmController extends GetxController {
       int hours = remainingTime.inHours;
       int minutes = remainingTime.inMinutes % 60;
 
+      String message;
+
+      // Format next repeat days
+      if (remainingTime.isNegative || remainingTime.inHours >= 24) {
+        // If the alarm is set for a future day or the remaining time is more than 24 hours
+        message = 'Alarm set for ${newAlarm.repeatDays.join(', ')}';
+      } else {
+        // If the alarm is within the next 24 hours
+        message = "Alarm set for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
+      }
+
+
       // ✅ Print Alarm Details
       debugPrint("Scheduled Alarm Time: ${alarmTime.toLocal()}");
       debugPrint("🚀 Alarm Saved!");
@@ -443,9 +455,14 @@ class AddAlarmController extends GetxController {
 
       Get.snackbar(
         "",
-        "Alarm set for $hours hour and $minutes minute",
+        message,
         duration: const Duration(seconds: 2),
       );
+      // Get.snackbar(
+      //   "",
+      //   "Alarm set for $hours hour and $minutes minute",
+      //   duration: const Duration(seconds: 2),
+      // );
     } catch (e) {
       Get.snackbar("Error", "Failed to Save Alarm: $e",
           duration: const Duration(seconds: 2));

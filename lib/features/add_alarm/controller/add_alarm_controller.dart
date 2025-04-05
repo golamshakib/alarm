@@ -329,16 +329,24 @@ class AddAlarmController extends GetxController {
   static const MethodChannel _channel = MethodChannel('alarm_channel');
 
   /// Set an alarm at the given time (in milliseconds since epoch)
-  Future<void> setAlarmNative(
-      int timeInMillis, int alarmId, List<String> repeatDays) async {
+  Future<void> setAlarmNative(int timeInMillis, int alarmId, List<String> repeatDays) async {
     try {
-      await _channel.invokeMethod('setAlarm', {
-        'time': timeInMillis,
-        'alarmId': alarmId,
-        'repeatDays': repeatDays.isNotEmpty ? repeatDays : [],
-      });
-      debugPrint(
-          "============>>>>Native Alarm Set with Repeat Days: $repeatDays;");
+      final dbHelper = DBHelperAlarm();  // Get the singleton instance
+      // Fetch the alarm object from the database to check its toggle status
+      final Alarm? alarm = await dbHelper.getAlarm(alarmId);
+
+      // If the alarm exists and is toggled on, proceed with setting the alarm
+      if (alarm != null && alarm.isToggled.value) {
+        // Proceed with scheduling the alarm
+        await _channel.invokeMethod('setAlarm', {
+          'time': timeInMillis,
+          'alarmId': alarmId,
+          'repeatDays': repeatDays.isNotEmpty ? repeatDays : [],
+        });
+        debugPrint("============>>>>Native Alarm Set with Repeat Days: $repeatDays;");
+      } else {
+        debugPrint("Alarm with ID $alarmId is toggled off. Not setting alarm.");
+      }
     } on PlatformException catch (e) {
       debugPrint("Failed to set alarm: ${e.message}");
     }
@@ -353,6 +361,7 @@ class AddAlarmController extends GetxController {
       debugPrint("Failed to cancel alarm: ${e.message}");
     }
   }
+
 
 
   /// --  D A T A B A S E   S E R V I C E S --

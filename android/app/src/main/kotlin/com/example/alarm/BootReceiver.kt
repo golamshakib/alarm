@@ -4,8 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.embedding.engine.FlutterEngine
 
 class BootReceiver : BroadcastReceiver() {
     private val CHANNEL = "alarm_channel"

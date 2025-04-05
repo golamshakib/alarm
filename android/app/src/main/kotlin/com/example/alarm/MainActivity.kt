@@ -38,6 +38,16 @@ class MainActivity : FlutterActivity() {
                     }
                 }
 
+                "cancelAlarm" -> {
+                    val alarmId = call.argument<Int>("alarmId")
+                    if (alarmId != null) {
+                        cancelAlarm(alarmId) // Call the cancelAlarm method
+                        result.success("Alarm with alarmId $alarmId canceled")
+                    } else {
+                        result.error("INVALID_ARGUMENT", "alarmId is required", null)
+                    }
+                }
+
                 "snoozeAlarm" -> {
                     val snoozeTime = call.argument<Long>("time")
                     if (snoozeTime != null) {
@@ -55,13 +65,11 @@ class MainActivity : FlutterActivity() {
 
                 "handleAlarmOnBoot" -> {
                     // This method is invoked after device reboot or app start
-                    // Call Flutter method to reschedule alarms
                     rescheduleAlarmsFromFlutter()
                     result.success("Alarms Rescheduled")
                 }
 
-
-            else -> result.notImplemented()
+                else -> result.notImplemented()
             }
         }
     }
@@ -84,15 +92,14 @@ class MainActivity : FlutterActivity() {
         // Optionally: use a MethodChannel to notify Flutter about the intent change
     }
 
-    // Communicate with Flutter to reschedule alarms
+    // Reschedule alarms after device restart
     private fun rescheduleAlarmsFromFlutter() {
         // Send method call to Flutter to fetch alarms and reschedule them
         MethodChannel(flutterEngine!!.dartExecutor.binaryMessenger, "alarm_channel")
             .invokeMethod("rescheduleAlarms", null)
     }
 
-
-    private fun setAlarm(timeInMillis: Long, alarmId: Int, repeatDays: List<String> =emptyList()) {
+    private fun setAlarm(timeInMillis: Long, alarmId: Int, repeatDays: List<String> = emptyList()) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java).apply {
             putExtra("alarmId", alarmId)
@@ -141,7 +148,6 @@ class MainActivity : FlutterActivity() {
         Process.killProcess(Process.myPid()) // Correct import is now added
     }
 
-
     private fun cancelAlarm(alarmId: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
@@ -153,3 +159,4 @@ class MainActivity : FlutterActivity() {
         pendingIntent.cancel()  // Ensure the PendingIntent is removed completely
     }
 }
+

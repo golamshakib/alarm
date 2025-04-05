@@ -27,6 +27,7 @@ class AlarmScreenController extends GetxController {
         DateTime nextAlarmTime = getNextAlarmTime(alarm);
         int alarmTimeInMillis = nextAlarmTime.millisecondsSinceEpoch;
 
+        // Schedule the alarm to trigger at the next occurrence
         await controller.setAlarmNative(alarmTimeInMillis, alarm.id!, alarm.repeatDays);
 
         debugPrint("Alarm ID ${alarm.id} is ON. Next occurrence: $nextAlarmTime");
@@ -35,7 +36,6 @@ class AlarmScreenController extends GetxController {
         // 🔹 If the alarm is OFF, cancel all scheduled instances
         await controller.cancelAlarmNative(alarm.id!);
         debugPrint("Alarm ID ${alarm.id} is OFF and canceled.");
-
       }
 
       // 🔹 Refresh alarms from the database
@@ -46,6 +46,7 @@ class AlarmScreenController extends GetxController {
       debugPrint("Error toggling alarm: $e");
     }
   }
+
 
 
   /// **Get Next Alarm Time Based on Current Time**

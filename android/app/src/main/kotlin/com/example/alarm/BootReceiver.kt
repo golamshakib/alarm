@@ -4,12 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugins.GeneratedPluginRegistrant
 
 class BootReceiver : BroadcastReceiver() {
-
-    // Define a method channel name that matches the one used in the Flutter app
     private val CHANNEL = "alarm_channel"
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -18,15 +17,14 @@ class BootReceiver : BroadcastReceiver() {
 
             // Initialize the Flutter engine
             val flutterEngine = FlutterEngine(context)
+            flutterEngine.lifecycleChannel.appIsResumed()
 
-            // Run the default entry point for the Flutter engine
-//            flutterEngine.dartExecutor.executeDartEntrypoint(
-//                flutterEngine.dartExecutor.dartEntrypoint
-//            )
+            // Register plugins
+            GeneratedPluginRegistrant.registerWith(flutterEngine)
 
-            // Call method on FlutterEngine using MethodChannel
+            // Call method on FlutterEngine using MethodChannel to trigger rescheduling
             MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
-                .invokeMethod("handleAlarmOnAppStart", null)
+                .invokeMethod("handleAlarmOnBoot", null)
 
             Log.d("BootReceiver", "Flutter Method Invoked Successfully")
         }

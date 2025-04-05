@@ -154,7 +154,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
         displayHour = 12; // Noon case (12:xx -> 12:xx PM)
         period = 'PM';
       } else if (hour > 12) {
-        displayHour = hour - 12; // Convert PM times (13:xx -> 1:xx PM)
+        displayHour = hour; // Convert PM times (13:xx -> 1:xx PM)
         period = 'PM';
       } else {
         period = 'AM'; // AM times (1:xx -> 1:xx AM)

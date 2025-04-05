@@ -94,7 +94,6 @@ class MainActivity : FlutterActivity() {
 
     // Reschedule alarms after device restart
     private fun rescheduleAlarmsFromFlutter() {
-        // Send method call to Flutter to fetch alarms and reschedule them
         MethodChannel(flutterEngine!!.dartExecutor.binaryMessenger, "alarm_channel")
             .invokeMethod("rescheduleAlarms", null)
     }

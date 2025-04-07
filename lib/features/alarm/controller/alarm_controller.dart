@@ -9,18 +9,14 @@ import '../../add_alarm/data/alarm_model.dart';
 class AlarmController extends GetxController {
   final AddAlarmController controller = Get.find<AddAlarmController>();
 
-  static const platform = MethodChannel('alarm_channel');
-
-  // Fetch alarms and reschedule
-  // This method will be triggered by the BootReceiver after device restart
+  // This method should be triggered when the BootReceiver calls the Flutter method
   Future<void> rescheduleAlarms() async {
     final dbHelper = DBHelperAlarm();
     List<Alarm> alarms = await dbHelper.fetchAlarms();
 
     // Loop through all alarms and reschedule them
     for (var alarm in alarms) {
-      DateTime nextAlarmTime =
-          getNextAlarmTime(alarm); // Calculate the next alarm time
+      DateTime nextAlarmTime = getNextAlarmTime(alarm); // Calculate the next alarm time
       int timeInMillis = nextAlarmTime.millisecondsSinceEpoch;
 
       // Call the native side (Android) to set the alarm with the next time
@@ -33,33 +29,14 @@ class AlarmController extends GetxController {
     }
   }
 
-  // This method calculates the next alarm time
   DateTime getNextAlarmTime(Alarm alarm) {
     DateTime now = DateTime.now();
-    DateTime alarmTime =
-        DateTime(now.year, now.month, now.day, alarm.hour, alarm.minute);
+    DateTime alarmTime = DateTime(now.year, now.month, now.day, alarm.hour, alarm.minute);
 
     if (alarmTime.isBefore(now)) {
-      alarmTime =
-          alarmTime.add(const Duration(days: 1)); // Move to the next day
+      alarmTime = alarmTime.add(const Duration(days: 1)); // Move to the next day
     }
     return alarmTime;
   }
-
-  // This method calls the native method to set the alarm
-  // Future<void> setAlarmNative(
-  //     int timeInMillis, int alarmId, List<String> repeatDays) async {
-  //   const MethodChannel _channel = MethodChannel('alarm_channel');
-  //   try {
-  //     await _channel.invokeMethod('setAlarm', {
-  //       'time': timeInMillis,
-  //       'alarmId': alarmId,
-  //       'repeatDays': repeatDays.isNotEmpty ? repeatDays : [],
-  //     });
-  //     debugPrint(
-  //         "Alarm Set for $alarmId at $timeInMillis with repeat days: $repeatDays");
-  //   } on PlatformException catch (e) {
-  //     debugPrint("Failed to set alarm: ${e.message}");
-  //   }
-  // }
 }
+

@@ -31,12 +31,38 @@ class AlarmController extends GetxController {
 
   DateTime getNextAlarmTime(Alarm alarm) {
     DateTime now = DateTime.now();
-    DateTime alarmTime = DateTime(now.year, now.month, now.day, alarm.hour, alarm.minute);
 
-    if (alarmTime.isBefore(now)) {
-      alarmTime = alarmTime.add(const Duration(days: 1)); // Move to the next day
+    int alarmHour = alarm.hour;
+
+    // Adjust hour for 24-hour format
+    if (!alarm.isAm && alarm.hour < 12) {
+      alarmHour += 12; // PM times should be 12+ (e.g., 1 PM should be 13)
+    } else if (alarm.isAm && alarm.hour == 00) {
+      alarmHour = 0; // 12 AM should be 00:00 in 24-hour format
+    } else if (!alarm.isAm && alarm.hour == 12) {
+      alarmHour = 12; // Noon should stay 12:00 in 24-hour format
     }
-    return alarmTime;
+
+    DateTime alarmDateTime = DateTime(now.year, now.month, now.day, alarmHour, alarm.minute);
+
+    // If the alarm time is already past today, move to the next valid day
+    if (alarmDateTime.isBefore(now)) {
+      alarmDateTime = alarmDateTime.add(const Duration(days: 1));
+    }
+
+    // If the user has selected repeat days, find the next valid day
+    if (alarm.repeatDays.isNotEmpty) {
+      List<String> weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      int todayIndex = now.weekday - 1; // Monday is index 0
+
+      for (int i = 0; i < 7; i++) {
+        int nextDayIndex = (todayIndex + i) % 7;
+        if (alarm.repeatDays.contains(weekDays[nextDayIndex])) {
+          return alarmDateTime.add(Duration(days: i));
+        }
+      }
+    }
+    return alarmDateTime;
   }
 }
 

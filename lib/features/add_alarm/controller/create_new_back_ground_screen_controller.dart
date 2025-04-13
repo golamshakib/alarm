@@ -4,13 +4,11 @@ import 'dart:io';
 import 'package:alarm/features/add_alarm/presentation/screens/local_background_screen.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/src/widgets/navigator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../core/db_helpers/db_helper_local_background.dart';
-import '../../../routes/app_routes.dart';
 
 class CreateNewBackgroundController extends GetxController {
   ImagePicker picker = ImagePicker();
@@ -129,7 +127,7 @@ class CreateNewBackgroundController extends GetxController {
   RxBool isMusicDisabled = false.obs; // To disable the music button
   // RxString recordingHoverMessage = ''.obs;
 
-  /// ✅ **Check & Request Permissions**
+  /// **Check & Request Permissions**
   // Future<void> checkPermissions() async {
   //   await Permission.microphone.request();
   //   await Permission.storage.request();
@@ -137,7 +135,7 @@ class CreateNewBackgroundController extends GetxController {
   //   await Permission.notification.request();
   // }
 
-  /// ✅ **Launch Any Available Voice Recorder**
+  /// **Launch Any Available Voice Recorder**
   // Future<void> openVoiceRecorder() async {
   //   try {
   //     final intent = AndroidIntent(
@@ -151,7 +149,7 @@ class CreateNewBackgroundController extends GetxController {
   //   }
   // }
 
-  /// ✅ **Pick the Recorded File Manually**
+  /// **Pick the Recorded File Manually**
   // Future<void> pickRecordedFile() async {
   //   FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.audio);
   //
@@ -220,7 +218,7 @@ class CreateNewBackgroundController extends GetxController {
 
   /// -- P L A Y    R E C O R D I N G
 
-  /// ✅ **Play Selected Recording**
+  /// **Play Selected Recording**
   // Future<void> playRecording() async {
   //   if (recordingPath.value.isNotEmpty && File(recordingPath.value).existsSync()) {
   //     try {
@@ -232,7 +230,7 @@ class CreateNewBackgroundController extends GetxController {
   //   }
   // }
 
-  /// ✅ **Stop Playing Recording**
+  /// **Stop Playing Recording**
   // Future<void> stopPlayback() async {
   //   await audioPlayer.stop();
   //   isPlaying.value = false;

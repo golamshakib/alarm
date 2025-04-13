@@ -116,17 +116,6 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     }
   }
 
-  // /// **Forcefully Kill the App on Android**
-  // void _forceCloseAndroidApp() {
-  //   SystemNavigator.pop(); // Closes the app normally
-  //
-  //   Future.delayed(const Duration(milliseconds: 500), () {
-  //     exit(0); // Completely kill the app
-  //   });
-  //
-  //   // This will remove the app from recent apps list (only works on rooted or specific Android versions)
-  //   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-  // }
   /// **Format Repeat Days**
   String formatRepeatDays(List<String> repeatDays) {
     if (repeatDays.length == 7) {
@@ -163,8 +152,6 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
       return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
     }
   }
-
-
 
 
   @override

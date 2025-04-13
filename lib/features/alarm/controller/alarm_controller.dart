@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:alarm/features/add_alarm/data/alarm_model.dart';
+import 'package:alarm/core/db_helpers/db_helper_alarm.dart';
 
-import '../../../core/db_helpers/db_helper_alarm.dart';
 import '../../add_alarm/controller/add_alarm_controller.dart';
-import '../../add_alarm/data/alarm_model.dart';
 
 class AlarmController extends GetxController {
   final AddAlarmController controller = Get.find<AddAlarmController>();
@@ -65,4 +64,3 @@ class AlarmController extends GetxController {
     return alarmDateTime;
   }
 }
-

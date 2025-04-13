@@ -1,5 +1,6 @@
 
 
+import 'package:alarm/features/alarm/controller/alarm_controller.dart';
 import 'package:get/get.dart';
 
 import '../../features/add_alarm/controller/add_alarm_controller.dart';
@@ -20,6 +21,10 @@ class ControllerBinder extends Bindings {
     );
     Get.lazyPut<CreateNewBackgroundController>(
           () => CreateNewBackgroundController(),
+      fenix: true,
+    );
+    Get.lazyPut<AlarmController>(
+          () => AlarmController(),
       fenix: true,
     );
 

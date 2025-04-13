@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:alarm/core/utils/constants/image_path.dart';
+import 'package:alarm/features/alarm/controller/alarm_controller.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +15,8 @@ import '../data/alarm_model.dart';
 
 class AddAlarmController extends GetxController {
   final SettingsController settingsController = Get.find<SettingsController>();
+  // final AlarmController alarmController = Get.find<AlarmController>();
+
 
   final labelController = TextEditingController();
 
@@ -87,6 +89,7 @@ class AddAlarmController extends GetxController {
       adjustTimeFormat();
     });
     handleAlarmOnAppStart();
+    // alarmController.rescheduleAlarms();
   }
 
   /// -- S E T   B A C K G R O U N D --
@@ -176,8 +179,7 @@ class AddAlarmController extends GetxController {
   /// -- E N D   V I B R A T I O N   S E C T I O N --
 
   /// -- V O L U M E   S E C T I O N --
-  ///
-  ///
+
   var volume = 0.5.obs; // Independent volume variable
 
 
@@ -188,39 +190,9 @@ class AddAlarmController extends GetxController {
     volume.value = savedVolume;
   }
 
-  // Set volume (Only updates the app state, not the system volume)
   void setAppVolume(double newVolume) {
     volume.value = newVolume;
-    // Here, you can integrate it with an audio player
-    saveVolume(newVolume); // Save volume for persistence
   }
-
-  // Save volume (optional)
-  Future<void> saveVolume(double volume) async {
-    // Simulate saving to shared preferences or local storage
-  }
-
-  // var volume = 0.5.obs; // Default volume set to 50%
-  // late VolumeController volumeController; // VolumeController instance
-  //
-  // // Initialize volume controller
-  // Future<void> initializeVolumeController() async {
-  //   volumeController =
-  //       VolumeController.instance; // Initialize the VolumeController instance
-  //   // Add a listener for volume changes
-  //   volumeController.addListener((double newVolume) {
-  //     volume.value = newVolume; // Update the volume value
-  //   });
-  //   // Get the initial system volume
-  //   volume.value = await volumeController.getVolume();
-  // }
-  //
-  // // Set device volume
-  // Future<void> setDeviceVolume(double newVolume) async {
-  //   volume.value = newVolume; // Update the volume value
-  //   await volumeController.setVolume(newVolume); // Set the system volume
-  //   saveScreenPreferences(); // Save the volume to preferences
-  // }
 
   /// -- E N D   V O L U M E   S E C T I O N --
 
@@ -362,10 +334,7 @@ class AddAlarmController extends GetxController {
     }
   }
 
-
-
   /// --  D A T A B A S E   S E R V I C E S --
-  // Save alarm to Database
 
   /// -- S E T   A L A R M   N A T I V E
   Future<void> saveAlarmToDatabase() async {
@@ -429,7 +398,6 @@ class AddAlarmController extends GetxController {
         newAlarm.repeatDays,
       );
 
-
       // Calculate remaining time
       Duration remainingTime = alarmTime.difference(DateTime.now());
 
@@ -468,11 +436,7 @@ class AddAlarmController extends GetxController {
         message,
         duration: const Duration(seconds: 2),
       );
-      // Get.snackbar(
-      //   "",
-      //   "Alarm set for $hours hour and $minutes minute",
-      //   duration: const Duration(seconds: 2),
-      // );
+
     } catch (e) {
       Get.snackbar("Error", "Failed to Save Alarm: $e",
           duration: const Duration(seconds: 2));
@@ -570,16 +534,16 @@ class AddAlarmController extends GetxController {
       int hours = remainingTime.inHours;
       int minutes = remainingTime.inMinutes % 60;
 
-      // Print Alarm Details
-      debugPrint("Updated Alarm Time: \${alarmTime.toLocal()}");
-      debugPrint("📆 Alarm Rescheduled for: \${alarmTime.toLocal()}");
+      String message;
 
-      // Show snackbar with the remaining time
-      Get.snackbar(
-        "",
-        "Alarm updated and set for $hours hour and $minutes minute",
-        duration: const Duration(seconds: 2),
-      );
+      // Format next repeat days
+      if (remainingTime.isNegative || remainingTime.inHours >= 24) {
+        // If the alarm is set for a future day or the remaining time is more than 24 hours
+        message = 'Alarm set for ${updatedAlarm.repeatDays.join(', ')}';
+      } else {
+        // If the alarm is within the next 24 hours
+        message = "Alarm updated and set for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
+      }
     } catch (e) {
       Get.snackbar("Error", "Failed to update alarm: $e",
           duration: const Duration(seconds: 2));

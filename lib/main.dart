@@ -6,7 +6,7 @@ import 'core/services/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  await NotificationService.requestNotificationPermissions();
+  // await NotificationService.requestNotificationPermissions();
 
   runApp(const MyApp());
 }

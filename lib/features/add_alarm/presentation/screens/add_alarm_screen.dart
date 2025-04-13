@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../nav_bar/controllers/nav_bar_controller.dart';
-import '../../../nav_bar/presentation/screens/nav_bar.dart';
 import '../../../settings/controller/settings_controller.dart';
 import '../../controller/add_alarm_controller.dart';
 import '../../data/alarm_model.dart';
@@ -92,7 +91,7 @@ class AddAlarmScreen extends StatelessWidget {
                       );
                       controller.saveScreenPreferences();
 
-                      // // ✅ Navigate back and switch to Alarm Screen
+                       // Navigate back and switch to Alarm Screen
                       // navController.changeIndex(0); // Set the bottom nav to Alarm screen
                       // Get.offAll(() => const CreatorNavBar()); // Ensure smooth navigation
 

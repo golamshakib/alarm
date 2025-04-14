@@ -534,16 +534,21 @@ class AddAlarmController extends GetxController {
       int hours = remainingTime.inHours;
       int minutes = remainingTime.inMinutes % 60;
 
-      String message;
+      String updateMessage;
 
       // Format next repeat days
       if (remainingTime.isNegative || remainingTime.inHours >= 24) {
         // If the alarm is set for a future day or the remaining time is more than 24 hours
-        message = 'Alarm set for ${updatedAlarm.repeatDays.join(', ')}';
+        updateMessage = 'Alarm updated for ${updatedAlarm.repeatDays.join(', ')}';
       } else {
         // If the alarm is within the next 24 hours
-        message = "Alarm updated and set for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
+        updateMessage = "Alarm updated for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
       }
+      Get.snackbar(
+        "",
+        updateMessage,
+        duration: const Duration(seconds: 2),
+      );
     } catch (e) {
       Get.snackbar("Error", "Failed to update alarm: $e",
           duration: const Duration(seconds: 2));

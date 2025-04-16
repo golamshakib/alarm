@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:alarm/features/alarm/controller/alarm_controller.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -80,6 +81,7 @@ class AddAlarmController extends GetxController {
     loadScreenPreferences(); // Load preferences on initialization
     fetchAlarmsFromDatabase();
     setCurrentTime();
+
     timeFormat.value = settingsController.selectedTime.value;
 
 
@@ -190,8 +192,22 @@ class AddAlarmController extends GetxController {
     volume.value = savedVolume;
   }
 
+  // Set the device volume using flutter_volume_controller
+  Future<void> setDeviceVolume(double newVolume) async {
+    volume.value = newVolume; // Update local state (UI won't reflect)
+    try {
+      // Set the system volume (values between 0.0 and 1.0)
+      await FlutterVolumeController.setVolume(newVolume, stream: AudioStream.alarm,);
+      await FlutterVolumeController.updateShowSystemUI(false);
+
+    } catch (e) {
+      print("Failed to set volume: $e");
+    }
+  }
+
+  // Function to adjust the app's volume slider
   void setAppVolume(double newVolume) {
-    volume.value = newVolume;
+    setDeviceVolume(newVolume); // Adjust device volume using flutter_volume_controller
   }
 
   /// -- E N D   V O L U M E   S E C T I O N --

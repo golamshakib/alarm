@@ -432,9 +432,6 @@ class AddAlarmController extends GetxController {
         // If the alarm is within the next 24 hours
         message = "Alarm set for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
       }
-// Show notification
-      String alarmTimeFormatted = "${alarmHour}:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
-      await NotificationHelper.showPersistentNotification(newAlarm.id!, alarmTimeFormatted, newAlarm.label);
 
       // ✅ Print Alarm Details
       debugPrint("Scheduled Alarm Time: ${alarmTime.toLocal()}");
@@ -455,6 +452,9 @@ class AddAlarmController extends GetxController {
         message,
         duration: const Duration(seconds: 2),
       );
+      // Show notification
+      String alarmTimeFormatted = "${alarmHour}:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
+      await NotificationHelper.showPersistentNotification(newAlarm.id!, alarmTimeFormatted, newAlarm.label);
 
     } catch (e) {
       Get.snackbar("Error", "Failed to Save Alarm: $e",
@@ -563,11 +563,15 @@ class AddAlarmController extends GetxController {
         // If the alarm is within the next 24 hours
         updateMessage = "Alarm updated for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
       }
+
       Get.snackbar(
         "",
         updateMessage,
         duration: const Duration(seconds: 2),
       );
+      // Show notification
+      String alarmTimeFormatted = "${selectedHour.value}:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
+      await NotificationHelper.showPersistentNotification(updatedAlarm.id!, alarmTimeFormatted, updatedAlarm.label);
     } catch (e) {
       Get.snackbar("Error", "Failed to update alarm: $e",
           duration: const Duration(seconds: 2));

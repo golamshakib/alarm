@@ -1,0 +1,2 @@
+/Users/yasinmia/SHAKIB/Office_Project/alarm/android/app/.cxx/RelWithDebInfo/2u6c1m3w/x86/CMakeFiles/edit_cache.dir
+/Users/yasinmia/SHAKIB/Office_Project/alarm/android/app/.cxx/RelWithDebInfo/2u6c1m3w/x86/CMakeFiles/rebuild_cache.dir

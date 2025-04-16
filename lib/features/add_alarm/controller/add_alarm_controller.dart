@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:flutter/services.dart';
 import '../../../core/db_helpers/db_helper_alarm.dart';
+import '../../../core/services/notification_helper.dart';
 import '../../settings/controller/settings_controller.dart';
 import '../data/alarm_model.dart';
 
@@ -431,7 +432,9 @@ class AddAlarmController extends GetxController {
         // If the alarm is within the next 24 hours
         message = "Alarm set for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
       }
-
+// Show notification
+      String alarmTimeFormatted = "${alarmHour}:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
+      await NotificationHelper.showPersistentNotification(newAlarm.id!, alarmTimeFormatted, newAlarm.label);
 
       // ✅ Print Alarm Details
       debugPrint("Scheduled Alarm Time: ${alarmTime.toLocal()}");

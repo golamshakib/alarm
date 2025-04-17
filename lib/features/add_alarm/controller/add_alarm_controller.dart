@@ -198,10 +198,10 @@ class AddAlarmController extends GetxController {
     volume.value = newVolume; // Update local state (UI won't reflect)
     try {
       // Set the system volume (values between 0.0 and 1.0)
-      await FlutterVolumeController.setVolume(newVolume, stream: AudioStream.alarm,);
+      await FlutterVolumeController.setVolume(newVolume);
       await FlutterVolumeController.updateShowSystemUI(false);
 
-    } catch (e) {
+    } catch (e) { 
       print("Failed to set volume: $e");
     }
   }
@@ -450,6 +450,7 @@ class AddAlarmController extends GetxController {
       Get.snackbar(
         "",
         message,
+        snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 2),
       );
       // Show notification
@@ -567,6 +568,7 @@ class AddAlarmController extends GetxController {
       Get.snackbar(
         "",
         updateMessage,
+        snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 2),
       );
       // Show notification
@@ -574,16 +576,16 @@ class AddAlarmController extends GetxController {
       await NotificationHelper.showPersistentNotification(updatedAlarm.id!, alarmTimeFormatted, updatedAlarm.label);
     } catch (e) {
       Get.snackbar("Error", "Failed to update alarm: $e",
-          duration: const Duration(seconds: 2));
-    }
-  }
+          duration: const Duration(seconds: 2)); 
+    } 
+  } 
 
   // **Handle Alarm on App Start (for rescheduling alarms after app restart)**
   Future<void> handleAlarmOnAppStart() async {
     try {
       final dbHelper = DBHelperAlarm();
       List<Alarm> alarms = await dbHelper.fetchAlarms();
-
+ 
       // Iterate over the alarms and reschedule each one
       for (var alarm in alarms) {
         DateTime alarmTime = getNextAlarmTime(alarm);

@@ -5,10 +5,12 @@ import 'package:alarm/core/utils/constants/app_sizes.dart';
 import 'package:alarm/core/utils/constants/image_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 
 import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
+import '../../../../core/db_helpers/db_helper_alarm.dart';
 import '../../../add_alarm/controller/add_alarm_controller.dart';
 import '../../../add_alarm/data/alarm_model.dart';
 
@@ -25,13 +27,27 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   final AddAlarmController controller = Get.find<AddAlarmController>();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
+  Alarm? alarmData;
+
   @override
   void initState() {
     super.initState();
-    _playAlarmSound(); // Manually play alarm sound
+    _fetchAlarmData();
+    _playAlarmSound();
     _triggerVibration();
   }
 
+  /// Fetch the alarm data from the database
+  Future<void> _fetchAlarmData() async {
+    int alarmId = widget.alarm.id!;
+    final dbHelper = DBHelperAlarm();
+    alarmData = await dbHelper.getAlarm(alarmId);
+    if (alarmData != null) {
+
+      await FlutterVolumeController.updateShowSystemUI(false);
+      await controller.setDeviceVolume(alarmData!.volume);
+    }
+  }
   /// **Play Alarm Sound (Supports Network & Local Files)**
   Future<void> _playAlarmSound() async {
     String musicPath = widget.alarm.musicPath;

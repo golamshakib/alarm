@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:alarm/core/utils/constants/image_path.dart';
-import 'package:alarm/features/alarm/controller/alarm_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
@@ -198,17 +197,17 @@ class AddAlarmController extends GetxController {
     volume.value = newVolume; // Update local state (UI won't reflect)
     try {
       // Set the system volume (values between 0.0 and 1.0)
-      await FlutterVolumeController.setVolume(newVolume);
       await FlutterVolumeController.updateShowSystemUI(false);
+      await FlutterVolumeController.setVolume(newVolume);
 
     } catch (e) { 
-      print("Failed to set volume: $e");
+      debugPrint("Failed to set volume: $e");
     }
   }
 
   // Function to adjust the app's volume slider
   void setAppVolume(double newVolume) {
-    setDeviceVolume(newVolume); // Adjust device volume using flutter_volume_controller
+    setDeviceVolume(newVolume);
   }
 
   /// -- E N D   V O L U M E   S E C T I O N --
@@ -454,7 +453,7 @@ class AddAlarmController extends GetxController {
         duration: const Duration(seconds: 2),
       );
       // Show notification
-      String alarmTimeFormatted = "${alarmHour}:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
+      String alarmTimeFormatted = "$alarmHour:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
       await NotificationHelper.showPersistentNotification(newAlarm.id!, alarmTimeFormatted, newAlarm.label);
 
     } catch (e) {

@@ -154,14 +154,14 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   }
 
   /// **Format Repeat Days**
-  String formatRepeatDays(List<String> repeatDays) {
-    if (repeatDays.length == 7) {
-      return "Everyday";
-    } else if (repeatDays.isNotEmpty) {
-      return repeatDays.join(', ');
-    }
-    return "Today";
-  }
+  // String formatRepeatDays(List<String> repeatDays) {
+  //   if (repeatDays.length == 7) {
+  //     return "Everyday";
+  //   } else if (repeatDays.isNotEmpty) {
+  //     return repeatDays.join(', ');
+  //   }
+  //   return "Today";
+  // }
 
   /// **Format Time Based on User Settings**
   String formatTime(int hour, int minute, bool isAm, int timeFormat) {
@@ -242,7 +242,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                         ),
                         color: Colors.white,
                         fontSize: getWidth(40),
-                        fontWeight: FontWeight.w300,
+                        fontWeight: FontWeight.w600,
                       ),
                       SizedBox(width: getWidth(16)),
                       Container(
@@ -253,11 +253,11 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                       SizedBox(width: getWidth(16)),
                       Flexible(
                         child: CustomText(
-                          text: formatRepeatDays(widget.alarm.repeatDays),
-                          fontSize: getWidth(14),
+                          text: controller.formatRepeatDays(widget.alarm.repeatDays),
+                          fontSize: getWidth(20),
                           maxLines: 3,
                           textAlign: TextAlign.center,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
                       ),

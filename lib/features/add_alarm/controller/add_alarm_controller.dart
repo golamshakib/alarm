@@ -182,13 +182,13 @@ class AddAlarmController extends GetxController {
 
   /// -- V O L U M E   S E C T I O N --
 
-  var volume = 0.5.obs; // Independent volume variable
+  var volume = 1.0.obs; // Independent volume variable
 
 
   // Load the saved volume (optional)
   Future<void> loadSavedVolume() async {
     // Simulate loading from shared preferences or local storage
-    double savedVolume = 0.5; // Default value
+    double savedVolume = 1.0; // Default value
     volume.value = savedVolume;
   }
 
@@ -243,7 +243,7 @@ class AddAlarmController extends GetxController {
     }
     selectedSnoozeDuration.value = prefs.getInt('snoozeDuration') ?? 5;
     isVibrationEnabled.value = prefs.getBool('isVibrationEnabled') ?? true;
-    volume.value = prefs.getDouble('volume') ?? 0.5;
+    volume.value = prefs.getDouble('volume') ?? 1.0;
     selectedBackground.value =
         prefs.getString('selectedBackground') ?? "Cute Dog";
     selectedBackgroundImage.value =
@@ -422,13 +422,12 @@ class AddAlarmController extends GetxController {
       int minutes = remainingTime.inMinutes % 60;
 
       String message;
-
+      // Format next repeat days using the formatRepeatDays method
+      String repeatDaysFormatted = formatRepeatDays(newAlarm.repeatDays);
       // Format next repeat days
       if (remainingTime.isNegative || remainingTime.inHours >= 24) {
-        // If the alarm is set for a future day or the remaining time is more than 24 hours
-        message = 'Alarm set for ${newAlarm.repeatDays.join(', ')}';
+        message = 'Alarm set for $repeatDaysFormatted';
       } else {
-        // If the alarm is within the next 24 hours
         message = "Alarm set for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
       }
 
@@ -460,6 +459,13 @@ class AddAlarmController extends GetxController {
       Get.snackbar("Error", "Failed to Save Alarm: $e",
           duration: const Duration(seconds: 2));
     }
+  }
+
+  // Repeating days method
+  String formatRepeatDays(List<String> repeatDays) {
+    if (repeatDays.isEmpty) return "Today"; // Default if empty
+    if (repeatDays.length == 7) return "Everyday"; // If all days are selected
+    return repeatDays.join(', '); // Otherwise, join with commas
   }
 
   // getNextAlarmTime
@@ -554,11 +560,12 @@ class AddAlarmController extends GetxController {
       int minutes = remainingTime.inMinutes % 60;
 
       String updateMessage;
+      String repeatDaysFormatted = formatRepeatDays(updatedAlarm.repeatDays);
 
       // Format next repeat days
       if (remainingTime.isNegative || remainingTime.inHours >= 24) {
         // If the alarm is set for a future day or the remaining time is more than 24 hours
-        updateMessage = 'Alarm updated for ${updatedAlarm.repeatDays.join(', ')}';
+        updateMessage = 'Alarm updated for $repeatDaysFormatted';
       } else {
         // If the alarm is within the next 24 hours
         updateMessage = "Alarm updated for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
@@ -629,7 +636,7 @@ class AddAlarmController extends GetxController {
     repeatDays.updateAll((key, value) => false);
     selectedSnoozeDuration.value = 5;
     isVibrationEnabled.value = false;
-    volume.value = 0.5;
+    volume.value = 1.0;
   }
 
   @override

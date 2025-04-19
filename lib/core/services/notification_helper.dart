@@ -14,9 +14,9 @@ class NotificationHelper {
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  // Display a persistent notification
+  // Display a persistent notification (with repeat days logic)
   static Future<void> showPersistentNotification(
-      int alarmId, String alarmTime, String label) async {
+      int alarmId, String alarmTime, String label, List<String> repeatDays) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
     AndroidNotificationDetails(
       'alarm_channel', // channel id
@@ -30,17 +30,26 @@ class NotificationHelper {
     const NotificationDetails platformChannelSpecifics =
     NotificationDetails(android: androidPlatformChannelSpecifics);
 
+    // Show the notification only if the alarm is set to repeat
+    String message = repeatDays.isNotEmpty
+        ? 'Alarm at - ${repeatDays.join(', ')} - $alarmTime - $label' // Show repeat days
+        : 'Alarm at $alarmTime - $label'; // Non-repeating alarm message
+
     await flutterLocalNotificationsPlugin.show(
       alarmId, // Unique notification ID
       'Upcoming Alarm', // Title
-      'Alarm at $alarmTime - $label', // Content
+      message, // Content
       platformChannelSpecifics,
       payload: 'alarm $alarmId',
     );
   }
 
-  // Close notification
-  static Future<void> closeNotification(int alarmId) async {
-    await flutterLocalNotificationsPlugin.cancel(alarmId);
+  // Close notification (for non-repeating alarms after the alarm triggers)
+  static Future<void> closeNotification(int alarmId, List<String> repeatDays) async {
+    // Only cancel notification if it's not a repeat alarm
+    if (repeatDays.isEmpty) {
+      await flutterLocalNotificationsPlugin.cancel(alarmId);
+    }
   }
 }
+

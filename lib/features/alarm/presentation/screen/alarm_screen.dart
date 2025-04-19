@@ -9,6 +9,7 @@ import 'package:alarm/features/alarm/controller/alarm_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/common/widgets/custom_text.dart';
+import '../../../add_alarm/data/alarm_model.dart';
 import '../../../add_alarm/presentation/screens/add_alarm_screen.dart';
 import 'package:alarm/features/settings/controller/settings_controller.dart';
 
@@ -69,6 +70,17 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
     }
   }
 
+  void sortAlarmsChronologically(List<Alarm> alarms) {
+    alarms.sort((a, b) {
+      final aTime = a.isAm ? a.hour % 12 : (a.hour % 12) + 12;
+      final bTime = b.isAm ? b.hour % 12 : (b.hour % 12) + 12;
+
+      final aTotalMinutes = aTime * 60 + a.minute;
+      final bTotalMinutes = bTime * 60 + b.minute;
+
+      return aTotalMinutes.compareTo(bTotalMinutes);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +90,13 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
           padding: EdgeInsets.symmetric(
               vertical: getHeight(16), horizontal: getWidth(16)),
           child: Obx(() {
-            if (addAlarmController.alarms.isEmpty) {
+            // Create a copy of the alarms list to sort
+            final alarms = List<Alarm>.from(addAlarmController.alarms);
+
+            // Sort alarms chronologically by time
+            sortAlarmsChronologically(alarms);
+
+            if (alarms.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -114,9 +132,9 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                             Obx(() {
                               return controller.isSelectionMode.value
                                   ? IconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: controller.exitSelectionMode,
-                                    )
+                                icon: const Icon(Icons.close),
+                                onPressed: controller.exitSelectionMode,
+                              )
                                   : const SizedBox.shrink();
                             }),
                             SizedBox(width: getWidth(12)),
@@ -164,13 +182,13 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                   ListView.separated(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: addAlarmController.alarms.length,
+                    itemCount: alarms.length,
                     separatorBuilder: (context, _) =>
                         SizedBox(height: getHeight(16)),
                     itemBuilder: (context, index) {
-                      final alarm = addAlarmController.alarms[index];
+                      final alarm = alarms[index];
                       final isSelected =
-                          controller.selectedAlarms.contains(index);
+                      controller.selectedAlarms.contains(index);
 
                       return GestureDetector(
                         onLongPress: () {
@@ -194,15 +212,12 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: alarm.backgroundImage.startsWith("http") ||
-                                      alarm.backgroundImage.startsWith("https")
-                                  ? NetworkImage(alarm
-                                      .backgroundImage) // Use network image if it's a URL
+                                  alarm.backgroundImage.startsWith("https")
+                                  ? NetworkImage(alarm.backgroundImage) // Use network image if it's a URL
                                   : File(alarm.backgroundImage).existsSync()
-                                      ? FileImage(File(alarm
-                                          .backgroundImage)) // Use FileImage for local files
-                                      : const AssetImage(ImagePath.cat)
-                                          as ImageProvider,
-                              // Fallback asset image
+                                  ? FileImage(File(alarm.backgroundImage)) // Use FileImage for local files
+                                  : const AssetImage(ImagePath.cat)
+                              as ImageProvider,
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(10),
@@ -224,7 +239,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                               children: [
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
                                       children: [
@@ -235,12 +250,12 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                                 index, alarm.musicPath);
                                           },
                                           child: Obx(() {
-                                            final isPlaying = addAlarmController
-                                                    .isPlaying.value &&
-                                                addAlarmController
+                                            final isPlaying =
+                                                addAlarmController.isPlaying.value &&
+                                                    addAlarmController
                                                         .currentlyPlayingIndex
                                                         .value ==
-                                                    index;
+                                                        index;
                                             return Icon(
                                               isPlaying
                                                   ? Icons.play_circle_fill_rounded
@@ -256,7 +271,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                             controller.toggleAlarm(index);
                                           },
                                           child: Obx(
-                                            () => AnimatedContainer(
+                                                () => AnimatedContainer(
                                               duration: const Duration(
                                                   milliseconds: 300),
                                               width: getWidth(37),
@@ -265,9 +280,9 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                                 color: alarm.isToggled.value
                                                     ? const Color(0xffFFAB4C)
                                                     : const Color(0xffA3B2C7)
-                                                        .withOpacity(0.3),
+                                                    .withOpacity(0.3),
                                                 borderRadius:
-                                                    BorderRadius.circular(30),
+                                                BorderRadius.circular(30),
                                               ),
                                               child: AnimatedAlign(
                                                 duration: const Duration(
@@ -278,8 +293,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                                 child: Container(
                                                   width: getWidth(18),
                                                   height: getHeight(18),
-                                                  decoration:
-                                                      const BoxDecoration(
+                                                  decoration: const BoxDecoration(
                                                     color: Colors.white,
                                                     shape: BoxShape.circle,
                                                   ),
@@ -304,19 +318,15 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                       ),
                                   ],
                                 ),
-                                Text(
-                                  formatTime(
+                                CustomText(
+                                  text: formatTime(
                                       alarm.hour,
                                       alarm.minute,
                                       alarm.isAm,
                                       addAlarmController.timeFormat.value),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: getWidth(36),
-                                  ),
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: getWidth(36),
                                 ),
-
-
                                 SizedBox(height: getHeight(15)),
                                 Row(
                                   children: [
@@ -353,7 +363,8 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                 ],
               ),
             );
-          }),
+          })
+
         ),
       ),
     );

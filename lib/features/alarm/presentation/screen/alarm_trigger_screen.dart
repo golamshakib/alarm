@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import '../../../../core/db_helpers/db_helper_alarm.dart';
+import '../../../../core/services/notification_helper.dart';
 import '../../../add_alarm/controller/add_alarm_controller.dart';
 import '../../../add_alarm/data/alarm_model.dart';
 
@@ -64,6 +65,13 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
         await _audioPlayer
             .setLoopMode(LoopMode.one); // Keep playing until dismissed
         await _audioPlayer.play();
+        // // Show the persistent notification if the alarm is repeating
+        // if (widget.alarm.repeatDays.isNotEmpty) {
+        //   String alarmTimeFormatted = "${widget.alarm.hour}:${widget.alarm.minute < 10 ? '0' : ''}${widget.alarm.minute}";
+        //   await NotificationHelper.showPersistentNotification(
+        //       widget.alarm.id!, alarmTimeFormatted, widget.alarm.label, widget.alarm.repeatDays
+        //   );
+        // }
       } catch (e) {
         debugPrint("Error playing alarm sound: $e");
       }
@@ -81,8 +89,9 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   }
 
   /// **Dismiss Alarm**
-  void _dismissAlarm()  async {
+  void _dismissAlarm() async {
     _stopAlarmProcesses();
+
     // Get the next valid alarm time (next repeat day)
     DateTime nextRepeatTime = controller.getNextAlarmTime(widget.alarm);
     int nextRepeatTimeInMillis = nextRepeatTime.millisecondsSinceEpoch;
@@ -95,8 +104,14 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     );
     debugPrint("Alarm ID ${widget.alarm.id} dismissed.");
 
-    _closeApp();
+    // Do not close the notification if the alarm is repeating, just keep it visible
+    if (widget.alarm.repeatDays.isEmpty) {
+      await NotificationHelper.closeNotification(widget.alarm.id!, widget.alarm.repeatDays);
+    }
+
+    _closeApp(); // Close the app so no screen is shown
   }
+
 
   /// **Snooze Alarm and Re-Schedule Notification**
   void _snoozeAlarm() async {
@@ -114,8 +129,14 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
 
     debugPrint("Alarm ID ${widget.alarm.id} snoozed for ${widget.alarm.snoozeDuration} minutes.");
 
-    _closeApp();
+    // Do not close the notification if the alarm is repeating
+    if (widget.alarm.repeatDays.isEmpty) {
+      await NotificationHelper.closeNotification(widget.alarm.id!, widget.alarm.repeatDays);
+    }
+
+    _closeApp(); // Close the app so no screen is shown
   }
+
   /// **Stop All Running Processes**
   void _stopAlarmProcesses() {
     _audioPlayer.stop();

@@ -54,13 +54,6 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
     }
   }
 
-  String formatRepeatDays(List<String> repeatDays) {
-    if (repeatDays.isEmpty) return "Today"; // Default if empty
-    if (repeatDays.length == 7) return "Everyday"; // If all days are selected
-    return repeatDays.join(', '); // Otherwise, join with commas
-  }
-
-
 // Format time based on the format setting
   String formatTime(int hour, int minute, bool isAm, int timeFormat) {
     if (timeFormat == 24) {
@@ -331,9 +324,9 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                 Row(
                                   children: [
                                     CustomText(
-                                      text: formatRepeatDays(alarm.repeatDays),
+                                      text: addAlarmController.formatRepeatDays(alarm.repeatDays),
                                       fontSize: getWidth(14),
-                                      fontWeight: FontWeight.w400,
+                                      fontWeight: FontWeight.w600,
                                       color: const Color(0xffA59F92),
                                     ),
                                     Image.asset(
@@ -347,7 +340,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                         text: alarm.label,
                                         textOverflow: TextOverflow.ellipsis,
                                         fontSize: getWidth(14),
-                                        fontWeight: FontWeight.w400,
+                                        fontWeight: FontWeight.w600,
                                         color: const Color(0xffA59F92),
                                       ),
                                     ),

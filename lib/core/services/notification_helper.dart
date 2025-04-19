@@ -1,5 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 
+import '../../features/add_alarm/controller/add_alarm_controller.dart';
+final AddAlarmController addAlarmController = Get.put(AddAlarmController());
 class NotificationHelper {
   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
@@ -31,11 +34,18 @@ class NotificationHelper {
     const NotificationDetails platformChannelSpecifics =
     NotificationDetails(android: androidPlatformChannelSpecifics);
 
+    // // Format the repeat days using your formatRepeatDays method
+    // String formatRepeatDays(List<String> repeatDays) {
+    //   if (repeatDays.isEmpty) return "Today"; // Default if empty
+    //   if (repeatDays.length == 7) return "Everyday"; // If all days are selected
+    //   return repeatDays.join(', '); // Otherwise, join with commas
+    // }
+
+    String repeatDaysFormatted = addAlarmController.formatRepeatDays(repeatDays);
     // Show the notification only if the alarm is set to repeat
     String message = repeatDays.isNotEmpty
-        ? 'Alarm at - ${repeatDays.join(
-        ', ')} - $alarmTime - $label' // Show repeat days
-        : 'Alarm at $alarmTime - $label'; // Non-repeating alarm message
+        ? 'Alarm at - $repeatDaysFormatted - $alarmTime - $label'
+        : 'Alarm at $alarmTime - $label';
 
     await flutterLocalNotificationsPlugin.show(
       alarmId, // Unique notification ID

@@ -24,7 +24,8 @@ class NotificationHelper {
       importance: Importance.high,
       priority: Priority.high,
       ongoing: true, // Make it persistent
-      visibility: NotificationVisibility.public, // Make it visible on the lock screen
+      visibility: NotificationVisibility
+          .public, // Make it visible on the lock screen
     );
 
     const NotificationDetails platformChannelSpecifics =
@@ -32,7 +33,8 @@ class NotificationHelper {
 
     // Show the notification only if the alarm is set to repeat
     String message = repeatDays.isNotEmpty
-        ? 'Alarm at - ${repeatDays.join(', ')} - $alarmTime - $label' // Show repeat days
+        ? 'Alarm at - ${repeatDays.join(
+        ', ')} - $alarmTime - $label' // Show repeat days
         : 'Alarm at $alarmTime - $label'; // Non-repeating alarm message
 
     await flutterLocalNotificationsPlugin.show(

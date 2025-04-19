@@ -65,13 +65,13 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
         await _audioPlayer
             .setLoopMode(LoopMode.one); // Keep playing until dismissed
         await _audioPlayer.play();
-        // // Show the persistent notification if the alarm is repeating
-        // if (widget.alarm.repeatDays.isNotEmpty) {
-        //   String alarmTimeFormatted = "${widget.alarm.hour}:${widget.alarm.minute < 10 ? '0' : ''}${widget.alarm.minute}";
-        //   await NotificationHelper.showPersistentNotification(
-        //       widget.alarm.id!, alarmTimeFormatted, widget.alarm.label, widget.alarm.repeatDays
-        //   );
-        // }
+        // Show the persistent notification if the alarm is repeating
+        if (widget.alarm.repeatDays.isNotEmpty) {
+          String alarmTimeFormatted = "${widget.alarm.hour}:${widget.alarm.minute < 10 ? '0' : ''}${widget.alarm.minute}";
+          await NotificationHelper.showPersistentNotification(
+              widget.alarm.id!, alarmTimeFormatted, widget.alarm.label, widget.alarm.repeatDays
+          );
+        }
       } catch (e) {
         debugPrint("Error playing alarm sound: $e");
       }

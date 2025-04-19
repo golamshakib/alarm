@@ -454,7 +454,7 @@ class AddAlarmController extends GetxController {
       );
       // Show notification
       String alarmTimeFormatted = "$alarmHour:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
-      await NotificationHelper.showPersistentNotification(newAlarm.id!, alarmTimeFormatted, newAlarm.label);
+      await NotificationHelper.showPersistentNotification(newAlarm.id!, alarmTimeFormatted, newAlarm.label, newAlarm.repeatDays);
 
     } catch (e) {
       Get.snackbar("Error", "Failed to Save Alarm: $e",
@@ -572,7 +572,7 @@ class AddAlarmController extends GetxController {
       );
       // Show notification
       String alarmTimeFormatted = "${selectedHour.value}:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
-      await NotificationHelper.showPersistentNotification(updatedAlarm.id!, alarmTimeFormatted, updatedAlarm.label);
+      await NotificationHelper.showPersistentNotification(updatedAlarm.id!, alarmTimeFormatted, updatedAlarm.label, updatedAlarm.repeatDays);
     } catch (e) {
       Get.snackbar("Error", "Failed to update alarm: $e",
           duration: const Duration(seconds: 2)); 

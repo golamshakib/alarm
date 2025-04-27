@@ -92,22 +92,24 @@ class AlarmScreenController extends GetxController {
     });
   }
 
-// Selection mode on the Alarm Screen
+  // Selection mode on the Alarm Screen
   var isSelectionMode = false.obs;
   var selectedAlarms = <int>[].obs;
 
 // Enable selection mode
   void enableSelectionMode(int index) {
     isSelectionMode.value = true;
-    selectedAlarms.add(index);
+    if (!selectedAlarms.contains(index)) {
+      selectedAlarms.add(index); // Add the index of the selected alarm
+    }
   }
 
-// Toggle selection
+// Toggle selection for deletion
   void toggleSelection(int index) {
     if (selectedAlarms.contains(index)) {
-      selectedAlarms.remove(index);
+      selectedAlarms.remove(index); // Remove from selection if already selected
     } else {
-      selectedAlarms.add(index);
+      selectedAlarms.add(index); // Add to selection if not selected
     }
   }
 
@@ -139,4 +141,5 @@ class AlarmScreenController extends GetxController {
 
     Get.snackbar("Success", "Selected alarms deleted successfully!");
   }
+
 }

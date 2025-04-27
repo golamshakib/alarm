@@ -13,32 +13,26 @@ class AlarmScreenController extends GetxController {
   /// **Toggle Alarm ON/OFF**
   void toggleAlarm(int index) async {
     try {
-      // Get the alarm object
+      // Get the alarm object using the updated index
       Alarm alarm = controller.alarms[index];
 
       // Toggle the alarm ON/OFF
       alarm.isToggled.value = !alarm.isToggled.value;
 
-      // 🔹 Update the database with the new state
+      // Update the alarm in the database
       await dbHelper.updateAlarm(alarm);
 
       if (alarm.isToggled.value) {
-        // 🔹 If the alarm is ON, schedule it for the next occurrence
+        // If the alarm is ON, set it at the next scheduled time
         DateTime nextAlarmTime = getNextAlarmTime(alarm);
         int alarmTimeInMillis = nextAlarmTime.millisecondsSinceEpoch;
-
-        // Schedule the alarm to trigger at the next occurrence
         await controller.setAlarmNative(alarmTimeInMillis, alarm.id!, alarm.repeatDays);
-
-        debugPrint("Alarm ID ${alarm.id} is ON. Next occurrence: $nextAlarmTime");
-
       } else {
-        // 🔹 If the alarm is OFF, cancel all scheduled instances
+        // If the alarm is OFF, cancel it
         await controller.cancelAlarmNative(alarm.id!);
-        debugPrint("Alarm ID ${alarm.id} is OFF and canceled.");
       }
 
-      // 🔹 Refresh alarms from the database
+      // Refresh the list after toggling
       fetchAlarms();
       update(); // Ensure UI updates
 
@@ -78,12 +72,24 @@ class AlarmScreenController extends GetxController {
           alarm.repeatDays.assignAll(["Today"]); // Fallback to "Today" if empty
         }
       }
-
+      sortAlarmsChronologically(fetchedAlarms);
       controller.alarms.assignAll(fetchedAlarms);
       update(); // 🔹 Ensure UI updates after fetching
     } catch (e) {
       debugPrint("Error fetching alarms: $e");
     }
+  }
+
+  void sortAlarmsChronologically(List<Alarm> alarms) {
+    alarms.sort((a, b) {
+      final aTime = a.isAm ? a.hour % 12 : (a.hour % 12) + 12;
+      final bTime = b.isAm ? b.hour % 12 : (b.hour % 12) + 12;
+
+      final aTotalMinutes = aTime * 60 + a.minute;
+      final bTotalMinutes = bTime * 60 + b.minute;
+
+      return aTotalMinutes.compareTo(bTotalMinutes);
+    });
   }
 
 // Selection mode on the Alarm Screen

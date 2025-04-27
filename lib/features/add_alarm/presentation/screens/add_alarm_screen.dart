@@ -45,9 +45,14 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedMinute.value = alarm.minute;
       controller.isAm.value = alarm.isAm;
       controller.label.value = alarm.label;
-      controller.repeatDays.updateAll((key, value) => false);
-      for (var day in alarm.repeatDays) {
-        controller.repeatDays[day] = true;
+      // Check if repeatDays is empty or contains "Today" and adjust it
+      if (alarm.repeatDays.isEmpty || alarm.repeatDays.contains("Today")) {
+        controller.repeatDays.updateAll((key, value) => false); // Reset all days to false
+      } else {
+        // Prepopulate repeat days from the alarm's repeatDays
+        for (var day in alarm.repeatDays) {
+          controller.repeatDays[day] = true;
+        }
       }
       controller.selectedBackground.value = alarm.backgroundTitle;
       controller.selectedBackgroundImage.value = alarm.backgroundImage;

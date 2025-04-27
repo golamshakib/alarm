@@ -1,6 +1,8 @@
 
 
+import 'package:alarm/core/services/notification_helper.dart';
 import 'package:alarm/features/alarm/controller/alarm_controller.dart';
+import 'package:alarm/features/alarm/controller/alarm_screen_controller.dart';
 import 'package:get/get.dart';
 
 import '../../features/add_alarm/controller/add_alarm_controller.dart';
@@ -14,6 +16,8 @@ class ControllerBinder extends Bindings {
     Get.lazyPut<SettingsController>(() => SettingsController());
 
     Get.lazyPut<AddAlarmController>(() => AddAlarmController());
+    Get.lazyPut<AlarmScreenController>(() => AlarmScreenController());
+
 
     Get.lazyPut<ChangeBackgroundScreenController>(
           () => ChangeBackgroundScreenController(),
@@ -27,6 +31,5 @@ class ControllerBinder extends Bindings {
           () => AlarmController(),
       fenix: true,
     );
-
   }
 }

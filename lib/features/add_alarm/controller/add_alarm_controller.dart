@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:alarm/core/utils/constants/image_path.dart';
+import 'package:alarm/features/alarm/controller/alarm_screen_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
@@ -16,6 +17,7 @@ import '../data/alarm_model.dart';
 
 class AddAlarmController extends GetxController {
   final SettingsController settingsController = Get.find<SettingsController>();
+  // final AlarmScreenController alarmScreenController = Get.put(AlarmScreenController());
   // final AlarmController alarmController = Get.find<AlarmController>();
 
 
@@ -512,10 +514,23 @@ class AddAlarmController extends GetxController {
     final dbHelper = DBHelperAlarm();
     try {
       alarms.value = await dbHelper.fetchAlarms();
+      sortAlarmsChronologically(alarms.toList());  // Sort after fetching
     } catch (e) {
       Get.snackbar("Error", "Failed to fetch alarms: $e",
           duration: const Duration(seconds: 2));
     }
+  }
+  /// Sort Alarms Chronologically
+  void sortAlarmsChronologically(List<Alarm> alarms) {
+    alarms.sort((a, b) {
+      final aTime = a.isAm ? a.hour % 12 : (a.hour % 12) + 12;
+      final bTime = b.isAm ? b.hour % 12 : (b.hour % 12) + 12;
+
+      final aTotalMinutes = aTime * 60 + a.minute;
+      final bTotalMinutes = bTime * 60 + b.minute;
+
+      return aTotalMinutes.compareTo(bTotalMinutes);
+    });
   }
 
   ///** Update Alarm In Database
@@ -542,7 +557,15 @@ class AddAlarmController extends GetxController {
 
     try {
       await dbHelper.updateAlarm(updatedAlarm);
-      await fetchAlarmsFromDatabase();
+      // Manually update the alarms list to reflect the changes
+      int indexToUpdate = alarms.indexWhere((alarm) => alarm.id == updatedAlarm.id);
+      if (indexToUpdate != -1) {
+        alarms[indexToUpdate] = updatedAlarm;
+      }
+      // await fetchAlarmsFromDatabase();
+      // Sort the alarms after updating
+      sortAlarmsChronologically(alarms.toList());
+      update(); // Trigger UI update after sorting
       DateTime alarmTime = getNextAlarmTime(updatedAlarm);
       int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
 

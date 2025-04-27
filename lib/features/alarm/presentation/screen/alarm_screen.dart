@@ -63,17 +63,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
     }
   }
 
-  void sortAlarmsChronologically(List<Alarm> alarms) {
-    alarms.sort((a, b) {
-      final aTime = a.isAm ? a.hour % 12 : (a.hour % 12) + 12;
-      final bTime = b.isAm ? b.hour % 12 : (b.hour % 12) + 12;
 
-      final aTotalMinutes = aTime * 60 + a.minute;
-      final bTotalMinutes = bTime * 60 + b.minute;
-
-      return aTotalMinutes.compareTo(bTotalMinutes);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +77,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
             final alarms = List<Alarm>.from(addAlarmController.alarms);
 
             // Sort alarms chronologically by time
-            sortAlarmsChronologically(alarms);
+            controller.sortAlarmsChronologically(alarms);
 
             if (alarms.isEmpty) {
               return Center(

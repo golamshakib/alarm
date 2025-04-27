@@ -406,6 +406,8 @@ class AddAlarmController extends GetxController {
       newAlarm.id = id; // Assign database ID
       alarms.add(newAlarm);
 
+      sortAlarmsChronologically(alarms);
+
       // ✅ Get the next valid alarm time
       DateTime alarmTime = getNextAlarmTime(newAlarm);
       int alarmTimeInMillis = alarmTime.millisecondsSinceEpoch;
@@ -515,6 +517,7 @@ class AddAlarmController extends GetxController {
     try {
       alarms.value = await dbHelper.fetchAlarms();
       sortAlarmsChronologically(alarms.toList());  // Sort after fetching
+      update();
     } catch (e) {
       Get.snackbar("Error", "Failed to fetch alarms: $e",
           duration: const Duration(seconds: 2));

@@ -359,26 +359,43 @@ class AddAlarmController extends GetxController {
     final dbHelper = DBHelperAlarm();
 
     // Adjust time based on format
+    // int alarmHour = selectedHour.value;
+    //
+    // // If using 24-hour format
+    // if (timeFormat.value == 24) {
+    //   if (selectedHour.value == 00 && isAm.value) {
+    //     alarmHour = 0; // Handle 12 AM as 00:00 (Midnight)
+    //   } else if (selectedHour.value == 12) {
+    //     alarmHour = 12; // Keep 12 PM as 12:00 (Noon)
+    //   } else if (!isAm.value && selectedHour.value < 12) {
+    //     alarmHour += 12; // Handle PM time (convert 1 PM to 13:00, 2 PM to 14:00, etc.)
+    //   }
+    // } else {
+    //   // If 12-hour format
+    //   if (selectedHour.value == 12 && !isAm.value) {
+    //     alarmHour = 12; // Keep 12 PM as 12:00
+    //   } else if (selectedHour.value == 12 && isAm.value) {
+    //     alarmHour = 0; // Midnight should be 00:00
+    //   } else if (!isAm.value) {
+    //     alarmHour += 12; // Convert PM times (1 PM to 13:00, 2 PM to 14:00, etc.)
+    //   }
+    // }
+
+// Convert time based on format
     int alarmHour = selectedHour.value;
 
-    // If using 24-hour format
-    if (timeFormat.value == 24) {
-      if (selectedHour.value == 00 && isAm.value) {
-        alarmHour = 0; // Handle 12 AM as 00:00 (Midnight)
-      } else if (selectedHour.value == 12) {
-        alarmHour = 12; // Keep 12 PM as 12:00 (Noon)
-      } else if (!isAm.value && selectedHour.value < 12) {
-        alarmHour += 12; // Handle PM time (convert 1 PM to 13:00, 2 PM to 14:00, etc.)
+// For 12-hour format, do AM/PM conversion
+    if (timeFormat.value == 12) {
+      if (selectedHour.value == 12 && isAm.value) {
+        alarmHour = 0;
+      } else if (selectedHour.value == 12 && !isAm.value) {
+        alarmHour = 12;
+      } else if (!isAm.value) {
+        alarmHour += 12;
       }
     } else {
-      // If 12-hour format
-      if (selectedHour.value == 12 && !isAm.value) {
-        alarmHour = 12; // Keep 12 PM as 12:00
-      } else if (selectedHour.value == 12 && isAm.value) {
-        alarmHour = 0; // Midnight should be 00:00
-      } else if (!isAm.value) {
-        alarmHour += 12; // Convert PM times (1 PM to 13:00, 2 PM to 14:00, etc.)
-      }
+      // For 24-hour format, determine AM/PM automatically
+      isAm.value = selectedHour.value < 12;
     }
 
     final newAlarm = Alarm(
@@ -539,6 +556,12 @@ class AddAlarmController extends GetxController {
   ///** Update Alarm In Database
   Future<void> updateAlarmInDatabase(Alarm existingAlarm) async {
     final dbHelper = DBHelperAlarm();
+
+    //Recalculate AM/PM in 24-hour format
+    if (timeFormat.value == 24) {
+      isAm.value = selectedHour.value < 12;
+    }
+
     final updatedAlarm = Alarm(
       id: existingAlarm.id,
       hour: selectedHour.value,

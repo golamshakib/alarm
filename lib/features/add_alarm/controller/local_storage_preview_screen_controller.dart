@@ -4,15 +4,14 @@ import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
 class LocalStoragePreviewScreenController extends GetxController {
-  final RxBool isPlaying = false.obs; // Tracks playback state
-  final AudioPlayer audioPlayer = AudioPlayer(); // AudioPlayer instance
+  final RxBool isPlaying = false.obs;
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void onInit() {
     super.onInit();
-    // Sync `isPlaying` with the AudioPlayer's playing state
     audioPlayer.playerStateStream.listen((state) {
-      isPlaying.value = state.playing; // Updates based on actual playback state
+      isPlaying.value = state.playing;
     });
   }
 
@@ -24,10 +23,8 @@ class LocalStoragePreviewScreenController extends GetxController {
       }
 
       if (isPlaying.value) {
-        // Pause the playback
         await audioPlayer.pause();
       } else {
-        // Set the file path (if not already set) and play the audio
         if (audioPlayer.processingState == ProcessingState.idle) {
           await audioPlayer.setFilePath(audioPath);
         }
@@ -38,12 +35,11 @@ class LocalStoragePreviewScreenController extends GetxController {
     }
   }
 
-  // Stop music playback
   Future<void> stopMusic() async {
     try {
       if (isPlaying.value) {
-        await audioPlayer.stop(); // Stop the audio playback
-        isPlaying.value = false; // Reset the playing state
+        await audioPlayer.stop();
+        isPlaying.value = false;
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to stop the audio: $e", duration: const Duration(seconds: 2));
@@ -52,8 +48,8 @@ class LocalStoragePreviewScreenController extends GetxController {
 
   @override
   void onClose() {
-    stopMusic(); // Ensure music is stopped before disposing
-    audioPlayer.dispose(); // Dispose of the audio player
+    stopMusic();
+    audioPlayer.dispose();
     super.onClose();
   }
 }

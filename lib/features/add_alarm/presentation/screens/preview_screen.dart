@@ -26,7 +26,7 @@ class PreviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller =
-        Get.put(PreviewScreenController()); // Initialize controller
+        Get.put(PreviewScreenController());
 
     return Scaffold(
       body: SafeArea(
@@ -35,7 +35,7 @@ class PreviewScreen extends StatelessWidget {
               horizontal: getWidth(16), vertical: getHeight(16)),
           child: SingleChildScrollView(
             child: Column(
-              mainAxisSize: MainAxisSize.min, // Prevents infinite height error
+              mainAxisSize: MainAxisSize.min,
               children: [
                 CustomAppbarWithLogo(
                   text: "Preview",
@@ -51,7 +51,6 @@ class PreviewScreen extends StatelessWidget {
                 ),
                 SizedBox(height: getHeight(24)),
 
-                // Wrap Flexible in a SizedBox
                 Row(
                   children: [
                     Flexible(
@@ -78,12 +77,11 @@ class PreviewScreen extends StatelessWidget {
                 ),
                 SizedBox(height: getHeight(24)),
 
-                // Image Preview - Ensure it has proper constraints
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(imagePath,
                       width: double.infinity,
-                      height: getHeight(200), // Ensure finite height
+                      height: getHeight(200),
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
@@ -102,7 +100,7 @@ class PreviewScreen extends StatelessWidget {
                     addAlarmController.selectedBackgroundImage.value =
                         imagePath;
                     addAlarmController.selectedMusicPath.value =
-                        musicPath; // Pass music path
+                        musicPath;
                     Get.toNamed(AppRoute.navBarScreen, arguments: {
                       'title': title,
                       'imagePath': imagePath,

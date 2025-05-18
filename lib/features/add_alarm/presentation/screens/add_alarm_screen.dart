@@ -34,23 +34,19 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedBackground.value = arguments['title'] ?? '';
       controller.selectedBackgroundImage.value = arguments['imagePath'] ?? '';
       controller.selectedMusicPath.value = arguments['musicPath'] ?? '';
-      // controller.selectedRecordingPath.value = arguments['recordingPath'] ?? '';
     }
 
     final isEditMode = arguments?['isEditMode'] ?? false;
     final alarm = arguments?['alarm'];
 
     if (isEditMode && alarm != null) {
-      // Prepopulate fields with the existing alarm's data
       controller.selectedHour.value = alarm.hour;
       controller.selectedMinute.value = alarm.minute;
       controller.isAm.value = alarm.isAm;
       controller.label.value = alarm.label;
-      // Check if repeatDays is empty or contains "Today" and adjust it
       if (alarm.repeatDays.isEmpty || alarm.repeatDays.contains("Today")) {
-        controller.repeatDays.updateAll((key, value) => false); // Reset all days to false
+        controller.repeatDays.updateAll((key, value) => false);
       } else {
-        // Prepopulate repeat days from the alarm's repeatDays
         for (var day in alarm.repeatDays) {
           controller.repeatDays[day] = true;
         }
@@ -58,7 +54,6 @@ class AddAlarmScreen extends StatelessWidget {
       controller.selectedBackground.value = alarm.backgroundTitle;
       controller.selectedBackgroundImage.value = alarm.backgroundImage;
       controller.selectedMusicPath.value = alarm.musicPath;
-      // controller.selectedRecordingPath.value = alarm.recordingPath;
       controller.selectedSnoozeDuration.value = alarm.snoozeDuration;
       controller.isVibrationEnabled.value = alarm.isVibrationEnabled;
       controller.volume.value = alarm.volume;
@@ -73,8 +68,6 @@ class AddAlarmScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // App Bar
-
                 CustomAppbarWithLogo(
                   text: isEditMode ? 'Edit Alarm' : 'Add Alarm',
                   iconPath: IconPath.check,
@@ -97,16 +90,13 @@ class AddAlarmScreen extends StatelessWidget {
                       );
                       controller.saveScreenPreferences();
 
-                       // Navigate back and switch to Alarm Screen
-                      navController.changeIndex(0); // Set the bottom nav to Alarm screen
-                      Get.offAll(() => const CreatorNavBar()); // Ensure smooth navigation
-
+                      navController.changeIndex(0);
+                      Get.offAll(() => const CreatorNavBar());
                     }
                   },
                 ),
                 SizedBox(height: getHeight(16)),
 
-                // Time Picker
                 Container(
                   margin: EdgeInsets.symmetric(vertical: getHeight(16)),
                   decoration: BoxDecoration(
@@ -116,7 +106,6 @@ class AddAlarmScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   child: TimePickerUI(controller: controller),
                 ),
-
                 // Background Section
                 Container(
                   padding: EdgeInsets.all(getWidth(16)),
@@ -165,13 +154,10 @@ class AddAlarmScreen extends StatelessWidget {
 
                           if (imagePath.startsWith("http") ||
                               imagePath.startsWith("https")) {
-                            // If it's a URL, use NetworkImage
                             imageProvider = NetworkImage(imagePath);
                           } else if (File(imagePath).existsSync()) {
-                            // If it's a local file, use FileImage
                             imageProvider = FileImage(File(imagePath));
                           } else {
-                            // If neither, use a fallback asset
                             imageProvider = const AssetImage(ImagePath.cat);
                           }
 
@@ -187,16 +173,15 @@ class AddAlarmScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              if (isEditMode) // Add grey overlay if in edit mode
+                              if (isEditMode)
                                 Container(
                                   height: getHeight(150),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
-                                    color: Colors.grey.withValues(alpha: 0.7), // Semi-transparent grey overlay
+                                    color: Colors.grey.withValues(alpha: 0.7),
                                   ),
                                 ),
                             ],
-
                           );
                         }
                         return const SizedBox.shrink();
@@ -332,7 +317,7 @@ class AddAlarmScreen extends StatelessWidget {
                                 min: 0.0,
                                 max: 1.0,
                                 onChanged: (value) {
-                                  controller.setAppVolume(value); // Only updates local volume
+                                  controller.setAppVolume(value);
                                 },
                                 activeColor: Colors.orange,
                               );

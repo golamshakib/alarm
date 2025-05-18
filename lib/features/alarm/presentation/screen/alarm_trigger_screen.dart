@@ -38,7 +38,6 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     _triggerVibration();
   }
 
-  /// Fetch the alarm data from the database
   Future<void> _fetchAlarmData() async {
     int alarmId = widget.alarm.id!;
     final dbHelper = DBHelperAlarm();
@@ -49,23 +48,21 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
       await controller.setDeviceVolume(alarmData!.volume);
     }
   }
-  /// **Play Alarm Sound (Supports Network & Local Files)**
   Future<void> _playAlarmSound() async {
     String musicPath = widget.alarm.musicPath;
     if (musicPath.isNotEmpty) {
       try {
         if (musicPath.startsWith("http") || musicPath.startsWith("https")) {
-          await _audioPlayer.setUrl(musicPath); // Play from URL
+          await _audioPlayer.setUrl(musicPath);
         } else if (File(musicPath).existsSync()) {
-          await _audioPlayer.setFilePath(musicPath); // Play from local file
+          await _audioPlayer.setFilePath(musicPath);
         } else {
           await _audioPlayer.setAsset('assets/audio/iphone_alarm.mp3');
         }
 
         await _audioPlayer
-            .setLoopMode(LoopMode.one); // Keep playing until dismissed
+            .setLoopMode(LoopMode.one);
         await _audioPlayer.play();
-        // Show the persistent notification if the alarm is repeating
         if (widget.alarm.repeatDays.isNotEmpty) {
           String alarmTimeFormatted = "${widget.alarm.hour}:${widget.alarm.minute < 10 ? '0' : ''}${widget.alarm.minute}";
           await NotificationHelper.showPersistentNotification(
@@ -78,38 +75,32 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
     }
   }
 
-  /// **Trigger Continuous Vibration Until Dismissed**
   Future<void> _triggerVibration() async {
     if (widget.alarm.isVibrationEnabled) {
       bool? hasVibrator = await Vibration.hasVibrator();
       if (hasVibrator == true) {
-        Vibration.vibrate(pattern: [500, 1000], repeat: 0); // Loop vibration
+        Vibration.vibrate(pattern: [500, 1000], repeat: 0);
       }
     }
   }
 
-  /// **Dismiss Alarm**
   void _dismissAlarm() async {
     _stopAlarmProcesses();
 
-    // Get the next valid alarm time (next repeat day)
     DateTime nextRepeatTime = controller.getNextAlarmTime(widget.alarm);
     int nextRepeatTimeInMillis = nextRepeatTime.millisecondsSinceEpoch;
 
-    // Reschedule the alarm using the native method
     await controller.setAlarmNative(
       nextRepeatTimeInMillis,
       widget.alarm.id!,
       widget.alarm.repeatDays,
     );
     debugPrint("Alarm ID ${widget.alarm.id} dismissed.");
-
-    // Do not close the notification if the alarm is repeating, just keep it visible
     if (widget.alarm.repeatDays.isEmpty) {
       await NotificationHelper.closeNotification(widget.alarm.id!, widget.alarm.repeatDays);
     }
 
-    _closeApp(); // Close the app so no screen is shown
+    _closeApp();
   }
 
 
@@ -117,73 +108,53 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   void _snoozeAlarm() async {
     _stopAlarmProcesses();
 
-    // Retrieve snooze duration from the database (in minutes)
-    int snoozeTimeInMillis = widget.alarm.snoozeDuration * 60 * 1000; // Convert to milliseconds
+    int snoozeTimeInMillis = widget.alarm.snoozeDuration * 60 * 1000;
 
-    // Get the next snooze time
     DateTime snoozeTriggerTime = DateTime.now().add(Duration(milliseconds: snoozeTimeInMillis));
     int snoozeTimeEpoch = snoozeTriggerTime.millisecondsSinceEpoch;
 
-    // Schedule the alarm in Native Code
     await controller.setAlarmNative(snoozeTimeEpoch, widget.alarm.id!, widget.alarm.repeatDays);
 
     debugPrint("Alarm ID ${widget.alarm.id} snoozed for ${widget.alarm.snoozeDuration} minutes.");
 
-    // Do not close the notification if the alarm is repeating
     if (widget.alarm.repeatDays.isEmpty) {
       await NotificationHelper.closeNotification(widget.alarm.id!, widget.alarm.repeatDays);
     }
-
-    _closeApp(); // Close the app so no screen is shown
+    _closeApp();
   }
 
-  /// **Stop All Running Processes**
   void _stopAlarmProcesses() {
     _audioPlayer.stop();
     Vibration.cancel();
   }
 
-  /// **Close the App Properly (Ensures No Background Activity)**
   void _closeApp() {
     const platform = MethodChannel("alarm_channel");
     if (Platform.isAndroid) {
-      platform.invokeMethod("closeApp"); // Call the Android function
+      platform.invokeMethod("closeApp");
     } else {
-      exit(0); // Exit the app on iOS
+      exit(0);
     }
   }
 
-  /// **Format Repeat Days**
-  // String formatRepeatDays(List<String> repeatDays) {
-  //   if (repeatDays.length == 7) {
-  //     return "Everyday";
-  //   } else if (repeatDays.isNotEmpty) {
-  //     return repeatDays.join(', ');
-  //   }
-  //   return "Today";
-  // }
-
-  /// **Format Time Based on User Settings**
   String formatTime(int hour, int minute, bool isAm, int timeFormat) {
     if (timeFormat == 24) {
-      // 24-hour format, show time as is
       return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
     } else {
-      // 12-hour format conversion
       String period = 'AM';
       int displayHour = hour;
 
       if (hour == 0) {
-        displayHour = 12; // Midnight case (00:xx -> 12:xx AM)
+        displayHour = 12;
         period = 'AM';
       } else if (hour == 12) {
-        displayHour = 12; // Noon case (12:xx -> 12:xx PM)
+        displayHour = 12;
         period = 'PM';
       } else if (hour > 12) {
-        displayHour = hour; // Convert PM times (13:xx -> 1:xx PM)
+        displayHour = hour;
         period = 'PM';
       } else {
-        period = 'AM'; // AM times (1:xx -> 1:xx AM)
+        period = 'AM';
       }
 
       return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
@@ -193,31 +164,27 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine the image source (Supports Network & Local)
     String backgroundImage = widget.alarm.backgroundImage;
     ImageProvider imageProvider;
 
     if (backgroundImage.startsWith("http") ||
         backgroundImage.startsWith("https")) {
-      imageProvider = NetworkImage(backgroundImage); // Network image
+      imageProvider = NetworkImage(backgroundImage);
     } else if (File(backgroundImage).existsSync()) {
-      imageProvider = FileImage(File(backgroundImage)); // Local image
+      imageProvider = FileImage(File(backgroundImage));
     } else {
-      imageProvider = const AssetImage(ImagePath.cat); // Fallback asset image
+      imageProvider = const AssetImage(ImagePath.cat);
     }
 
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image
           Image(
             image: imageProvider,
             height: double.infinity,
             width: double.infinity,
             fit: BoxFit.cover,
           ),
-
-          // Bottom Content
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -238,7 +205,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                           widget.alarm.hour,
                           widget.alarm.minute,
                           widget.alarm.isAm,
-                          controller.timeFormat.value, // Pass the time format
+                          controller.timeFormat.value,
                         ),
                         color: Colors.white,
                         fontSize: getWidth(40),
@@ -264,7 +231,6 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                     ],
                   ),
 
-                  // Alarm Label
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
                     child: CustomText(

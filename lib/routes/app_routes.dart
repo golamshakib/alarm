@@ -47,7 +47,6 @@ class AppRoute {
         final alarmIdParam = Get.parameters['alarmId'];
         if (alarmIdParam != null) {
           final int alarmId = int.tryParse(alarmIdParam) ?? -1;
-          // Use a FutureBuilder to fetch the alarm from the local DB.
           return FutureBuilder<Alarm?>(
             future: DBHelperAlarm().getAlarm(alarmId),
             builder: (context, snapshot) {
@@ -58,14 +57,12 @@ class AppRoute {
                   body: Center(child: Text("Error loading alarm data")),
                 );
               }
-              // While loading, show a progress indicator.
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
             },
           );
         } else {
-          // Fallback: use a dummy alarm if no alarmId is passed.
           Alarm dummyAlarm = Alarm(
             hour: 7,
             minute: 0,

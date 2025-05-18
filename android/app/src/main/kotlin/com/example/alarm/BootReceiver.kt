@@ -15,14 +15,11 @@ class BootReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
             Log.d("BootReceiver", "Device Booted, Triggering Flutter Method...")
 
-            // Initialize the Flutter engine
             val flutterEngine = FlutterEngine(context)
             flutterEngine.lifecycleChannel.appIsResumed()
 
-            // Register plugins
             GeneratedPluginRegistrant.registerWith(flutterEngine)
 
-            // Call method on FlutterEngine using MethodChannel to trigger rescheduling
             MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
                 .invokeMethod("handleAlarmOnBoot", null)
 

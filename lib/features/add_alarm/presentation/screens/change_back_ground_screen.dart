@@ -52,12 +52,11 @@ class ChangeBackGroundScreen extends StatelessWidget {
               ),
               SizedBox(height: getHeight(24)),
 
-              // First ListView for `items`
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
                     await controller
-                        .fetchBackgroundsFromNetwork(); // Reload custom backgrounds
+                        .fetchBackgroundsFromNetwork();
                   },
                   child: Obx(() {
                     if (controller.items.isEmpty) {

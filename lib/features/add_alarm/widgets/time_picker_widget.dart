@@ -23,7 +23,6 @@ class TimePickerUI extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Hour Picker (Adjusts for 12-hour or 24-hour format)
             Expanded(
               child: SizedBox(
                 height: getHeight(120),
@@ -110,7 +109,6 @@ class TimePickerUI extends StatelessWidget {
               ),
             ),
 
-            // AM/PM Picker (Only visible in 12-hour format)
             if (!is24Hour)
               Expanded(
                 child: SizedBox(

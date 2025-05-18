@@ -19,22 +19,16 @@ class CreateNewBackgroundScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    // Fetch the arguments
     final Map<String, dynamic>? arguments = Get.arguments;
     final int? id = arguments?['id'];
     final String? title = arguments?['title'];
     final String? imagePath = arguments?['imagePath'];
     final String? musicPath = arguments?['musicPath'];
-    // final String? recordingPath = arguments?['recordingPath'];
 
     final CreateNewBackgroundController controller = Get.put(CreateNewBackgroundController());
-
-    // Pre-fill the fields if arguments are provided
     if (title != null) controller.labelText.value = title;
     if (imagePath != null) controller.imagePath.value = imagePath;
     if (musicPath != null) controller.musicPath.value = musicPath;
-    // if (recordingPath != null) controller.recordingPath.value = recordingPath;
 
     return Scaffold(
       body: SafeArea(
@@ -55,7 +49,6 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                 ),
                 SizedBox(height: getHeight(24)),
 
-                // Upload Background Image
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -79,7 +72,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextFormField(
-                          initialValue: title, // Pre-fill with the passed title
+                          initialValue: title,
                           onChanged: (value) {
                             controller.labelText.value = value;
                           },
@@ -116,7 +109,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                               padding: const EdgeInsets.all(16),
                               child: controller.imagePath.value != null
                                   ? Image.file(
-                                File(controller.imagePath.value!), // Create a File object here
+                                File(controller.imagePath.value!),
                                 fit: BoxFit.cover,
                               )
                                   : Center(
@@ -168,7 +161,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                             : "Pick an audio file",
                           child: GestureDetector(
                             onTap: controller.isMusicDisabled.value
-                                ? null // Disable interaction if isMusicDisabled is true
+                                ? null
                                 : () async {
                               controller.pickMusic();
                             },
@@ -232,7 +225,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                                                   child: CircleAvatar(
                                                     backgroundColor:
                                                     controller.isMusicDisabled.value
-                                                        ? Colors.grey // Change text color when disabled
+                                                        ? Colors.grey
                                                         : const Color(0xffFFF8F1),
                                                     child: Center(
                                                         child: SizedBox(
@@ -249,7 +242,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                                                 fontSize: getWidth(14),
                                                 fontWeight: FontWeight.w400,
                                                 color: controller.isMusicDisabled.value
-                                                    ? Colors.grey // Change text color when disabled
+                                                    ? Colors.grey
                                                       : const Color(0xffA59F92),
                                                 decoration: TextDecoration.underline,
                                               ),
@@ -262,20 +255,8 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       SizedBox(height: getHeight(8)),
-
-                      // Record Your Tune
-                      // Center(
-                      //     child: CustomText(
-                      //   text: "Or",
-                      //   color: const Color(0xffA59F92),
-                      //   fontSize: getWidth(14),
-                      // )),
-
                       const SizedBox(height: 16),
-                      // RecordTuneSection(controller: controller),
-                      // WaveFormSection(controller: controller),
                     ],
                   ),
                 ),

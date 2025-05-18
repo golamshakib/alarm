@@ -13,28 +13,18 @@ class AlarmScreenController extends GetxController {
   /// **Toggle Alarm ON/OFF**
   void toggleAlarm(int index) async {
     try {
-      // Get the alarm object using the updated index
       Alarm alarm = controller.alarms[index];
-
-      // Toggle the alarm ON/OFF
       alarm.isToggled.value = !alarm.isToggled.value;
-
-      // Update the alarm in the database
       await dbHelper.updateAlarm(alarm);
-
       if (alarm.isToggled.value) {
-        // If the alarm is ON, set it at the next scheduled time
         DateTime nextAlarmTime = getNextAlarmTime(alarm);
         int alarmTimeInMillis = nextAlarmTime.millisecondsSinceEpoch;
         await controller.setAlarmNative(alarmTimeInMillis, alarm.id!, alarm.repeatDays);
       } else {
-        // If the alarm is OFF, cancel it
         await controller.cancelAlarmNative(alarm.id!);
       }
-
-      // Refresh the list after toggling
       fetchAlarms();
-      update(); // Ensure UI updates
+      update();
 
     } catch (e) {
       debugPrint("Error toggling alarm: $e");
@@ -55,26 +45,22 @@ class AlarmScreenController extends GetxController {
     );
 
     if (alarmTime.isBefore(now)) {
-      alarmTime = alarmTime.add(const Duration(days: 1)); // Move to the next day
+      alarmTime = alarmTime.add(const Duration(days: 1));
     }
-
     return alarmTime;
   }
 
-  /// **Fetch All Alarms from Database**
   Future<void> fetchAlarms() async {
     try {
       List<Alarm> fetchedAlarms = await dbHelper.fetchAlarms();
-
-      // Ensure repeatDays is correctly formatted
       for (var alarm in fetchedAlarms) {
         if (alarm.repeatDays.isEmpty) {
-          alarm.repeatDays.assignAll(["Today"]); // Fallback to "Today" if empty
+          alarm.repeatDays.assignAll(["Today"]);
         }
       }
       sortAlarmsChronologically(fetchedAlarms);
       controller.alarms.assignAll(fetchedAlarms);
-      update(); // 🔹 Ensure UI updates after fetching
+      update();
     } catch (e) {
       debugPrint("Error fetching alarms: $e");
     }
@@ -91,55 +77,41 @@ class AlarmScreenController extends GetxController {
       return aTotalMinutes.compareTo(bTotalMinutes);
     });
   }
-
-  // Selection mode on the Alarm Screen
   var isSelectionMode = false.obs;
   var selectedAlarms = <int>[].obs;
 
-// Enable selection mode
   void enableSelectionMode(int index) {
     isSelectionMode.value = true;
     if (!selectedAlarms.contains(index)) {
-      selectedAlarms.add(index); // Add the index of the selected alarm
+      selectedAlarms.add(index);
     }
   }
-
-// Toggle selection for deletion
   void toggleSelection(int index) {
     if (selectedAlarms.contains(index)) {
-      selectedAlarms.remove(index); // Remove from selection if already selected
+      selectedAlarms.remove(index);
     } else {
-      selectedAlarms.add(index); // Add to selection if not selected
+      selectedAlarms.add(index);
     }
   }
 
-// Exit selection mode
   void exitSelectionMode() {
     isSelectionMode.value = false;
     selectedAlarms.clear();
   }
 
-// Delete selected alarms
   Future<void> deleteSelectedAlarms() async {
-    final dbHelper = DBHelperAlarm(); // Instantiate the database helper
-
-    // Loop through selected alarms and delete them from the database
+    final dbHelper = DBHelperAlarm();
     for (int index in selectedAlarms) {
-      final alarm = controller.alarms[index]; // Get the alarm at the selected index
+      final alarm = controller.alarms[index];
       if (alarm.id != null) {
         await dbHelper.deleteAlarm(
-            alarm.id!); // Delete the alarm from the database
+            alarm.id!);
       }
     }
-
-    // Remove the alarms from the local list
     controller.alarms.removeWhere((alarm) =>
         selectedAlarms.contains(controller.alarms.indexOf(alarm)));
 
-    // Exit selection mode and clear the selection
     exitSelectionMode();
-
     Get.snackbar("Success", "Selected alarms deleted successfully!");
   }
-
 }

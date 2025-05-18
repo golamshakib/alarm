@@ -61,7 +61,7 @@ class LocalBackgroundScreen extends StatelessWidget {
                           final item = createAlarmController.items[index];
 
                           return Dismissible(
-                            key: ValueKey(item['id']), // Use ID to prevent unnecessary rebuilding
+                            key: ValueKey(item['id']),
                             direction: DismissDirection.endToStart,
                             background: Container(
                               alignment: Alignment.centerRight,
@@ -74,18 +74,15 @@ class LocalBackgroundScreen extends StatelessWidget {
 
                               if (confirmed) {
                                 final id = item['id'];
-                                // Ensure the ID is not null before proceeding
                                 if (id != null) {
-                                  await dbHelper.deleteBackground(id); // Delete the background from DB
-                                  createAlarmController.items.removeAt(index); // Remove the item from list immediately
+                                  await dbHelper.deleteBackground(id);
+                                  createAlarmController.items.removeAt(index);
                                   Get.snackbar("Success", "Background deleted successfully!", duration: const Duration(seconds: 2));
                                   Get.off(const LocalBackgroundScreen());
                                 } else {
-                                  // If ID is null, show an error or handle it gracefully
                                   Get.snackbar("Error", "Invalid background ID. Could not delete the item.", duration: const Duration(seconds: 2));
                                 }
                               } else {
-                                // If the dismissal is canceled, we don't need to remove the item
                                 Get.off(const ChangeBackGroundScreen());
                               }
                             },
@@ -167,7 +164,7 @@ class LocalBackgroundScreen extends StatelessWidget {
   Future<bool> showDeleteConfirmationPopup(BuildContext context) async {
     return await showDialog<bool>(
       context: context,
-      barrierDismissible: false, // Prevent dismissal by tapping outside
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: CustomText(
@@ -198,7 +195,7 @@ class LocalBackgroundScreen extends StatelessWidget {
         );
       },
     ) ??
-        false; // Return false if dialog is dismissed without action
+        false;
   }
 }
 class PlayButton extends StatelessWidget {

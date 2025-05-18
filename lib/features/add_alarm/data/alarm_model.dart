@@ -7,7 +7,6 @@ class Alarm {
   int hour, minute;
   bool isAm;
   String label, backgroundTitle, backgroundImage, musicPath;
-
   // String recordingPath;
   RxList<String> repeatDays;
   bool isVibrationEnabled;
@@ -60,7 +59,7 @@ class Alarm {
         backgroundImage: map['backgroundImage'],
         musicPath: map['musicPath'],
         // recordingPath: map['recordingPath'],
-        repeatDays: List<String>.from(jsonDecode(map['repeatDays'] ?? '[]')), // Convert JSON string back to list
+        repeatDays: List<String>.from(jsonDecode(map['repeatDays'] ?? '[]')),
         isVibrationEnabled: map['isVibrationEnabled'] == 1,
         snoozeDuration: map['snoozeDuration'],
         volume: map['volume'],

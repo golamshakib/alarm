@@ -41,7 +41,7 @@ class MainActivity : FlutterActivity() {
                 "cancelAlarm" -> {
                     val alarmId = call.argument<Int>("alarmId")
                     if (alarmId != null) {
-                        cancelAlarm(alarmId) // Call the cancelAlarm method
+                        cancelAlarm(alarmId)
                         result.success("Alarm with alarmId $alarmId canceled")
                     } else {
                         result.error("INVALID_ARGUMENT", "alarmId is required", null)
@@ -64,7 +64,6 @@ class MainActivity : FlutterActivity() {
                 }
 
                 "handleAlarmOnBoot" -> {
-                    // This method is invoked after device reboot or app start
                     rescheduleAlarmsFromFlutter()
                     result.success("Alarms Rescheduled")
                 }
@@ -74,7 +73,6 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    // Override getInitialRoute() instead of provideInitialRoute()
     override fun getInitialRoute(): String? {
         val showTrigger = intent.getBooleanExtra("showAlarmTrigger", false)
         val alarmId = intent.getIntExtra("alarmId", -1)
@@ -85,14 +83,11 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    // (Optional) If your app might already be running, you can also override onNewIntent:
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        // Optionally: use a MethodChannel to notify Flutter about the intent change
     }
 
-    // Reschedule alarms after device restart
     private fun rescheduleAlarmsFromFlutter() {
         MethodChannel(flutterEngine!!.dartExecutor.binaryMessenger, CHANNEL)
             .invokeMethod("rescheduleAlarms", null)
@@ -126,14 +121,13 @@ class MainActivity : FlutterActivity() {
             this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val snoozeTime = System.currentTimeMillis() + timeInMillis // Snooze time from current time
+        val snoozeTime = System.currentTimeMillis() + timeInMillis
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Check if the app should close
         if (intent.getBooleanExtra("closeApp", false)) {
             closeApp()
         }
@@ -142,9 +136,9 @@ class MainActivity : FlutterActivity() {
     private fun closeApp() {
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (task in activityManager.appTasks) {
-            task.finishAndRemoveTask() // Fix for ambiguous `forEach` error
+            task.finishAndRemoveTask()
         }
-        Process.killProcess(Process.myPid()) // Correct import is now added
+        Process.killProcess(Process.myPid())
     }
 
     private fun cancelAlarm(alarmId: Int) {
@@ -155,7 +149,7 @@ class MainActivity : FlutterActivity() {
         )
 
         alarmManager.cancel(pendingIntent)
-        pendingIntent.cancel()  // Ensure the PendingIntent is removed completely
+        pendingIntent.cancel()
     }
 }
 

@@ -28,7 +28,7 @@ class AlarmReceiver : BroadcastReceiver() {
     private val CHANNEL_ID = "alarm_channel_id"
 
     companion object {
-        private var ringtone: Ringtone? = null  // Static variable to store ringtone instance
+        private var ringtone: Ringtone? = null
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -50,7 +50,6 @@ class AlarmReceiver : BroadcastReceiver() {
             else -> {
                 vibratePhone(context)
 
-                // Show the alarm trigger screen
                 val alarmIntent = Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     putExtra("showAlarmTrigger", true)
@@ -60,7 +59,6 @@ class AlarmReceiver : BroadcastReceiver() {
 
                 showNotification(context, alarmId, snoozeDuration)
 
-                // Trigger the next repeat day
                 if (repeatDays.isNotEmpty()) {
                     scheduleNextRepeat(context, alarmId, repeatDays)
                 }
@@ -128,7 +126,7 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     private fun snoozeAlarm(context: Context, alarmId: Int, snoozeDuration: Long = 60000L) {
-        stopAlarmSound(context) // Stop alarm sound & vibration
+        stopAlarmSound(context)
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
@@ -160,7 +158,6 @@ class AlarmReceiver : BroadcastReceiver() {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancelAll()
 
-        // Kill the app process (Remove from recent apps)
         val intent = Intent(context, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         intent.putExtra("closeApp", true)
@@ -191,15 +188,12 @@ class AlarmReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Retrieve Alarm Label from SharedPreferences or Intent
         val sharedPreferences =
             context.getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
         val alarmLabel = sharedPreferences.getString("alarm_label_$alarmId", "Alarm Triggered")
 
-        // Ensure label is not null (fallback to default)
         val notificationText = if (!alarmLabel.isNullOrEmpty()) alarmLabel else "Time to wake up"
 
-        // Create an empty pending intent that does nothing when clicked
         val emptyIntent = PendingIntent.getActivity(
             context, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -217,20 +211,19 @@ class AlarmReceiver : BroadcastReceiver() {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Alarm Triggered")
             .setContentText(notificationText)
-            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm) // Android's default alarm icon
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setSound(null)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(false)
-            .setOngoing(false)  // Ensure it doesn't persist
-            .setContentIntent(emptyIntent)  // Prevent any action on tap
+            .setOngoing(false)
+            .setContentIntent(emptyIntent)
             .build()
 
         NotificationManagerCompat.from(context).notify(alarmId, notification)
-        // Remove notification after 2 seconds
         Handler(Looper.getMainLooper()).postDelayed({
-            notificationManager.cancel(alarmId) // Remove notification from panel
+            notificationManager.cancel(alarmId)
         }, 2000)
     }
 }

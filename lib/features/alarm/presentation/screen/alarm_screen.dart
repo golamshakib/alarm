@@ -196,9 +196,9 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                             image: DecorationImage(
                               image: alarm.backgroundImage.startsWith("http") ||
                                   alarm.backgroundImage.startsWith("https")
-                                  ? NetworkImage(alarm.backgroundImage) // Use network image if it's a URL
+                                  ? NetworkImage(alarm.backgroundImage)
                                   : File(alarm.backgroundImage).existsSync()
-                                  ? FileImage(File(alarm.backgroundImage)) // Use FileImage for local files
+                                  ? FileImage(File(alarm.backgroundImage))
                                   : const AssetImage(ImagePath.cat)
                               as ImageProvider,
                               fit: BoxFit.cover,
@@ -226,7 +226,6 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                   children: [
                                     Row(
                                       children: [
-                                        // 🎵 Play Button (Supports Network & Local Music)
                                         GestureDetector(
                                           onTap: () {
                                             addAlarmController.togglePlayPause(

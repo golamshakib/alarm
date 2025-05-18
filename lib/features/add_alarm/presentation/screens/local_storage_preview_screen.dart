@@ -33,9 +33,8 @@ class LocalStoragePreviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller =
-        Get.put(LocalStoragePreviewScreenController()); // Initialize controller
+        Get.put(LocalStoragePreviewScreenController());
 
-    // Determine which path to use for playback
     final audioPlay = musicPath.isNotEmpty ? musicPath : recordingPath;
     return Scaffold(
       body: SafeArea(
@@ -95,12 +94,12 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: imagePath.isNotEmpty && File(imagePath).existsSync()
                       ? Image.file(
-                          File(imagePath), // Display local image
+                          File(imagePath),
                           width: double.infinity,
                           fit: BoxFit.contain,
                         )
                       : Image.asset(
-                          ImagePath.cat, // Fallback asset image
+                          ImagePath.cat,
                           width: double.infinity,
                           fit: BoxFit.contain,
                         ),
@@ -113,7 +112,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                     final addAlarmController = Get.find<AddAlarmController>();
                     addAlarmController.selectedBackground.value = title;
                     addAlarmController.selectedBackgroundImage.value = imagePath;
-                    addAlarmController.selectedMusicPath.value = musicPath; // Pass music path
+                    addAlarmController.selectedMusicPath.value = musicPath;
                     Get.toNamed(AppRoute.navBarScreen, arguments: {
                       'title': title,
                       'imagePath': imagePath,

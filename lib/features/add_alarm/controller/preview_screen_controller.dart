@@ -2,15 +2,14 @@ import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
 class PreviewScreenController extends GetxController {
-  final RxBool isPlaying = false.obs; // Tracks playback state
-  final AudioPlayer audioPlayer = AudioPlayer(); // AudioPlayer instance
+  final RxBool isPlaying = false.obs;
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void onInit() {
     super.onInit();
-    // Sync `isPlaying` with the AudioPlayer's playing state
     audioPlayer.playerStateStream.listen((state) {
-      isPlaying.value = state.playing; // Updates based on actual playback state
+      isPlaying.value = state.playing;
     });
   }
 
@@ -22,15 +21,11 @@ class PreviewScreenController extends GetxController {
       }
 
       if (isPlaying.value) {
-        // Pause playback
         await audioPlayer.pause();
       } else {
-        // Check if the audioPath is a URL or local file
         if (audioPath.startsWith("http") || audioPath.startsWith("https")) {
-          // Play from network URL
           await audioPlayer.setUrl(audioPath);
         } else {
-          // Play from local file (if necessary)
           await audioPlayer.setFilePath(audioPath);
         }
         await audioPlayer.play();
@@ -40,12 +35,11 @@ class PreviewScreenController extends GetxController {
     }
   }
 
-  // Stop music playback
   Future<void> stopMusic() async {
     try {
       if (isPlaying.value) {
-        await audioPlayer.stop(); // Stop the audio playback
-        isPlaying.value = false; // Reset the playing state
+        await audioPlayer.stop();
+        isPlaying.value = false;
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to stop the audio: $e", duration: const Duration(seconds: 2));
@@ -54,8 +48,8 @@ class PreviewScreenController extends GetxController {
 
   @override
   void onClose() {
-    stopMusic(); // Ensure music is stopped before disposing
-    audioPlayer.dispose(); // Dispose of the audio player
+    stopMusic();
+    audioPlayer.dispose();
     super.onClose();
   }
 }

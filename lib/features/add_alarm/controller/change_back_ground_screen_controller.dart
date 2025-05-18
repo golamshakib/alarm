@@ -29,16 +29,14 @@ class ChangeBackgroundScreenController extends GetxController {
     try {
       final ResponseData response = await networkCaller.getRequest(endpoint);
       if (response.isSuccess && response.responseData != null) {
-        // Ensure responseData is a Map and extract the "data" field
         final responseData = response.responseData as Map<String, dynamic>;
         if (responseData.containsKey('data')) {
           final List<dynamic> dataList = responseData['data'];
-          // Map the list to your items format
           items.value = dataList.map((item) {
             return {
               'title': item['description'],
-              'imagePath': item['images'], // Image URL
-              'musicPath': item['audio'], // Audio URL
+              'imagePath': item['images'],
+              'musicPath': item['audio'],
             };
           }).toList();
           isPlaying.value = List.generate(items.length, (_) => false);
@@ -61,32 +59,28 @@ class ChangeBackgroundScreenController extends GetxController {
         return;
       }
 
-      // Update the state immediately to reflect the icon change
       if (currentlyPlayingIndex == index && isPlaying[index]) {
-        // Pause the currently playing audio
         isPlaying[index] = false;
         currentlyPlayingIndex = null;
-        isPlaying.refresh(); // Ensure UI updates immediately
+        isPlaying.refresh();
         await player.pause();
       } else {
-        // Stop any currently playing audio
         if (currentlyPlayingIndex != null) {
           isPlaying[currentlyPlayingIndex!] = false;
-          isPlaying.refresh(); // Update UI before stopping
+          isPlaying.refresh();
           await player.stop();
         }
 
-        // Start playing the new audio
         currentlyPlayingIndex = index;
         isPlaying[index] = true;
-        isPlaying.refresh(); // Ensure UI updates immediately
+        isPlaying.refresh();
         await player.setUrl(musicPath);
         await player.play();
       }
     } catch (e) {
       // Get.snackbar("Error", "Failed to play audio: $e", duration: const Duration(seconds: 2));
     } finally {
-      isPlaying.refresh(); // Final UI refresh to ensure proper state
+      isPlaying.refresh();
     }
   }
   /// Method to stop music playback
@@ -94,7 +88,7 @@ class ChangeBackgroundScreenController extends GetxController {
     if (currentlyPlayingIndex != null) {
       isPlaying[currentlyPlayingIndex!] = false;
       currentlyPlayingIndex = null;
-      isPlaying.refresh(); // Ensure UI updates immediately
+      isPlaying.refresh();
       await player.stop();
     }
   }
@@ -102,7 +96,6 @@ class ChangeBackgroundScreenController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-    // Stop audio playback when the controller is closed
     stopMusic();
     player.dispose();
   }

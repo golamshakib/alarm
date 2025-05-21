@@ -107,16 +107,11 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
   /// **Snooze Alarm and Re-Schedule Notification**
   void _snoozeAlarm() async {
     _stopAlarmProcesses();
-
     int snoozeTimeInMillis = widget.alarm.snoozeDuration * 60 * 1000;
-
     DateTime snoozeTriggerTime = DateTime.now().add(Duration(milliseconds: snoozeTimeInMillis));
     int snoozeTimeEpoch = snoozeTriggerTime.millisecondsSinceEpoch;
-
     await controller.setAlarmNative(snoozeTimeEpoch, widget.alarm.id!, widget.alarm.repeatDays);
-
     debugPrint("Alarm ID ${widget.alarm.id} snoozed for ${widget.alarm.snoozeDuration} minutes.");
-
     if (widget.alarm.repeatDays.isEmpty) {
       await NotificationHelper.closeNotification(widget.alarm.id!, widget.alarm.repeatDays);
     }
@@ -136,30 +131,46 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
       exit(0);
     }
   }
-
   String formatTime(int hour, int minute, bool isAm, int timeFormat) {
     if (timeFormat == 24) {
       return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
     } else {
-      String period = 'AM';
       int displayHour = hour;
+      String period = isAm ? "AM" : "PM";
 
-      if (hour == 0) {
+      if (hour == 0 || hour == 12) {
         displayHour = 12;
-        period = 'AM';
-      } else if (hour == 12) {
-        displayHour = 12;
-        period = 'PM';
-      } else if (hour > 12) {
-        displayHour = hour;
-        period = 'PM';
       } else {
-        period = 'AM';
+        displayHour = hour % 12;
       }
 
       return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
     }
   }
+
+  // String formatTime(int hour, int minute, bool isAm, int timeFormat) {
+  //   if (timeFormat == 24) {
+  //     return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+  //   } else {
+  //     String period = 'AM';
+  //     int displayHour = hour;
+  //
+  //     if (hour == 0) {
+  //       displayHour = 12;
+  //       period = 'AM';
+  //     } else if (hour == 12) {
+  //       displayHour = 12;
+  //       period = 'PM';
+  //     } else if (hour > 12) {
+  //       displayHour = hour;
+  //       period = 'PM';
+  //     } else {
+  //       period = 'AM';
+  //     }
+  //
+  //     return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
+  //   }
+  // }
 
 
   @override

@@ -131,22 +131,30 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
       exit(0);
     }
   }
-  String formatTime(int hour, int minute, bool isAm, int timeFormat) {
-    if (timeFormat == 24) {
-      return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
-    } else {
-      int displayHour = hour;
-      String period = isAm ? "AM" : "PM";
-
-      if (hour == 0 || hour == 12) {
-        displayHour = 12;
-      } else {
-        displayHour = hour % 12;
-      }
-
-      return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
-    }
+  String formatTime(int hour, int minute, bool isAm) {
+    String period = isAm ? 'AM' : 'PM';
+    return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period";
   }
+
+
+
+
+  // String formatTime(int hour, int minute, bool isAm, int timeFormat) {
+  //   if (timeFormat == 24) {
+  //     return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+  //   } else {
+  //     int displayHour = hour;
+  //     String period = isAm ? "AM" : "PM";
+  //
+  //     if (hour == 0 || hour == 12) {
+  //       displayHour = 12;
+  //     } else {
+  //       displayHour = hour % 12;
+  //     }
+  //
+  //     return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
+  //   }
+  // }
 
   // String formatTime(int hour, int minute, bool isAm, int timeFormat) {
   //   if (timeFormat == 24) {
@@ -216,7 +224,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                           widget.alarm.hour,
                           widget.alarm.minute,
                           widget.alarm.isAm,
-                          controller.timeFormat.value,
+                          // controller.timeFormat.value,
                         ),
                         color: Colors.white,
                         fontSize: getWidth(40),

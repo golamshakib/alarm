@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "117666353326",
+    "project_id": "alarm-optimus2727",
+    "storage_bucket": "alarm-optimus2727.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:117666353326:android:ec90e5f75a1e4d42809d3f",
+        "android_client_info": {
+          "package_name": "com.alarm.optimus2727"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5RPFaZdeMIwZ_KD5WjdaOgdeX54qfo0c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

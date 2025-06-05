@@ -18,6 +18,5 @@ void main() async {
   await NotificationService.requestNotificationPermissions();
   await NotificationHelper.init();
 
-
   runApp(const MyApp());
 }

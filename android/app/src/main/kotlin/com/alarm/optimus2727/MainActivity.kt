@@ -1,4 +1,4 @@
-package com.example.alarm
+package com.alarm.optimus2727
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -10,7 +10,7 @@ import android.os.Bundle
 import android.app.ActivityManager
 import android.os.Process
 import androidx.annotation.NonNull
-import com.example.alarm.AlarmReceiver
+import com.alarm.optimus2727.AlarmReceiver
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel

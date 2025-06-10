@@ -1,8 +1,13 @@
 
+import 'dart:convert';
 import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../utils/constants/api_constants.dart';
 
 
 
@@ -31,6 +36,13 @@ class PushNotificationService {
     /// Get FCM Token (Optional: Use this for testing with FCM API)
     String? fcmToken = await _firebaseMessaging.getToken();
     log("FCM Token: $fcmToken");
+    if (fcmToken != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('fcm_token', fcmToken);
+
+      // Send the FCM token to the backend
+      await sendTokenToBackend(fcmToken);
+    }
 
     /// Handle Foreground Notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -90,6 +102,30 @@ class PushNotificationService {
       message.notification?.body ?? 'You have a new message',
       platformChannelSpecifics,
     );
+  }
+
+  /// Send FCM Token to Backend Server
+  Future<void> sendTokenToBackend(String fcmToken) async {
+    const String storeFcmToke = AppUrls.storeFcmToken;
+    try {
+      final response = await http.post(
+        Uri.parse(storeFcmToke),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'fcm_token': fcmToken,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        log("FCM token sent successfully to backend");
+      } else {
+        log("Failed to send token to backend. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      log("Error sending token to backend: $e");
+    }
   }
 
 // /// Handle Navigation for Notification Clicks

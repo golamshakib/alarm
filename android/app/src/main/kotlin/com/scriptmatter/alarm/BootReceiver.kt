@@ -1,4 +1,4 @@
-package com.alarm.optimus2727
+package com.scriptmatter.alarm
 
 import android.content.BroadcastReceiver
 import android.content.Context

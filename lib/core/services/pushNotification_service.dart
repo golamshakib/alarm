@@ -9,8 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/constants/api_constants.dart';
 
-
-
 class PushNotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
@@ -73,7 +71,6 @@ class PushNotificationService {
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
     );
-
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
@@ -114,11 +111,11 @@ class PushNotificationService {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'fcm_token': fcmToken,
+          'fcmToken': fcmToken,
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         log("FCM token sent successfully to backend");
       } else {
         log("Failed to send token to backend. Status code: ${response.statusCode}");

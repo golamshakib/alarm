@@ -1,4 +1,4 @@
-package com.alarm.optimus2727
+package com.scriptmatter.alarm
 
 import android.R
 import android.annotation.SuppressLint

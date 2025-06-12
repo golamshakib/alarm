@@ -131,9 +131,9 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
       exit(0);
     }
   }
-  String formatTime(int hour, int minute, bool isAm) {
-    String period = isAm ? 'AM' : 'PM';
-    return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period";
+  String formatTime(int hour, int minute) {
+    // String period = isAm ? 'AM' : 'PM';
+    return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
   }
 
 
@@ -223,7 +223,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                         text: formatTime(
                           widget.alarm.hour,
                           widget.alarm.minute,
-                          widget.alarm.isAm,
+                          // widget.alarm.isAm,
                           // controller.timeFormat.value,
                         ),
                         color: Colors.white,
@@ -249,7 +249,6 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                       ),
                     ],
                   ),
-
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
                     child: CustomText(

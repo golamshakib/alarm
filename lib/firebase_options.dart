@@ -47,29 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyChTKTfT9yjiwXA5HmH2TXYOF4Swl6maK8',
-    appId: '1:117666353326:web:cb1a4f1cfe5c53a3809d3f',
-    messagingSenderId: '117666353326',
-    projectId: 'alarm-optimus2727',
-    authDomain: 'alarm-optimus2727.firebaseapp.com',
-    storageBucket: 'alarm-optimus2727.firebasestorage.app',
-    measurementId: 'G-DE6SYL0QY3',
+    apiKey: 'AIzaSyAHteeQwWIytiAdrs2_DWtDXAhYrvy3u0M',
+    appId: '1:337345450183:web:24f85f971c9ecccdb3eee2',
+    messagingSenderId: '337345450183',
+    projectId: 'alarme-288bd',
+    authDomain: 'alarme-288bd.firebaseapp.com',
+    storageBucket: 'alarme-288bd.firebasestorage.app',
+    measurementId: 'G-1820W035VY',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB5RPFaZdeMIwZ_KD5WjdaOgdeX54qfo0c',
-    appId: '1:117666353326:android:ec90e5f75a1e4d42809d3f',
-    messagingSenderId: '117666353326',
-    projectId: 'alarm-optimus2727',
-    storageBucket: 'alarm-optimus2727.firebasestorage.app',
+    apiKey: 'AIzaSyB6-qjonx89k1IsmpcjhgzPvrBSMJhld88',
+    appId: '1:337345450183:android:18fcd98231a33885b3eee2',
+    messagingSenderId: '337345450183',
+    projectId: 'alarme-288bd',
+    storageBucket: 'alarme-288bd.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAPYLNxTkLxXx2pogv36zJVgtS3UWGK1D4',
-    appId: '1:117666353326:ios:ce6f78e8e211ad29809d3f',
-    messagingSenderId: '117666353326',
-    projectId: 'alarm-optimus2727',
-    storageBucket: 'alarm-optimus2727.firebasestorage.app',
-    iosBundleId: 'com.alarm.optimus2727',
+    apiKey: 'AIzaSyAbezwDuRjBIq7Qvd9vdO8pj9t81KKfzs0',
+    appId: '1:337345450183:ios:7ad7bdcd1978fcfdb3eee2',
+    messagingSenderId: '337345450183',
+    projectId: 'alarme-288bd',
+    storageBucket: 'alarme-288bd.firebasestorage.app',
+    iosBundleId: 'com.scriptmatter.alarm',
   );
+
 }

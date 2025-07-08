@@ -55,7 +55,6 @@ A personalized alarm app built using Flutter, offering users the ability to set 
 ```bash
 lib/
 │
-├── main.dart
 ├── core/
 │   └── bindings/
 │   └── common/widgets/

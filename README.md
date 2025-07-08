@@ -1,6 +1,6 @@
-# native_alarm_app
+# Alarm App
 
-### Native Alarm App with Flutter & Platform Channel Integration
+### Alarm App with Flutter & Platform Channel Integration
 
 A personalized alarm app built using Flutter, offering users the ability to set alarms with custom music, images, and a detailed alarm screen. The app leverages **Flutter Method Channels** to interact with native Android code for accurate alarm triggering and **Shared Preferences** for persistent local storage. Designed for a smooth and responsive user experience with native-level performance.
 

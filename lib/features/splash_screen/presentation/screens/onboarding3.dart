@@ -59,7 +59,7 @@ class OnBoarding3Screen extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: getWidth(8)),
                       child: RichText(
                         text: TextSpan(
-                          text: '',
+                          text: 'Personnalisez votre alarme avec ',
                           style: GoogleFonts.poppins(
                             fontSize: getWidth(32),
                             color: AppColors.textSecondary,
@@ -67,7 +67,7 @@ class OnBoarding3Screen extends StatelessWidget {
                           ),
                           children: [
                             TextSpan(
-                              text: 'Upload ',
+                              text: 'l\'image et la voix ',
                               style: GoogleFonts.poppins(
                                 fontSize: getWidth(32),
                                 color: AppColors.textYellow,
@@ -75,10 +75,18 @@ class OnBoarding3Screen extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: 'and save your favorites.',
+                              text: 'd\'une personne qui vous est ',
                               style: GoogleFonts.poppins(
                                 fontSize: getWidth(32),
                                 color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'chère.',
+                              style: GoogleFonts.poppins(
+                                fontSize: getWidth(32),
+                                color: AppColors.yellow,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),

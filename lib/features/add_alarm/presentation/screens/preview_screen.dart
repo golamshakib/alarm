@@ -38,7 +38,7 @@ class PreviewScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomAppbarWithLogo(
-                  text: "Preview",
+                  text: "Aperçu",
                   showBackIcon: true,
                   onBackTap: () async {
                     controller.stopMusic();
@@ -106,7 +106,7 @@ class PreviewScreen extends StatelessWidget {
                       'imagePath': imagePath,
                       'musicPath': musicPath,
                     });
-                    Get.snackbar("Success", "Background set successfully!",
+                    Get.snackbar("Succès", "Veuillez régler votre alarme",
                         duration: const Duration(seconds: 2));
                   },
                   child: Container(
@@ -117,7 +117,7 @@ class PreviewScreen extends StatelessWidget {
                     ),
                     child: const Center(
                       child: CustomText(
-                        text: 'Set as alarm background',
+                        text: "choisir cette alarme",
                         color: AppColors.textWhite,
                       ),
                     ),

@@ -25,7 +25,7 @@ class ChangeBackGroundScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomAppbarWithLogo(
-                text: "Change background",
+                text: "Vos alarme",
                 showBackIcon: true,
                 onBackTap: () async {
                   controller.stopMusic();
@@ -41,7 +41,7 @@ class ChangeBackGroundScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CustomText(text: 'Local Background', fontSize: getWidth(18)),
+                    CustomText(text: 'Personnaliser une alarme', fontSize: getWidth(18)),
                     Icon(
                       Icons.arrow_forward_ios,
                       size: getWidth(16),
@@ -61,7 +61,7 @@ class ChangeBackGroundScreen extends StatelessWidget {
                   child: Obx(() {
                     if (controller.items.isEmpty) {
                       return const Center(
-                          child: CustomText(text: 'No Backgrounds Found'));
+                          child: CustomText(text: 'Aucun arrière-plan trouvé'));
                     }
                     return ListView.separated(
                       itemCount: controller.items.length,

@@ -32,7 +32,7 @@ class SaveBackgroundButtonSection extends StatelessWidget {
         ),
         child: const Center(
           child: CustomText(
-            text: 'Save background',
+            text: 'sauvegarder',
             color: AppColors.textWhite,
           ),
         ),

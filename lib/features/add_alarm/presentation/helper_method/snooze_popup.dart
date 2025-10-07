@@ -19,7 +19,7 @@ void showSnoozePopup(BuildContext context, AddAlarmController controller) {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CustomText(text: 'Snooze:'),
+            const CustomText(text: 'repetition:'),
             SizedBox(height: getHeight(10)),
 
             Obx(() {

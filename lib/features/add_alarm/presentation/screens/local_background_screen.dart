@@ -31,7 +31,7 @@ class LocalBackgroundScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomAppbarWithLogo(
-                text: "Change background",
+                text: "Vos alarme",
                 showBackIcon: true,
                   onBackTap: () async {
                     createAlarmController.stopMusic();
@@ -52,7 +52,7 @@ class LocalBackgroundScreen extends StatelessWidget {
                 child: Obx(
                       () => createAlarmController.items.isEmpty
                       ? const Center(
-                      child: CustomText(text: 'No Background available'))
+                      child: CustomText(text: 'Aucun arrière-plan disponible'))
                       : ListView.separated(
                     itemCount: createAlarmController.items.length,
                     separatorBuilder: (_, __) =>
@@ -77,10 +77,10 @@ class LocalBackgroundScreen extends StatelessWidget {
                                 if (id != null) {
                                   await dbHelper.deleteBackground(id);
                                   createAlarmController.items.removeAt(index);
-                                  Get.snackbar("Success", "Background deleted successfully!", duration: const Duration(seconds: 2));
+                                  Get.snackbar("Succès", "Arrière-plan supprimé avec succès", duration: const Duration(seconds: 2));
                                   Get.off(const LocalBackgroundScreen());
                                 } else {
-                                  Get.snackbar("Error", "Invalid background ID. Could not delete the item.", duration: const Duration(seconds: 2));
+                                  Get.snackbar("Erreur", "ID d'arrière-plan non valide. Impossible de supprimer l'élément", duration: const Duration(seconds: 2));
                                 }
                               } else {
                                 Get.off(const ChangeBackGroundScreen());
@@ -168,11 +168,11 @@ class LocalBackgroundScreen extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: CustomText(
-            text: "Delete Background",
+            text: "Supprimer l'arrière-plan",
             fontSize: getWidth(18),
           ),
           content: CustomText(
-            text: "Are you sure you want to delete this background?",
+            text: "Êtes-vous sûr de vouloir supprimer ce fond d’écran ?",
             color: AppColors.textPrimary.withOpacity(0.5),
           ),
           actions: [

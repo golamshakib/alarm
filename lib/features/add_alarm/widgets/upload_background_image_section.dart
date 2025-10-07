@@ -21,7 +21,7 @@ class UploadBackgroundImageSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() => controller.imagePath.value == null
         ? CustomText(
-      text: "Upload Background Image:",
+      text: "télécharger votre image:",
       fontSize: getWidth(16),
       fontWeight: FontWeight.w600,
       color: const Color(0xff333333),
@@ -30,7 +30,7 @@ class UploadBackgroundImageSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         CustomText(
-          text: "Upload Background Image:",
+          text: "télécharger votre image:",
           fontSize: getWidth(16),
           fontWeight: FontWeight.w600,
           color: const Color(0xff333333),
@@ -40,7 +40,7 @@ class UploadBackgroundImageSection extends StatelessWidget {
               controller.pickImage();
             },
             child: CustomText(
-              text: "Change",
+              text: "Modifier",
               color: const Color(0xffFFA845),
               fontWeight: FontWeight.w600,
               fontSize: getWidth(16),

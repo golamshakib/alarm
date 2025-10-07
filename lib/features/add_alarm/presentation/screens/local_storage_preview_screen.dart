@@ -44,7 +44,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
             child: Column(
               children: [
                 CustomAppbarWithLogo(
-                  text: "Preview",
+                  text: "Aperçu",
                   showBackIcon: true,
                   iconPathColor: AppColors.yellow,
                   iconPath: IconPath.editSquare,
@@ -119,7 +119,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                       'musicPath': musicPath,
                       'recordingPath': recordingPath,
                     });
-                    Get.snackbar("Success", "Background set successfully!", duration: const Duration(seconds: 2));
+                    Get.snackbar("Succès", "Veuillez régler votre alarme", duration: const Duration(seconds: 2));
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: getHeight(12)),
@@ -129,7 +129,7 @@ class LocalStoragePreviewScreen extends StatelessWidget {
                     ),
                     child: const Center(
                       child: CustomText(
-                        text: 'Set as alarm background',
+                        text: "Définir comme arrière-plan d'alarme",
                         color: AppColors.textWhite,
                       ),
                     ),

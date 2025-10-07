@@ -49,7 +49,7 @@ class NotificationHelper {
 
     await flutterLocalNotificationsPlugin.show(
       alarmId, // Unique notification ID
-      'Upcoming Alarm', // Title
+      'Alarme a venir', // Title
       message, // Content
       platformChannelSpecifics,
       payload: 'alarm $alarmId',

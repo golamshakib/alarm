@@ -57,7 +57,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
         } else if (File(musicPath).existsSync()) {
           await _audioPlayer.setFilePath(musicPath);
         } else {
-          await _audioPlayer.setAsset('assets/audio/iphone_alarm.mp3');
+          await _audioPlayer.setAsset('assets/audio/hymne.mp3');
         }
 
         await _audioPlayer
@@ -279,7 +279,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                           ),
                           child: const Center(
                             child: CustomText(
-                              text: "Snooze",
+                              text: "répéter",
                               color: AppColors.yellow,
                               fontWeight: FontWeight.w600,
                             ),
@@ -301,7 +301,7 @@ class _AlarmTriggerScreenState extends State<AlarmTriggerScreen> {
                           ),
                           child: const Center(
                             child: CustomText(
-                              text: "Dismiss",
+                              text: "Fermer",
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),

@@ -91,7 +91,8 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                     ),
                     SizedBox(height: getHeight(10)),
                     CustomText(
-                      text: 'No Alarms Set Yet!',
+                      text: 'Ajouter de nouvelles alarmes',
+                      textAlign: TextAlign.center,
                       fontWeight: FontWeight.w700,
                       fontSize: getWidth(32),
                       color: AppColors.textGrey,
@@ -131,8 +132,8 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                                     SizedBox(height: getHeight(16)),
                                     CustomText(
                                       text: controller.isSelectionMode.value
-                                          ? '${controller.selectedAlarms.length} Item Selected'
-                                          : 'My Alarms',
+                                          ? '${controller.selectedAlarms.length} Élément sélectionné'
+                                          : 'Mes alarmes',
                                       fontSize: getWidth(24),
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.textPrimary,
@@ -358,7 +359,7 @@ void _showLabelPopup(BuildContext context, AlarmScreenController controller) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const CustomText(text: 'Delete this alarm?'),
+        title: const CustomText(text: 'Supprimer cette alarme?'),
         actions: [
           Row(
             children: [

@@ -36,7 +36,7 @@ class SettingsController extends GetxController {
       await dbHelper.clearAlarms();
       Get.find<AddAlarmController>().alarms.clear(); // Clear alarms list in UI controller
     } catch (e) {
-      Get.snackbar("Error", "Failed to reset alarms: $e", duration: const Duration(seconds: 2));
+      Get.snackbar("Erreur", "Échec de la réinitialisation des alarmes: $e", duration: const Duration(seconds: 2));
     }
   }
 }

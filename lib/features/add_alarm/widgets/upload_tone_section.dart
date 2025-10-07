@@ -18,7 +18,7 @@ class UploadToneSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() => controller.musicPath.value == null
         ? CustomText(
-      text: "Upload your tone:",
+      text: "télécharger votre music:",
       fontSize: getWidth(16),
       fontWeight: FontWeight.w600,
       color: const Color(0xff333333),
@@ -27,7 +27,7 @@ class UploadToneSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         CustomText(
-          text: "Upload your tone:",
+          text: "télécharger votre music:",
           fontSize: getWidth(16),
           fontWeight: FontWeight.w600,
           color: const Color(0xff333333),
@@ -35,7 +35,7 @@ class UploadToneSection extends StatelessWidget {
         Obx(() => Tooltip(
           message: controller.musicHoverMessage.value.isNotEmpty
               ? controller.musicHoverMessage.value
-              : "Pick an audio file",
+              : "Choisissez un fichier audio",
             child: GestureDetector(
                 onTap: controller.isMusicDisabled.value
                     ? null // Disable interaction if isMusicDisabled is true
@@ -43,7 +43,7 @@ class UploadToneSection extends StatelessWidget {
                   controller.pickMusic();
                 },
                 child: CustomText(
-                  text: "Change",
+                  text: "Modifier",
                   color: controller.isMusicDisabled.value
                       ? Colors.grey // Change text color when disabled
                       : const Color(0xffFFA845),

@@ -16,7 +16,7 @@ class PreviewScreenController extends GetxController {
   Future<void> togglePlay(String audioPath) async {
     try {
       if (audioPath.isEmpty) {
-        Get.snackbar("Error", "Audio file path is empty.", duration: const Duration(seconds: 2));
+        Get.snackbar("Erreur", "Le chemin du fichier audio est vide.", duration: const Duration(seconds: 2));
         return;
       }
 
@@ -42,7 +42,7 @@ class PreviewScreenController extends GetxController {
         isPlaying.value = false;
       }
     } catch (e) {
-      Get.snackbar("Error", "Failed to stop the audio: $e", duration: const Duration(seconds: 2));
+      Get.snackbar("Erreur", "Impossible d'arrêter l'audio: $e", duration: const Duration(seconds: 2));
     }
   }
 

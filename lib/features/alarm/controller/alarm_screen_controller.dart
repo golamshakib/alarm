@@ -112,6 +112,6 @@ class AlarmScreenController extends GetxController {
         selectedAlarms.contains(controller.alarms.indexOf(alarm)));
 
     exitSelectionMode();
-    Get.snackbar("Success", "Selected alarms deleted successfully!");
+    Get.snackbar("Succès", "Les alarmes sélectionnées ont été supprimées avec succès");
   }
 }

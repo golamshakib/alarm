@@ -86,9 +86,9 @@ class AddAlarmController extends GetxController {
   }
 
   /// -- S E T   B A C K G R O U N D --
-  var selectedBackground = "Cute Dog".obs;
+  var selectedBackground = "Hymn of Morocco".obs;
   var selectedBackgroundImage = ImagePath.cat.obs;
-  var selectedMusicPath = 'assets/audio/iphone_alarm.mp3'.obs;
+  var selectedMusicPath = 'assets/audio/hymne.mp3'.obs;
   var selectedRecordingPath = ''.obs;
 
   void updateBackground(String title, String imagePath, String musicPath) {
@@ -120,7 +120,7 @@ class AddAlarmController extends GetxController {
   /// -- E N D   R E P E A T   D A Y S --
 
   /// -- A L A R M   L A B E L   S E C T I O N --
-  var label = 'Morning Alarm'.obs;
+  var label = 'Réveil marocain 🇲🇦'.obs;
 
   void updateLabel(String text) {
     label.value = text;
@@ -214,7 +214,7 @@ class AddAlarmController extends GetxController {
   Future<void> loadScreenPreferences() async {
     final prefs = await SharedPreferences.getInstance();
 
-    label.value = prefs.getString('label') ?? 'Morning Alarm';
+    label.value = prefs.getString('label') ?? 'Réveil marocain 🇲🇦';
     final repeatDaysString = prefs.getString('repeatDays');
     if (repeatDaysString != null) {
       final Map<String, dynamic> repeatDaysMap = jsonDecode(repeatDaysString);
@@ -225,7 +225,7 @@ class AddAlarmController extends GetxController {
     isVibrationEnabled.value = prefs.getBool('isVibrationEnabled') ?? true;
     volume.value = prefs.getDouble('volume') ?? 1.0;
     selectedBackground.value =
-        prefs.getString('selectedBackground') ?? "Cute Dog";
+        prefs.getString('selectedBackground') ?? "Hymn of Morocco";
     selectedBackgroundImage.value =
         prefs.getString('selectedBackgroundImage') ?? ImagePath.cat;
     selectedMusicPath.value = prefs.getString('selectedMusicPath') ?? '';
@@ -244,7 +244,7 @@ class AddAlarmController extends GetxController {
   Future<void> togglePlayPause(int index, String musicPath) async {
     try {
       if (musicPath.isEmpty) {
-        Get.snackbar("Error", "No music file available.",
+        Get.snackbar("Erreur", "Aucun fichier musical disponible.",
             duration: const Duration(seconds: 2));
         return;
       }
@@ -261,7 +261,7 @@ class AddAlarmController extends GetxController {
         } else if (File(musicPath).existsSync()) {
           await audioPlayer.setFilePath(musicPath);
         } else {
-          Get.snackbar("Error", "Invalid music file.",
+          Get.snackbar("Erreur", "Fichier de musique non valide.",
               duration: const Duration(seconds: 2));
           return;
         }
@@ -270,7 +270,7 @@ class AddAlarmController extends GetxController {
         await audioPlayer.play();
       }
     } catch (e) {
-      Get.snackbar("Error", "Failed to play music: $e",
+      Get.snackbar("Erreur", "Échec de la lecture de la musique: $e",
           duration: const Duration(seconds: 2));
     }
   }
@@ -339,12 +339,12 @@ class AddAlarmController extends GetxController {
       hour: alarmHour,
       minute: selectedMinute.value,
       isAm: isAm.value,
-      label: label.value.isEmpty ? 'Morning Alarm' : label.value,
+      label: label.value.isEmpty ? 'Réveil marocain 🇲🇦' : label.value,
       backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
       musicPath: selectedMusicPath.value.isNotEmpty == true
           ? selectedMusicPath.value
-          : "assets/audio/iphone_alarm.mp3",
+          : "assets/audio/hymne.mp3",
       repeatDays: repeatDays.entries
           .where((entry) => entry.value)
           .map((entry) => entry.key)
@@ -375,9 +375,9 @@ class AddAlarmController extends GetxController {
       String message;
       String repeatDaysFormatted = formatRepeatDays(newAlarm.repeatDays);
       if (remainingTime.isNegative || remainingTime.inHours >= 24) {
-        message = 'Alarm set for $repeatDaysFormatted';
+        message = 'Alarme pour $repeatDaysFormatted';
       } else {
-        message = "Alarm set for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
+        message = "Alarme pour $hours heure${hours == 1 ? '' : 's'} Et $minutes minute${minutes == 1 ? '' : 's'}";
       }
 
       Get.snackbar(
@@ -389,14 +389,14 @@ class AddAlarmController extends GetxController {
       String alarmTimeFormatted = "$alarmHour:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
       await NotificationHelper.showPersistentNotification(newAlarm.id!, alarmTimeFormatted, newAlarm.label, newAlarm.repeatDays);
     } catch (e) {
-      Get.snackbar("Error", "Failed to Save Alarm: $e",
+      Get.snackbar("Erreur", "Échec de l'enregistrement de l'alarme: $e",
           duration: const Duration(seconds: 2));
     }
   }
 
   String formatRepeatDays(List<String> repeatDays) {
-    if (repeatDays.isEmpty) return "Today";
-    if (repeatDays.length == 7) return "Everyday";
+    if (repeatDays.isEmpty) return "Aujourd'hui";
+    if (repeatDays.length == 7) return "Tous les jours";
     return repeatDays.join(', ');
   }
 
@@ -440,7 +440,7 @@ class AddAlarmController extends GetxController {
       sortAlarmsChronologically(alarms.toList());
       update();
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch alarms: $e",
+      Get.snackbar("Erreur", "Échec de la récupération des alarmes: $e",
           duration: const Duration(seconds: 2));
     }
   }
@@ -467,7 +467,7 @@ class AddAlarmController extends GetxController {
       hour: selectedHour.value,
       minute: selectedMinute.value,
       isAm: isAm.value,
-      label: label.value.isEmpty ? 'Morning Alarm' : label.value,
+      label: label.value.isEmpty ? 'Réveil marocain 🇲🇦' : label.value,
       backgroundTitle: selectedBackground.value,
       backgroundImage: selectedBackgroundImage.value,
       musicPath: selectedMusicPath.value,
@@ -506,9 +506,9 @@ class AddAlarmController extends GetxController {
       String repeatDaysFormatted = formatRepeatDays(updatedAlarm.repeatDays);
 
       if (remainingTime.isNegative || remainingTime.inHours >= 24) {
-        updateMessage = 'Alarm updated for $repeatDaysFormatted';
+        updateMessage = 'Alarme mise à jour pour $repeatDaysFormatted';
       } else {
-        updateMessage = "Alarm updated for $hours hour${hours == 1 ? '' : 's'} and $minutes minute${minutes == 1 ? '' : 's'}";
+        updateMessage = "Alarme mise à jour pour $hours heure${hours == 1 ? '' : 's'} Et $minutes minute${minutes == 1 ? '' : 's'}";
       }
 
       Get.snackbar(
@@ -520,7 +520,7 @@ class AddAlarmController extends GetxController {
       String alarmTimeFormatted = "${selectedHour.value}:${selectedMinute.value < 10 ? '0' : ''}${selectedMinute.value}";
       await NotificationHelper.showPersistentNotification(updatedAlarm.id!, alarmTimeFormatted, updatedAlarm.label, updatedAlarm.repeatDays);
     } catch (e) {
-      Get.snackbar("Error", "Failed to update alarm: $e",
+      Get.snackbar("Erreur", "Échec de la mise à jour de l'alarme: $e",
           duration: const Duration(seconds: 2)); 
     } 
   }
@@ -550,10 +550,10 @@ class AddAlarmController extends GetxController {
     try {
       await dbHelper.deleteAlarm(id);
       alarms.removeWhere((alarm) => alarm.id == id);
-      Get.snackbar("Success", "Alarm deleted successfully!",
+      Get.snackbar("Succès", "Alarme supprimée avec succès",
           duration: const Duration(seconds: 2));
     } catch (e) {
-      Get.snackbar("Error", "Failed to delete alarm: $e",
+      Get.snackbar("Erreur", "Échec de la suppression de l'alarme: $e",
           duration: const Duration(seconds: 2));
     }
   }

@@ -40,7 +40,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
               children: [
                 // AppBar
                 CustomAppbarWithLogo(
-                  text: "Create New",
+                  text: "Créer une alarme",
                   showBackIcon: true,
                   iconPath: IconPath.deleteIcon,
                   onIconTap: (){
@@ -58,7 +58,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomText(
-                        text: "Background Title:",
+                        text: "Nom de l’alarme:",
                         fontSize: getWidth(16),
                         fontWeight: FontWeight.w600,
                         color: const Color(0xff333333),
@@ -77,7 +77,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                             controller.labelText.value = value;
                           },
                           decoration: InputDecoration(
-                            hintText: 'Background title',
+                            hintText: 'Nom de l’alarme',
                             hintStyle: GoogleFonts.poppins(color: const Color(0xffA59F92), fontSize: getWidth(14)),
                             border: InputBorder.none,
                             focusedBorder: InputBorder.none,
@@ -134,7 +134,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                                       width: getWidth(8),
                                     ),
                                     CustomText(
-                                      text: "Upload your image",
+                                      text: "telecharger votre image",
                                       color: const Color(0xffA59F92),
                                       fontWeight: FontWeight.w400,
                                       fontSize: getWidth(14),
@@ -158,7 +158,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                       Obx(() => Tooltip(
                         message: controller.musicHoverMessage.value.isNotEmpty
                             ? controller.musicHoverMessage.value
-                            : "Pick an audio file",
+                            : "Choisissez un fichier audio",
                           child: GestureDetector(
                             onTap: controller.isMusicDisabled.value
                                 ? null
@@ -238,7 +238,7 @@ class CreateNewBackgroundScreen extends StatelessWidget {
                                                 width: getWidth(8),
                                               ),
                                               CustomText(
-                                                text: "Upload your Audio file",
+                                                text: "telecharger votre son",
                                                 fontSize: getWidth(14),
                                                 fontWeight: FontWeight.w400,
                                                 color: controller.isMusicDisabled.value

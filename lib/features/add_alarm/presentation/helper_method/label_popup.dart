@@ -11,7 +11,7 @@ void showLabelPopup(BuildContext context, AddAlarmController controller) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const CustomText(text: 'Label:'),
+        title: const CustomText(text: 'Nom:'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

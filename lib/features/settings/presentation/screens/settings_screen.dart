@@ -20,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const CustomAppbarWithLogo(text: 'Settings'),
+            const CustomAppbarWithLogo(text: 'Paramètres'),
             SizedBox(height: getHeight(24)),
             Container(
               padding: const EdgeInsets.all(16),
@@ -31,12 +31,12 @@ class SettingsScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const CustomText(text: 'Time format'),
+                  const CustomText(text: 'format'),
                   GestureDetector(
                     onTap: () => _timeFormatPopup(context, controller),
                     child: Obx(() => TextWithArrow(
                       text:
-                      '${controller.selectedTime.value} Hour',
+                      '${controller.selectedTime.value} heure',
                     )),
                   ),
                 ],
@@ -53,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const CustomText(text: 'Reset Alarms'),
+                  const CustomText(text: 'réinitialisé les alarmes'),
                   GestureDetector(
                     onTap: () => _resetAlarmPopup(context, controller),
                     child: const TextWithArrow(
@@ -84,7 +84,7 @@ void _timeFormatPopup(BuildContext context, SettingsController controller) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title
-            const CustomText(text: 'Time Format:'),
+            const CustomText(text: 'format:'),
             SizedBox(height: getHeight(10)),
 
             Obx(() {
@@ -99,7 +99,7 @@ void _timeFormatPopup(BuildContext context, SettingsController controller) {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: CustomText(
-                            text: '$option Hour',
+                            text: '$option heure',
                             fontSize: getWidth(14),
                             fontWeight: FontWeight.w400,
                             color: isSelected
@@ -193,7 +193,7 @@ void _resetAlarmPopup(BuildContext context, SettingsController controller) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title
-            const CustomText(text: 'Reset All Alarms?'),
+            const CustomText(text: 'Réinitialiser toutes les alarmes ?'),
             SizedBox(height: getHeight(16)),
             Row(
               children: [
@@ -228,8 +228,7 @@ void _resetAlarmPopup(BuildContext context, SettingsController controller) {
                       await controller.resetAllAlarms();
 
                       Get.snackbar(
-                        "Success",
-                        "All alarms have been reset.", duration: const Duration(seconds: 2)
+                        "Succès","Toutes les alarmes ont été réinitialisées", duration: const Duration(seconds: 2)
                       );
                     },
                     child: Container(

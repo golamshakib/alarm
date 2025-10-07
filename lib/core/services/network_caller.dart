@@ -90,7 +90,7 @@ class NetworkCaller {
             isSuccess: false,
             statusCode: response.statusCode,
             errorMessage: decodedResponse['error'] ??
-                'Something went wrong. Please try again.',
+                "Une erreur s'est produite. Veuillez réessayer.",
             responseData: null,
           );
       }
@@ -121,14 +121,14 @@ class NetworkCaller {
         isSuccess: false,
         statusCode: 500,
         errorMessage:
-            'Network error occurred. Please check your connection and try again.',
+            'Une erreur réseau s’est produite. Veuillez vérifier votre connexion et réessayer.',
         responseData: null,
       );
     } else {
       return ResponseData(
         isSuccess: false,
         statusCode: 500,
-        errorMessage: 'Unexpected error occurred. Please try again later.',
+        errorMessage: "Une erreur inattendue s'est produite. Veuillez réessayer ultérieurement.",
         responseData: null,
       );
     }

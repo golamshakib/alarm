@@ -69,7 +69,7 @@ class AddAlarmScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomAppbarWithLogo(
-                  text: isEditMode ? 'Edit Alarm' : 'Add Alarm',
+                  text: isEditMode ? 'Modifier une alarme' : 'Ajouter une alarme',
                   iconPath: IconPath.check,
                   onIconTap: () async {
                     if (isEditMode) {
@@ -120,7 +120,7 @@ class AddAlarmScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           CustomText(
-                            text: 'Background:',
+                            text: 'Choisir une alarme:',
                             color: isEditMode
                                 ? AppColors.textGrey
                                 : AppColors.textPrimary,
@@ -190,7 +190,7 @@ class AddAlarmScreen extends StatelessWidget {
                       SizedBox(height: getHeight(24)),
 
                       // Repeat Section
-                      const CustomText(text: 'Repeat:'),
+                      const CustomText(text: 'repetition:'),
                       SizedBox(height: getHeight(8)),
                       Obx(() {
                         return Row(
@@ -227,7 +227,7 @@ class AddAlarmScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const CustomText(text: 'Label:'),
+                          const CustomText(text: 'Nom:'),
                           GestureDetector(
                             onTap: () {
                               showLabelPopup(context, controller);
@@ -239,7 +239,7 @@ class AddAlarmScreen extends StatelessWidget {
                                   child: TextWithArrow(
                                     text: controller.label.value.isNotEmpty
                                         ? controller.label.value
-                                        : "Morning Alarm",
+                                        : "Réveil marocain 🇲🇦",
                                   ),
                                 )),
                           ),
@@ -252,7 +252,7 @@ class AddAlarmScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const CustomText(text: 'Snooze:'),
+                          const CustomText(text: 'repetition:'),
                           GestureDetector(
                             onTap: () => showSnoozePopup(context, controller),
                             child: Obx(() => TextWithArrow(

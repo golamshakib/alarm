@@ -41,13 +41,13 @@ class ChangeBackgroundScreenController extends GetxController {
           }).toList();
           isPlaying.value = List.generate(items.length, (_) => false);
         } else {
-          Get.snackbar("Error", "Invalid response: data field missing.", duration: const Duration(seconds: 2));
+          Get.snackbar("Erreur", "Réponse non valide : champ de données manquant", duration: const Duration(seconds: 2));
         }
       } else {
-        Get.snackbar("Error", response.errorMessage, duration: const Duration(seconds: 2));
+        Get.snackbar("Erreur", response.errorMessage, duration: const Duration(seconds: 2));
       }
     } catch (e) {
-      Get.snackbar("Error", "An unexpected error occurred while fetching data.", duration: const Duration(seconds: 2));
+      Get.snackbar("Erreur", "Une erreur inattendue s'est produite lors de la récupération des données", duration: const Duration(seconds: 2));
     }
   }
 
@@ -55,7 +55,7 @@ class ChangeBackgroundScreenController extends GetxController {
     try {
       final musicPath = items[index]['musicPath'];
       if (musicPath == null || musicPath.isEmpty) {
-        Get.snackbar("Error", "Invalid music path for this item.", duration: const Duration(seconds: 2));
+        Get.snackbar("Erreur", "Chemin de musique non valide pour cet élément", duration: const Duration(seconds: 2));
         return;
       }
 

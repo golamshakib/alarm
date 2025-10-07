@@ -54,7 +54,7 @@ class CreateNewBackgroundController extends GetxController {
     final filePath = item['musicPath'] ?? item['recordingPath'];
 
     if (filePath == null || !File(filePath).existsSync()) {
-      musicHoverMessage.value = "No audio file found!";
+      musicHoverMessage.value = "Aucun fichier audio trouvé !";
 
       return;
     }
@@ -77,7 +77,7 @@ class CreateNewBackgroundController extends GetxController {
       }
     } catch (e) {
       musicHoverMessage.value =
-          "Failed to play audio: $e";
+          "Échec de la lecture audio: $e";
     }
   }
 
@@ -126,7 +126,7 @@ class CreateNewBackgroundController extends GetxController {
   Future<void> pickMusic() async {
     if (isMusicDisabled.value) {
       musicHoverMessage.value =
-          "Recording is in progress or completed. Reset to enable music selection.";
+          "L'enregistrement est en cours ou terminé. Réinitialiser pour activer la sélection musicale.";
       return;
     }
 
@@ -137,7 +137,7 @@ class CreateNewBackgroundController extends GetxController {
     if (result != null) {
       musicPath.value = result.files.single.path;
       isMusicSelected.value = true;
-      musicHoverMessage.value = "Music file selected successfully.";
+      musicHoverMessage.value = "Fichier musical sélectionné avec succès";
     }
   }
 
@@ -145,23 +145,23 @@ class CreateNewBackgroundController extends GetxController {
 
   void saveData({int? id}) async {
     if (!isImageSelected.value) {
-      Get.snackbar("Error", "Please select an image before saving background.",
+      Get.snackbar("Erreur", "Veuillez sélectionner une image avant d'enregistrer l'arrière-plan.",
           duration: const Duration(seconds: 2));
       return;
     }
     if (!isMusicSelected.value) {
       Get.snackbar(
-          "Error", "Please select a music file before saving background.",
+          "Erreur", "Veuillez sélectionner un fichier musical avant d'enregistrer l'arrière-plan",
           duration: const Duration(seconds: 2));
       return;
     }
 
     final result = {
       'title':
-          labelText.value.isNotEmpty ? labelText.value : 'Background Title',
+          labelText.value.isNotEmpty ? labelText.value : "Titre de l'arrière-plan",
       'imagePath': imagePath.value,
       'musicPath': musicPath.value,
-      'type': musicPath.value != null ? 'music' : 'recording',
+      'type': musicPath.value != null ? 'musique' : 'recording',
     };
 
     final dbHelper = DBHelperMusic();
@@ -170,7 +170,7 @@ class CreateNewBackgroundController extends GetxController {
       if (id != null) {
         int rowsUpdated = await dbHelper.updateBackground(result, id);
         if (rowsUpdated > 0) {
-          Get.snackbar("Success", "Background updated successfully!",
+          Get.snackbar("Succès", "L'arrière-plan a été mis à jour avec succès !",
               duration: const Duration(seconds: 2));
           int indexToUpdate =
               items.indexWhere((element) => element['id'] == id);
@@ -179,13 +179,13 @@ class CreateNewBackgroundController extends GetxController {
             items.refresh();
           }
         } else {
-          Get.snackbar("Error", "Failed to update background.",
+          Get.snackbar("Erreur", "Échec de la mise à jour de l'arrière-plan.",
               duration: const Duration(seconds: 2));
         }
       } else {
         await dbHelper.insertBackground(result);
         addItem(result);
-        Get.snackbar("Success", "Background saved successfully!",
+        Get.snackbar("Succès", "Sauvegarder avec succès",
             duration: const Duration(seconds: 2));
       }
 
@@ -194,7 +194,7 @@ class CreateNewBackgroundController extends GetxController {
       Get.off(const LocalBackgroundScreen(), arguments: result);
     } catch (e) {
       log('Error saving data: $e');
-      Get.snackbar("Error", "Failed to save background: $e",
+      Get.snackbar("Erreur", "Échec de l'enregistrement de l'arrière-plan: $e",
           duration: const Duration(seconds: 2));
     }
   }

@@ -44,7 +44,7 @@ class OnBoarding2Screen extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: getWidth(8)),
                       child: RichText(
                         text: TextSpan(
-                          text: 'Choose from a wide variety of ',
+                          text: 'Réveillez-vous au son d\'un vendeur',
                           style: GoogleFonts.poppins(
                             fontSize: getWidth(32),
                             color: AppColors.textSecondary,
@@ -52,7 +52,7 @@ class OnBoarding2Screen extends StatelessWidget {
                           ),
                           children: [
                             TextSpan(
-                              text: 'animal',
+                              text: ' ambulant,',
                               style: GoogleFonts.poppins(
                                 fontSize: getWidth(32),
                                 color: AppColors.textYellow,
@@ -60,18 +60,10 @@ class OnBoarding2Screen extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: ' images and ',
+                              text: ' comme autrefois.',
                               style: GoogleFonts.poppins(
                                 fontSize: getWidth(32),
                                 color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'sounds',
-                              style: GoogleFonts.poppins(
-                                fontSize: getWidth(32),
-                                color: AppColors.textYellow,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
